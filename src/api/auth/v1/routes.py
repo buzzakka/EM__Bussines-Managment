@@ -1,6 +1,7 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from pydantic import EmailStr
 
+from src.api.auth.v1.services.invite import InviteService
 from src.api.auth.v1.models.user import UserModel
 from src.api.auth.v1.services.user import UserService
 from src.core.utils.unit_of_work import UnitOfWork
@@ -19,4 +20,10 @@ async def check_account(
     uow: UnitOfWork = Depends(UnitOfWork)
 ):
     user: UserModel = await UserService.get_by_query_one_or_none(uow=uow, email=account)
-    return user
+
+    if user is not None:
+        raise HTTPException(status_code=400, detail='Пользователь уже зарегестрирован.')
+
+    invite = await InviteService.create_invite_token(uow=uow, email=account)
+
+    return invite
