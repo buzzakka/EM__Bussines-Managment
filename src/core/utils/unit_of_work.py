@@ -1,5 +1,7 @@
 from abc import ABC, abstractmethod
 
+from src.api.auth.v1.repositories.invite import InviteRepository
+from src.api.auth.v1.repositories.user import UserRepository
 from src.core.database.db import async_session_maker
 
 
@@ -33,6 +35,9 @@ class UnitOfWork(AbstractUnitOfWork):
 
     async def __aenter__(self):
         self.session = self.session_factory()
+        
+        self.user = UserRepository(self.session)
+        self.invite = InviteRepository(self.session)
 
     async def __aexit__(self, exc_type, *args, **kwargs):
         if not exc_type:
