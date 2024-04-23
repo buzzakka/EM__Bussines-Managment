@@ -1,3 +1,4 @@
+from copy import deepcopy
 from sqlalchemy.orm import Mapped, mapped_column
 
 from src.api.auth.v1.schemas.user import UserSchema
@@ -22,9 +23,6 @@ class UserModel(Base):
     updated_at: Mapped[updated_at_T]
 
     def to_pydantic_schema(self):
-        return UserSchema(
-            id=self.id,
-            email=self.email,
-            first_name=self.first_name,
-            last_name=self.last_name
-        )
+        dict_copy: dict = deepcopy(self.__dict__)
+        dict_copy.pop('_sa_instance_state')
+        return UserSchema(**dict_copy)
