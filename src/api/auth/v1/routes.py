@@ -1,6 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import EmailStr
 
+from src.api.auth.v1.models.invite import InviteModel
+from src.api.auth.v1.schemas.user import SignUpRequestSchema
 from src.api.auth.v1.services.invite import InviteService
 from src.api.auth.v1.models.user import UserModel
 from src.api.auth.v1.services.user import UserService
@@ -27,3 +29,24 @@ async def check_account(
     invite = await InviteService.create_invite_token(uow=uow, email=account)
 
     return invite
+
+
+@router.post(
+    path='/sign-up-complete',
+)
+async def sign_up_complete(
+    info: SignUpRequestSchema,
+    uow: UnitOfWork = Depends(UnitOfWork)
+):
+    db_token: InviteModel = await InviteService.get_by_query_one_or_none(
+        uow, 
+        email=info.account,
+        token=info.invite_token
+    )
+
+    if db_token is None:
+        raise HTTPException(status_code=400, detail='Некорректные данные.')
+
+    db_token: InviteModel = await InviteService.update_one_by_id(uow=uow, _id=db_token.id, values={'is_confirmed': True})
+
+    return db_token

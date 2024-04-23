@@ -11,3 +11,8 @@ class UserSchema(BaseModel):
     is_active: bool
     created_at: datetime
     updated_at: datetime
+
+
+class SignUpRequestSchema(BaseModel):
+    account: EmailStr
+    invite_token: str
