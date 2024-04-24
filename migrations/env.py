@@ -9,6 +9,8 @@ from src.core.config import settings
 from src.core.models.base import Base
 from src.api.auth.v1.models.user import UserModel
 from src.api.auth.v1.models.invite import InviteModel
+from src.api.auth.v1.models.account import AccountModel
+from src.api.auth.v1.models.secret import SecretModel
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
