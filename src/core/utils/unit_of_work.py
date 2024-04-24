@@ -4,6 +4,7 @@ from src.api.auth.v1.repositories.account import AccountRepository
 from src.api.auth.v1.repositories.secret import SecretRepository
 from src.api.auth.v1.repositories.invite import InviteRepository
 from src.api.auth.v1.repositories.user import UserRepository
+from src.api.company.v1.repositories.company import CompanyRepository
 from src.core.database.db import async_session_maker
 
 
@@ -42,6 +43,7 @@ class UnitOfWork(AbstractUnitOfWork):
         self.invite = InviteRepository(self.session)
         self.secret = SecretRepository(self.session)
         self.account = AccountRepository(self.session)
+        self.company = CompanyRepository(self.session)
 
     async def __aexit__(self, exc_type, *args, **kwargs):
         if not exc_type:

@@ -1,15 +1,15 @@
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import EmailStr
 
-from src.api.auth.v1.models.invite import InviteModel
-from src.api.auth.v1.schemas.user import SignUpRequestSchema
-from src.api.auth.v1.services.account import AccountService
-from src.api.auth.v1.models.account import AccountModel
-
-from src.api.auth.v1.services.invite import InviteService
-from src.api.auth.v1.models.user import UserModel
-from src.api.auth.v1.services.user import UserService
 from src.core.utils.unit_of_work import UnitOfWork
+from src.api.auth.v1.services.auth import AuthService
+from src.api.auth.v1.services.account import AccountService
+from src.api.auth.v1.services.invite import InviteService
+from src.api.auth.v1.models.invite import InviteModel
+from src.api.auth.v1.models.account import AccountModel
+from src.api.auth.v1.schemas.user import SignUpCompleteRequestSchema, SignUpRequestSchema
+from src.api.auth.v1.exceptions import RegistrationError
+
 
 router: APIRouter = APIRouter(
     prefix='/v1/auth',
@@ -55,11 +55,15 @@ async def sign_up(
     return {'status': 'success', 'email': info.account}
 
 
-# @router.post(
-#     path='/sign-up-complete'
-# )
-# async def sign_up_complete(
-#     user_data: SignUpCompleteRequestSchema,
-#     uow: UnitOfWork = Depends(UnitOfWork)
-# ):
-#     return
+@router.post(
+    path='/sign-up-complete'
+)
+async def sign_up_complete(
+    user_data: SignUpCompleteRequestSchema,
+    uow: UnitOfWork = Depends(UnitOfWork)
+):
+    try:
+        await AuthService.register_user(uow=uow, user_data=user_data.model_dump())
+    except RegistrationError as e:
+        raise HTTPException(status_code=400, detail=e.message)
+    return
