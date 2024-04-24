@@ -1,7 +1,11 @@
 from sqlalchemy.orm import Mapped
 
 from src.core.models.base import Base
-from src.core.models.mixins.custom_types import int_pk_T
+from src.core.models.mixins.custom_types import (
+    int_pk_T,
+    created_at_T,
+    updated_at_T
+)
 
 
 class CompanyModel(Base):
@@ -9,3 +13,5 @@ class CompanyModel(Base):
     
     id: Mapped[int_pk_T]
     name: Mapped[str]
+    created_at: Mapped[created_at_T]
+    updated_at: Mapped[updated_at_T]
