@@ -7,6 +7,14 @@ from sqlalchemy.ext.asyncio import AsyncSession
 class AbstractRepository(ABC):
     
     @abstractmethod
+    async def add_one(self, *args, **kwargs):
+        raise NotImplementedError
+    
+    @abstractmethod
+    async def add_one_and_get_obj(self, *args, **kwargs):
+        raise NotImplementedError
+    
+    @abstractmethod
     async def get_by_query_one_or_none(self, *args, **kwargs):
         raise NotImplementedError
     
@@ -25,6 +33,15 @@ class SqlAlchemyRepository(AbstractRepository):
 
     def __init__(self, session: AsyncSession):
         self.session = session
+    
+    async def add_one(self, *args, **kwargs):
+        query = insert(self.model).values(**kwargs)
+        await self.session.execute(query)
+    
+    async def add_one_and_get_obj(self, **kwargs) -> type(model):
+        query = insert(self.model).values(**kwargs).returning(self.model)
+        _obj: Result = await self.session.execute(query)
+        return _obj.scalar_one()
     
     async def get_by_query_one_or_none(self, *args, **kwargs) -> type(model) | None:
         query = select(self.model).filter_by(**kwargs)
