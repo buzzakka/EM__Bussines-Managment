@@ -2,15 +2,18 @@ from fastapi import APIRouter, Depends, HTTPException
 from pydantic import EmailStr
 
 from src.api.auth.v1.models.invite import InviteModel
-from src.api.auth.v1.schemas.user import SignUpRequestSchema
+from src.api.auth.v1.schemas.user import (
+    SignUpCompleteRequestSchema,
+    SignUpRequestSchema
+)
 from src.api.auth.v1.services.invite import InviteService
 from src.api.auth.v1.models.user import UserModel
 from src.api.auth.v1.services.user import UserService
 from src.core.utils.unit_of_work import UnitOfWork
 
 router: APIRouter = APIRouter(
-    prefix='/v1',
-    tags=['v1']
+    prefix='/v1/auth',
+    tags=['v1', 'auth']
 )
 
 
@@ -32,9 +35,9 @@ async def check_account(
 
 
 @router.post(
-    path='/sign-up-complete',
+    path='/sign-up',
 )
-async def sign_up_complete(
+async def sign_up(
     info: SignUpRequestSchema,
     uow: UnitOfWork = Depends(UnitOfWork)
 ):
@@ -50,3 +53,13 @@ async def sign_up_complete(
     db_token: InviteModel = await InviteService.update_one_by_id(uow=uow, _id=db_token.id, values={'is_confirmed': True})
 
     return db_token
+
+
+@router.post(
+    path='/sign-up-complete'
+)
+async def sign_up_complete(
+    user_data: SignUpCompleteRequestSchema,
+    uow: UnitOfWork = Depends(UnitOfWork)
+):
+    return
