@@ -2,10 +2,10 @@ from fastapi import APIRouter, Depends, HTTPException
 from pydantic import EmailStr
 
 from src.api.auth.v1.models.invite import InviteModel
-from src.api.auth.v1.schemas.user import (
-    SignUpCompleteRequestSchema,
-    SignUpRequestSchema
-)
+from src.api.auth.v1.schemas.user import SignUpRequestSchema
+from src.api.auth.v1.services.account import AccountService
+from src.api.auth.v1.models.account import AccountModel
+
 from src.api.auth.v1.services.invite import InviteService
 from src.api.auth.v1.models.user import UserModel
 from src.api.auth.v1.services.user import UserService
@@ -24,9 +24,9 @@ async def check_account(
     account: EmailStr,
     uow: UnitOfWork = Depends(UnitOfWork)
 ):
-    user: UserModel = await UserService.get_by_query_one_or_none(uow=uow, email=account)
+    account_obj: AccountModel = await AccountService.get_by_query_one_or_none(uow=uow, email=account)
 
-    if user is not None:
+    if account_obj is not None:
         raise HTTPException(status_code=400, detail='Пользователь уже зарегестрирован.')
 
     invite = await InviteService.create_invite_token(uow=uow, email=account)
@@ -52,14 +52,14 @@ async def sign_up(
 
     db_token: InviteModel = await InviteService.update_one_by_id(uow=uow, _id=db_token.id, values={'is_confirmed': True})
 
-    return db_token
+    return {'status': 'success', 'email': info.account}
 
 
-@router.post(
-    path='/sign-up-complete'
-)
-async def sign_up_complete(
-    user_data: SignUpCompleteRequestSchema,
-    uow: UnitOfWork = Depends(UnitOfWork)
-):
-    return
+# @router.post(
+#     path='/sign-up-complete'
+# )
+# async def sign_up_complete(
+#     user_data: SignUpCompleteRequestSchema,
+#     uow: UnitOfWork = Depends(UnitOfWork)
+# ):
+#     return

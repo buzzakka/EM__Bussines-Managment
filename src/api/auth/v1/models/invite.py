@@ -12,7 +12,7 @@ class InviteModel(Base):
     id: Mapped[int_pk_T]
     email: Mapped[str]
     token: Mapped[str]
-    status: Mapped[bool] = mapped_column(default=False)
+    is_confirmed: Mapped[bool] = mapped_column(default=False)
     created_at: Mapped[created_at_T]
     
     def to_pydantic_schema(self):

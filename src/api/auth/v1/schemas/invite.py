@@ -6,5 +6,5 @@ class InviteSchema(BaseModel):
     id: int
     email: str
     token: str
-    status: bool
+    is_confirmed: bool
     created_at: datetime

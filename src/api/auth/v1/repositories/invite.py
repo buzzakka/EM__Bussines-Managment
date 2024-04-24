@@ -1,4 +1,3 @@
-from random import randint
 from src.api.auth.v1.models.invite import InviteModel
 from src.core.utils.repository import SqlAlchemyRepository
 
