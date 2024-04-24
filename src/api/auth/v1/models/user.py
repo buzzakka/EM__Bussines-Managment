@@ -14,11 +14,8 @@ class UserModel(Base):
     __tablename__ = 'user'
 
     id: Mapped[int_pk_T]
-    email: Mapped[str] = mapped_column(unique=True)
-    password: Mapped[bytes]
     first_name: Mapped[str]
     last_name: Mapped[str]
-    is_active: Mapped[bool] = mapped_column(default=True)
     created_at: Mapped[created_at_T]
     updated_at: Mapped[updated_at_T]
 
