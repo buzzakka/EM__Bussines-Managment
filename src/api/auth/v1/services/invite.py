@@ -30,5 +30,8 @@ class InviteService(BaseService):
 
         if db_token is None:
             raise exceptions.incorrect_account_or_invite_token()
+        
+        if db_token.is_confirmed:
+            raise exceptions.invite_token_already_confirmed()
 
         await cls.update_one_by_id(uow=uow, _id=db_token.id, values={'is_confirmed': True})
