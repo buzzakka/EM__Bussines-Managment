@@ -7,10 +7,9 @@ from src.api.auth.v1.models.account import AccountModel
 from src.api.auth.v1.models.invite import InviteModel
 
 from src.core.utils.unit_of_work import UnitOfWork
-from src.core.utils.service import BaseService
 
 
-class AuthService(BaseService):
+class RegistrationService:
 
     @classmethod
     async def register_user(

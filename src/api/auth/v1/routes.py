@@ -2,12 +2,12 @@ from fastapi import APIRouter, Depends, HTTPException
 from pydantic import EmailStr
 
 from src.core.utils.unit_of_work import UnitOfWork
-from src.api.auth.v1.services.auth import AuthService
+from src.api.auth.v1.services.registration import RegistrationService
 from src.api.auth.v1.services.account import AccountService
 from src.api.auth.v1.services.invite import InviteService
 from src.api.auth.v1.models.invite import InviteModel
 from src.api.auth.v1.models.account import AccountModel
-from src.api.auth.v1.schemas.user import SignUpCompleteRequestSchema, SignUpRequestSchema
+from src.api.auth.v1.schemas.user import SignUpCompleteRequestSchema, SignUpRequestSchema, UserLoginSchema
 from src.api.auth.v1.exceptions import RegistrationError
 
 
@@ -63,7 +63,18 @@ async def sign_up_complete(
     uow: UnitOfWork = Depends(UnitOfWork)
 ):
     try:
-        await AuthService.register_user(uow=uow, user_data=user_data.model_dump())
+        await RegistrationService.register_user(uow=uow, user_data=user_data.model_dump())
     except RegistrationError as e:
         raise HTTPException(status_code=400, detail=e.message)
     return
+
+
+@router.post('/login')
+async def auth_user(
+    user: UserLoginSchema
+):
+  async with UnitOfWork():
+    AccountService.add_one(UnitOfWork, email='qew@qwe.ru')
+    AccountService.add_one(UnitOfWork, email='qew1@qwe.ru')
+    # raise
+    AccountService.add_one(UnitOfWork, email='qew@qwe2.ru')

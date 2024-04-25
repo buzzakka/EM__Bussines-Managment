@@ -44,6 +44,8 @@ class UnitOfWork(AbstractUnitOfWork):
         self.secret = SecretRepository(self.session)
         self.account = AccountRepository(self.session)
         self.company = CompanyRepository(self.session)
+        
+        return self
 
     async def __aexit__(self, exc_type, *args, **kwargs):
         if not exc_type:
