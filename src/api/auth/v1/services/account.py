@@ -10,4 +10,4 @@ class AccountService(BaseService):
         uow: UnitOfWork,
         email: str
     ) -> bool:
-        return await uow.account.get_by_query_one_or_none(email=email) is not None
+        return await cls.get_by_query_one_or_none(uow, email=email) is not None
