@@ -1,6 +1,9 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import EmailStr
 
+from src.api.auth.v1.schemas.token import TokenInfo
+from src.api.auth.v1 import utils
+from src.api.auth.v1.services.secret import SecretService
 from src.core.utils.unit_of_work import UnitOfWork
 from src.api.auth.v1.services.registration import RegistrationService
 from src.api.auth.v1.services.account import AccountService
@@ -27,7 +30,8 @@ async def check_account(
     account_obj: AccountModel = await AccountService.get_by_query_one_or_none(uow=uow, email=account)
 
     if account_obj is not None:
-        raise HTTPException(status_code=400, detail='Пользователь уже зарегестрирован.')
+        raise HTTPException(
+            status_code=400, detail='Пользователь уже зарегестрирован.')
 
     invite = await InviteService.create_invite_token(uow=uow, email=account)
 
@@ -42,7 +46,7 @@ async def sign_up(
     uow: UnitOfWork = Depends(UnitOfWork)
 ):
     db_token: InviteModel = await InviteService.get_by_query_one_or_none(
-        uow, 
+        uow,
         email=info.account,
         token=info.invite_token
     )
@@ -69,12 +73,25 @@ async def sign_up_complete(
     return
 
 
-@router.post('/login')
+@router.post('/login', response_model=TokenInfo)
 async def auth_user(
-    user: UserLoginSchema
+    user: UserLoginSchema,
+    uow: UnitOfWork = Depends(UnitOfWork)
 ):
-  async with UnitOfWork():
-    AccountService.add_one(UnitOfWork, email='qew@qwe.ru')
-    AccountService.add_one(UnitOfWork, email='qew1@qwe.ru')
-    # raise
-    AccountService.add_one(UnitOfWork, email='qew@qwe2.ru')
+    hashed_password: bytes = await SecretService.get_password_by_email(uow, user.email)
+    is_valid_password: bool = utils.validate_password(user.password, hashed_password)
+    if not is_valid_password:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail='Неверные логин или пароль.'
+        )
+    
+    payload: dict = {
+        'sub': user.email,
+        'email': user.email
+    }
+    token: str = utils.encode_jwt(payload=payload)
+    return TokenInfo(
+        access_token=token,
+        token_type='Bearer'
+    )
