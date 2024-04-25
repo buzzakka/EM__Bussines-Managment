@@ -2,9 +2,10 @@ from copy import deepcopy
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column
 
-from src.api.auth.v1.schemas.secret import SecretSchema
 from src.core.models.base import Base
 from src.core.models.mixins.custom_types import int_pk_T
+
+from src.api.auth.v1.schemas import SecretSchema
 
 
 class SecretModel(Base):

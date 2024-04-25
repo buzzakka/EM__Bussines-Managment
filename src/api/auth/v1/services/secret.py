@@ -1,5 +1,4 @@
-from src.core.utils.unit_of_work import UnitOfWork
-from src.core.utils.service import BaseService
+from src.core.utils import UnitOfWork, BaseService
 
 
 class SecretService(BaseService):

@@ -1,13 +1,14 @@
 from copy import deepcopy
 from sqlalchemy.orm import Mapped
 
-from src.api.auth.v1.schemas.user import UserSchema
 from src.core.models.base import Base
 from src.core.models.mixins.custom_types import (
     int_pk_T,
     created_at_T,
     updated_at_T
 )
+
+from src.api.auth.v1.schemas import UserSchema
 
 
 class UserModel(Base):

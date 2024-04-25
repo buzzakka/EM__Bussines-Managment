@@ -1,10 +1,12 @@
-from src.api.auth.v1.services.account import AccountService
+from src.api.auth.v1.services import AccountService
 from src.api.auth.v1.exceptions import RegistrationError
 from src.api.auth.v1.utils import hash_password
 
-from src.api.auth.v1.models.user import UserModel
-from src.api.auth.v1.models.account import AccountModel
-from src.api.auth.v1.models.invite import InviteModel
+from src.api.auth.v1.models import (
+    UserModel,
+    AccountModel,
+    InviteModel,
+)
 
 from src.core.utils.unit_of_work import UnitOfWork
 

@@ -1,5 +1,5 @@
-from src.api.auth.v1.models.account import AccountModel
-from src.core.utils.repository import SqlAlchemyRepository
+from src.core.utils import SqlAlchemyRepository
+from src.api.auth.v1.models import AccountModel
 
 
 class AccountRepository(SqlAlchemyRepository):

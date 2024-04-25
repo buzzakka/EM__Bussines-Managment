@@ -1,8 +1,7 @@
 from sqlalchemy import Result, select
 
-from src.api.auth.v1.models.account import AccountModel
-from src.api.auth.v1.models.secret import SecretModel
-from src.core.utils.repository import SqlAlchemyRepository
+from src.core.utils import SqlAlchemyRepository
+from src.api.auth.v1.models import AccountModel, SecretModel
 
 
 class SecretRepository(SqlAlchemyRepository):

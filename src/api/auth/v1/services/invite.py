@@ -1,8 +1,7 @@
 from random import randint
 
-from src.core.utils.unit_of_work import UnitOfWork
-from src.api.auth.v1.models.invite import InviteModel
-from src.core.utils.service import BaseService
+from src.core.utils import UnitOfWork, BaseService
+from src.api.auth.v1.models import InviteModel
 
 
 class InviteService(BaseService):

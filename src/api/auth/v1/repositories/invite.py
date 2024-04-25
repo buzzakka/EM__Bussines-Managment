@@ -1,5 +1,5 @@
-from src.api.auth.v1.models.invite import InviteModel
-from src.core.utils.repository import SqlAlchemyRepository
+from src.core.utils import SqlAlchemyRepository
+from src.api.auth.v1.models import InviteModel
 
 
 class InviteRepository(SqlAlchemyRepository):

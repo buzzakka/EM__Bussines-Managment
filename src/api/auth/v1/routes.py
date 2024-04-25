@@ -2,16 +2,21 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import HTTPBearer
 from pydantic import EmailStr
 
-from src.api.auth.v1.schemas.token import TokenInfo
+from src.core.utils import UnitOfWork
 from src.api.auth.v1 import utils
-from src.api.auth.v1.services.secret import SecretService
-from src.core.utils.unit_of_work import UnitOfWork
-from src.api.auth.v1.services.registration import RegistrationService
-from src.api.auth.v1.services.account import AccountService
-from src.api.auth.v1.services.invite import InviteService
-from src.api.auth.v1.models.invite import InviteModel
-from src.api.auth.v1.models.account import AccountModel
-from src.api.auth.v1.schemas.user import SignUpCompleteRequestSchema, SignUpRequestSchema, UserLoginSchema
+from src.api.auth.v1.services import (
+    SecretService, 
+    RegistrationService, 
+    AccountService, 
+    InviteService
+)
+from src.api.auth.v1.models import InviteModel, AccountModel
+from src.api.auth.v1.schemas import (
+    TokenSchema,
+    SignUpCompleteRequestSchema, 
+    SignUpRequestSchema, 
+    UserLoginSchema
+)
 from src.api.auth.v1.exceptions import RegistrationError
 
 
@@ -74,7 +79,7 @@ async def sign_up_complete(
     return
 
 
-@router.post('/login', response_model=TokenInfo)
+@router.post('/login', response_model=TokenSchema)
 async def auth_user(
     user: UserLoginSchema,
     uow: UnitOfWork = Depends(UnitOfWork)
@@ -92,7 +97,7 @@ async def auth_user(
         'email': user.email
     }
     token: str = utils.encode_jwt(payload=payload)
-    return TokenInfo(
+    return TokenSchema(
         access_token=token,
         token_type='Bearer'
     )

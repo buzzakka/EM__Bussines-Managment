@@ -10,7 +10,7 @@ from src.core.models.mixins.custom_types import (
 
 class CompanyModel(Base):
     __tablename__ = 'company'
-    
+
     id: Mapped[int_pk_T]
     name: Mapped[str]
     created_at: Mapped[created_at_T]

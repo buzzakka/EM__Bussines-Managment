@@ -1,6 +1,3 @@
-from typing import Any
-
-from pydantic import BaseModel
 from sqlalchemy import Result
 from src.core.models.base import Base
 from src.core.utils.unit_of_work import UnitOfWork
