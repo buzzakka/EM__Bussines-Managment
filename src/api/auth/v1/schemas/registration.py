@@ -1,18 +1,14 @@
-from datetime import datetime
 from pydantic import BaseModel, EmailStr
-
-
-class UserSchema(BaseModel):
-    id: int
-    first_name: str
-    last_name: str
-    created_at: datetime
-    updated_at: datetime
 
 
 class SignUpRequestSchema(BaseModel):
     account: EmailStr
     invite_token: str
+
+
+class SignUpResponseSchema(BaseModel):
+    account: EmailStr
+    is_confirmed: bool = True
 
 
 class SignUpCompleteRequestSchema(BaseModel):
@@ -23,6 +19,9 @@ class SignUpCompleteRequestSchema(BaseModel):
     company_name: str
 
 
-class UserLoginSchema(BaseModel):
+class SignUpCompleteResponseSchema(BaseModel):
+    user_id: int
     email: EmailStr
-    password: str
+    first_name: str
+    last_name: str
+    company_name: str
