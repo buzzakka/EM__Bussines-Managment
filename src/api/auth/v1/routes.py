@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi.security import HTTPBearer
 from pydantic import EmailStr
 
 from src.api.auth.v1.schemas.token import TokenInfo

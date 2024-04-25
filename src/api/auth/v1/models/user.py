@@ -1,5 +1,5 @@
 from copy import deepcopy
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped
 
 from src.api.auth.v1.schemas.user import UserSchema
 from src.core.models.base import Base

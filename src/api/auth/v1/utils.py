@@ -1,5 +1,4 @@
 import bcrypt
-from fastapi import Form
 import jwt
 
 from src.core.config import settings

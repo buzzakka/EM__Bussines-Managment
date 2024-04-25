@@ -1,4 +1,3 @@
-from src.api.auth.v1.repositories.secret import SecretRepository
 from src.core.utils.unit_of_work import UnitOfWork
 from src.core.utils.service import BaseService
 
