@@ -52,11 +52,11 @@ def validate_password(
 def make_payload(
     account_id: int,
     email: str,
-    created_at: datetime = datetime.now()
+    iat: datetime
 ) -> dict:
     payload: dict = {
         'account_id': account_id,
         'email': email,
-        'created_at': created_at
+        'iat': iat
     }
     return payload

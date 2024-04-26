@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from src.core.utils import BaseService, UnitOfWork
 from src.api.auth.v1.models import SecretModel
 from src.api.auth.v1.utils import encode_jwt, make_payload
@@ -13,7 +13,7 @@ class CredentialService(BaseService):
         payload: dict = make_payload(
             account_id=secret.account_id,
             email=email,
-            created_at=str(created_at)
+            iat=created_at
         )
         token: str = encode_jwt(payload=payload)
 
