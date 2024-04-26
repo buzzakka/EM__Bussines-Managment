@@ -1,18 +1,8 @@
 from fastapi import APIRouter, Depends
-from fastapi.security import HTTPBearer
 from pydantic import EmailStr
 
-from src.api.auth.v1.services.credential import CredentialService
-from src.api.auth.v1.models import SecretModel
-from src.api.auth.v1.services.auth import AuthService
 from src.core.utils import UnitOfWork
-from src.api.auth import exceptions
-from src.api.auth.v1.services import (
-    RegistrationService,
-    AccountService,
-    InviteService
-)
-from src.api.auth.v1.models import AccountModel
+from src.api.auth.v1.services import AccountService
 from src.api.auth.v1.schemas import (
     TokenSchema,
     SignUpCompleteRequestSchema,
@@ -20,9 +10,8 @@ from src.api.auth.v1.schemas import (
     SignUpResponseSchema,
     UserLoginSchema,
     SignUpCompleteResponseSchema,
+    CheckAccountResponseSchema,
 )
-
-http_bearer = HTTPBearer()
 
 
 router: APIRouter = APIRouter(
@@ -32,20 +21,18 @@ router: APIRouter = APIRouter(
 
 
 @router.get(
-    path='/check_account/{account}'
+    path='/check_account/{account}',
+    response_model=CheckAccountResponseSchema
 )
 async def check_account(
     account: EmailStr,
     uow: UnitOfWork = Depends(UnitOfWork)
 ):
-    is_account_exists: AccountModel = await AccountService.is_account_exists(uow=uow, email=account)
-
-    if is_account_exists:
-        raise exceptions.account_already_registered()
-
-    invite = await InviteService.create_invite_token(uow=uow, email=account)
-
-    return invite
+    check_account_response: CheckAccountResponseSchema = await AccountService.check_account(
+        uow=uow,
+        email=account
+    )
+    return check_account_response
 
 
 @router.post(
@@ -53,21 +40,15 @@ async def check_account(
     response_model=SignUpResponseSchema
 )
 async def sign_up(
-    user_data: SignUpRequestSchema,
+    sign_up_data: SignUpRequestSchema,
     uow: UnitOfWork = Depends(UnitOfWork)
 ):
-    email: str = user_data.account
-    token: str = user_data.invite_token
+    sign_up_response: SignUpResponseSchema = await AccountService.sign_up(
+        uow=uow,
+        sign_up_data=sign_up_data
+    )
 
-    is_account_exists: bool = await AccountService.is_account_exists(uow, email)
-
-    if is_account_exists:
-        raise exceptions.account_already_registered()
-
-    await InviteService.check_invite_token(uow, email, token)
-
-    return SignUpResponseSchema(account=user_data.account)
-
+    return sign_up_response
 
 @router.post(
     path='/sign-up-complete',
@@ -75,22 +56,23 @@ async def sign_up(
 )
 async def sign_up_complete(
     user_data: SignUpCompleteRequestSchema,
-    uow: UnitOfWork = Depends(UnitOfWork)
+    uow: UnitOfWork = Depends(UnitOfWork),
 ):
-    response_data: dict = await RegistrationService.register_user(
+    sign_up_complete_response: dict = await AccountService.register_user(
         uow=uow,
         user_data=user_data.model_dump()
     )
-    return response_data
+    return sign_up_complete_response
 
 
-@router.post('/login')
+@router.post('/login', response_model=TokenSchema)
 async def auth_user(
     user: UserLoginSchema,
     uow: UnitOfWork = Depends(UnitOfWork)
 ):
-    account_info: SecretModel = await AuthService.authentication(uow, user.email, user.password)
+    login_response: TokenSchema = await AccountService.login(
+        uow=uow,
+        user=user
+    )
 
-    token = await CredentialService.add_token(uow, account_info, user.email)
-
-    return TokenSchema(access_token=token, token_type='Bearer')
+    return login_response

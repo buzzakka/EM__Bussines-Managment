@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import datetime
 from src.core.utils import BaseService, UnitOfWork
 from src.api.auth.v1.models import SecretModel
 from src.api.auth.v1.utils import encode_jwt, make_payload

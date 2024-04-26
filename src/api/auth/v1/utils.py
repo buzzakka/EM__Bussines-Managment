@@ -60,3 +60,18 @@ def make_payload(
         'iat': iat
     }
     return payload
+
+
+# def get_current_token_payload(
+#     credentials: HTTPAuthorizationCredentials = Depends(HTTPBearer())
+# ):
+#     token: str = credentials.credentials
+#     payload = decode_jwt(token)
+#     return payload
+
+
+# def get_current_user(
+#     payload: dict = Depends(get_current_token_payload)
+# ):
+#     account_id: int = payload.get('sub')
+#     user = 

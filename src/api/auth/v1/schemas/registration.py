@@ -1,6 +1,11 @@
 from pydantic import BaseModel, EmailStr
 
 
+class CheckAccountResponseSchema(BaseModel):
+    account: EmailStr
+    status: str = 'success'
+
+
 class SignUpRequestSchema(BaseModel):
     account: EmailStr
     invite_token: str
