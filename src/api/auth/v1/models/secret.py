@@ -1,6 +1,6 @@
 from copy import deepcopy
 from sqlalchemy import ForeignKey
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from src.core.models.base import Base
 from src.core.models.mixins.custom_types import int_pk_T
@@ -15,6 +15,9 @@ class SecretModel(Base):
     user_id: Mapped[int] = mapped_column(ForeignKey('user.id'))
     account_id: Mapped[int] = mapped_column(ForeignKey('account.id'))
     password_hash: Mapped[bytes]
+
+    account: Mapped['AccountModel'] = relationship(uselist=False)
+    user: Mapped['UserModel'] = relationship()
 
     def to_pydantic_schema(self):
         dict_copy: dict = deepcopy(self.__dict__)

@@ -1,12 +1,13 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends
 from fastapi.security import HTTPBearer
 from pydantic import EmailStr
 
+from src.api.auth.v1.services.credential import CredentialService
+from src.api.auth.v1.models import SecretModel
+from src.api.auth.v1.services.auth import AuthService
 from src.core.utils import UnitOfWork
 from src.api.auth import exceptions
-from src.api.auth.v1 import utils
 from src.api.auth.v1.services import (
-    SecretService,
     RegistrationService,
     AccountService,
     InviteService
@@ -83,24 +84,13 @@ async def sign_up_complete(
     return response_data
 
 
-@router.post('/login', response_model=TokenSchema)
+@router.post('/login')
 async def auth_user(
     user: UserLoginSchema,
     uow: UnitOfWork = Depends(UnitOfWork)
 ):
-    hashed_password: bytes = await SecretService.get_password_by_email(uow, user.email)
+    account_info: SecretModel = await AuthService.authentication(uow, user.email, user.password)
 
-    is_valid_password: bool = utils.validate_password(
-        user.password,
-        hashed_password
-    )
+    token = await CredentialService.add_token(uow, account_info, user.email)
 
-    if not is_valid_password:
-        raise exceptions.incorrect_email_or_password()
-
-    payload: dict = {
-        'sub': user.email,
-        'email': user.email
-    }
-    token: str = utils.encode_jwt(payload=payload)
     return TokenSchema(access_token=token, token_type='Bearer')

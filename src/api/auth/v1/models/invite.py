@@ -15,7 +15,7 @@ class InviteModel(Base):
     token: Mapped[str]
     is_confirmed: Mapped[bool] = mapped_column(default=False)
     created_at: Mapped[created_at_T]
-    
+
     def to_pydantic_schema(self):
         dict_copy: dict = deepcopy(self.__dict__)
         dict_copy.pop('_sa_instance_state')

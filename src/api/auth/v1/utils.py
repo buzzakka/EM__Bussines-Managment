@@ -1,3 +1,4 @@
+from datetime import datetime
 import bcrypt
 import jwt
 
@@ -46,3 +47,16 @@ def validate_password(
         password=password.encode(),
         hashed_password=hashed_password
     )
+
+
+def make_payload(
+    account_id: int,
+    email: str,
+    created_at: datetime = datetime.now()
+) -> dict:
+    payload: dict = {
+        'account_id': account_id,
+        'email': email,
+        'created_at': created_at
+    }
+    return payload

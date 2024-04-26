@@ -7,7 +7,7 @@ from alembic import context
 
 from src.core.config import settings
 from src.core.models.base import Base
-from src.api.auth.v1.models.user import (
+from src.api.auth.v1.models import (
     UserModel,
     InviteModel,
     AccountModel,

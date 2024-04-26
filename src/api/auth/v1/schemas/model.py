@@ -34,3 +34,10 @@ class AccountSchema(BaseModel):
     id: int
     email: str
     status: str
+
+
+class CredentialSchema(BaseModel):
+    id: int
+    account_id: int
+    created_at: datetime
+    api_key: str

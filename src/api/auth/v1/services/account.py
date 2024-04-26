@@ -3,7 +3,7 @@ from src.core.utils import UnitOfWork, BaseService
 
 class AccountService(BaseService):
     repository: str = 'account'
-    
+
     @classmethod
     async def is_account_exists(
         cls,

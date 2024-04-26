@@ -1,7 +1,5 @@
 from random import randint
 
-from fastapi import HTTPException
-
 from src.core.utils import UnitOfWork, BaseService
 from src.api.auth import exceptions
 from src.api.auth.v1.models import InviteModel
@@ -30,7 +28,7 @@ class InviteService(BaseService):
 
         if db_token is None:
             raise exceptions.incorrect_account_or_invite_token()
-        
+
         if db_token.is_confirmed:
             raise exceptions.invite_token_already_confirmed()
 

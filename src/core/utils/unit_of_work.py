@@ -5,7 +5,8 @@ from src.api.auth.v1.repositories import (
     AccountRepository,
     SecretRepository,
     InviteRepository,
-    UserRepository
+    UserRepository,
+    CredentialRepository,
 )
 from src.api.company.v1.repositories.company import CompanyRepository
 
@@ -46,6 +47,7 @@ class UnitOfWork(AbstractUnitOfWork):
         self.secret = SecretRepository(self.session)
         self.account = AccountRepository(self.session)
         self.company = CompanyRepository(self.session)
+        self.credential = CredentialRepository(self.session)
 
         return self
 

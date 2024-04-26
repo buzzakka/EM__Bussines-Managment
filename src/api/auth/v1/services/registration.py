@@ -1,5 +1,3 @@
-from fastapi import HTTPException, status
-
 from src.core.utils.unit_of_work import UnitOfWork
 from src.api.auth import exceptions
 from src.api.auth.v1.schemas import SignUpCompleteResponseSchema
@@ -12,7 +10,6 @@ from src.api.auth.v1.models import (
     InviteModel,
 )
 from src.api.company.v1.models import CompanyModel
-
 
 
 class RegistrationService:
