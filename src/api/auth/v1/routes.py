@@ -60,7 +60,7 @@ async def sign_up_complete(
     user_data: SignUpCompleteRequestSchema,
     uow: UnitOfWork = Depends(UnitOfWork),
 ):
-    sign_up_complete_response: dict = await AccountService.register_user(
+    sign_up_complete_response: dict = await AccountService.register_company(
         uow=uow,
         user_data=user_data.model_dump()
     )

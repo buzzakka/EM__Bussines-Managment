@@ -9,9 +9,9 @@ class MemberModel(Base):
     __tablename__ = 'member'
 
     id: Mapped[int_pk_T]
-    user_id: Mapped[str]
+    user_id: Mapped[str] = mapped_column(ForeignKey('user.id'))
     company_id: Mapped[int] = mapped_column(ForeignKey('company.id'))
-    is_admin: Mapped[bool]
+    is_admin: Mapped[bool] = mapped_column(default=False)
 
     user: Mapped['UserModel'] = relationship()
-    company_id: Mapped['Company'] = relationship()
+    company: Mapped['CompanyModel'] = relationship()

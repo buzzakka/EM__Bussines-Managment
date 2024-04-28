@@ -59,7 +59,7 @@ class AccountService(BaseService):
         return await cls.get_by_query_one_or_none(uow, email=email) is not None
 
     @classmethod
-    async def register_user(
+    async def register_company(
         cls,
         uow: UnitOfWork,
         user_data: dict
@@ -86,6 +86,8 @@ class AccountService(BaseService):
             await uow.secret.add_one(**secret_info)
 
             company_obj: CompanyModel = await uow.company.add_one_and_get_obj(name=user_data.get('company_name'))
+            
+            await uow.member.add_one(user_id=user_obj.id, company_id=company_obj.id, is_admin=True)
 
             response_data: SignUpCompleteResponseSchema = SignUpCompleteResponseSchema(
                 user_id=user_obj.id,
@@ -102,9 +104,7 @@ class AccountService(BaseService):
         async with uow:
             account_info: SecretModel = await uow.secret.get_account_info_and_password_or_none(email=email)
 
-            password_hash: bytes = account_info.password_hash
-
-            if account_info is None or not utils.validate_password(password, password_hash):
+            if account_info is None or not utils.validate_password(password, account_info.password_hash):
                 raise exceptions.incorrect_email_or_password()
 
             return account_info
