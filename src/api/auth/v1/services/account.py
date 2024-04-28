@@ -87,7 +87,7 @@ class AccountService(BaseService):
 
             company_obj: CompanyModel = await uow.company.add_one_and_get_obj(name=user_data.get('company_name'))
             
-            await uow.member.add_one(user_id=user_obj.id, company_id=company_obj.id, is_admin=True)
+            await uow.member.add_one(account_id=account_obj.id, company_id=company_obj.id, is_admin=True)
 
             response_data: SignUpCompleteResponseSchema = SignUpCompleteResponseSchema(
                 user_id=user_obj.id,
