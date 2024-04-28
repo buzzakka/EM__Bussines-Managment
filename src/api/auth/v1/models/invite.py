@@ -1,4 +1,5 @@
 from copy import deepcopy
+from typing import Literal
 from sqlalchemy.orm import Mapped, mapped_column
 
 from src.core.models.base import Base
@@ -7,12 +8,16 @@ from src.core.models.mixins.custom_types import int_pk_T, created_at_T
 from src.api.auth.v1.schemas import InviteSchema
 
 
+_invite_types = Literal['registration', 'employment']
+
+
 class InviteModel(Base):
     __tablename__ = 'invite'
 
     id: Mapped[int_pk_T]
     email: Mapped[str]
     token: Mapped[str]
+    invite_type: Mapped[_invite_types] = mapped_column(default='registration')
     is_confirmed: Mapped[bool] = mapped_column(default=False)
     created_at: Mapped[created_at_T]
 
