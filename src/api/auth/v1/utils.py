@@ -50,10 +50,12 @@ def validate_password(
 
 def make_payload(
     account_id: int,
-    email: str,
+    company_id: str,
+    is_admin: bool
 ) -> dict:
     payload: dict = {
         'account_id': account_id,
-        'email': email,
+        'company_id': company_id,
+        'is_admin': is_admin
     }
     return payload

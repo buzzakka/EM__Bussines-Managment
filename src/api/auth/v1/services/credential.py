@@ -7,23 +7,26 @@ class CredentialService(BaseService):
     repository: str = 'credential'
 
     @classmethod
-    async def add_token(cls, uow: UnitOfWork, secret: SecretModel, email: str):
-        payload: dict = make_payload(
-            account_id=secret.account_id,
-            email=email,
-        )
-        token: str = encode_jwt(payload=payload)
+    async def add_token(cls, uow: UnitOfWork, email: str):
+        async with uow:
+            db_payload = await uow.credential.get_payload(email=email)
+            payload: dict = make_payload(
+                account_id=db_payload.account_id,
+                company_id=db_payload.company_id,
+                is_admin=db_payload.is_admin
+            )
 
-        filters: dict = {'account_id': secret.account_id}
-        values: dict = {
-            'account_id': secret.account_id,
-            'api_key': token,
-        }
+            token: str = encode_jwt(payload=payload)
 
-        await cls.update_one_or_create_new(
-            uow=uow,
-            filters=filters,
-            values=values,
-        )
+            filters: dict = {'account_id': payload['account_id']}
+            values: dict = {
+                'account_id': payload['account_id'],
+                'api_key': token,
+            }
+
+            await uow.credential.update_one_or_create_new(
+                filters=filters,
+                values=values,
+            )
 
         return token

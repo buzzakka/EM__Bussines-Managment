@@ -111,12 +111,7 @@ class AccountService(BaseService):
 
     @classmethod
     async def login(cls, uow: UnitOfWork, user: UserLoginSchema) -> TokenSchema:
-        account_info: SecretModel = await cls.authentication(
-            uow=uow,
-            email=user.email,
-            password=user.password
-        )
-        token = await CredentialService.add_token(uow, account_info, user.email)
+        token = await CredentialService.add_token(uow, user.email)
         return TokenSchema(access_token=token, token_type='Bearer')
 
     @classmethod
