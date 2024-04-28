@@ -13,7 +13,10 @@ from src.api.auth.v1.models import (
     AccountModel,
     SecretModel,
 )
-from src.api.company.v1.models import CompanyModel
+from src.api.company.v1.models import (
+    CompanyModel,
+    MemberModel
+)
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
