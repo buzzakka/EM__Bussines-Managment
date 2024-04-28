@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends
 from pydantic import EmailStr
 
+from src.api.auth.v1.dependencies import get_current_account
 from src.core.utils import UnitOfWork
 from src.api.auth.v1.services import AccountService
 from src.api.auth.v1.schemas import (
@@ -13,6 +14,7 @@ from src.api.auth.v1.schemas import (
     CheckAccountResponseSchema,
 )
 
+from src.api.auth.v1 import utils
 
 router: APIRouter = APIRouter(
     prefix='/v1/auth',
@@ -76,3 +78,11 @@ async def auth_user(
     )
 
     return login_response
+
+@router.post('/logout')
+async def logout_user(
+    uow: UnitOfWork = Depends(UnitOfWork),
+    account = Depends(get_current_account)
+):
+    await AccountService.logout(uow=uow, account_id=account.id)
+    return

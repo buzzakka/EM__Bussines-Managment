@@ -17,7 +17,7 @@ from src.api.auth.v1 import utils
 
 
 class AccountService(BaseService):
-    
+
     repository: str = 'account'
 
     @classmethod
@@ -27,9 +27,9 @@ class AccountService(BaseService):
 
         if is_account_exists:
             raise exceptions.account_already_registered()
-        
+
         await InviteService.create_invite_token(uow=uow, email=email)
-        
+
         return CheckAccountResponseSchema(account=email)
 
     @classmethod
@@ -40,12 +40,12 @@ class AccountService(BaseService):
     ) -> SignUpResponseSchema:
         email: str = sign_up_data.account
         token: str = sign_up_data.invite_token
-        
+
         is_account_exists: bool = await cls.is_account_exists(uow, email)
-        
+
         if is_account_exists:
             raise exceptions.account_already_registered()
-        
+
         await InviteService.check_invite_token(uow, email, token)
 
         return SignUpResponseSchema(account=sign_up_data.account)
@@ -118,6 +118,11 @@ class AccountService(BaseService):
         )
         token = await CredentialService.add_token(uow, account_info, user.email)
         return TokenSchema(access_token=token, token_type='Bearer')
+
+    @classmethod
+    async def logout(cls, uow: UnitOfWork, account_id: int):
+        async with uow:
+            await uow.credential.delete_by_query(account_id=account_id)
 
     @classmethod
     def _generate_invite_info(cls, user_data: dict) -> dict:

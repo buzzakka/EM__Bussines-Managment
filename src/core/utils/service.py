@@ -57,3 +57,12 @@ class BaseService:
         async with uow:
             _obj: Base = await uow.__dict__[cls.repository].update_one_or_create_new(filters=filters, values=values)
             return _obj
+
+    @classmethod
+    async def delete_by_query(
+            cls,
+            uow: UnitOfWork,
+            **kwargs
+    ) -> None:
+        async with uow:
+            await uow.__dict__[cls.repository].delete_by_query(**kwargs)

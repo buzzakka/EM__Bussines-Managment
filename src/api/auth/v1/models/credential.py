@@ -15,7 +15,7 @@ class CredentialModel(Base):
     created_at: Mapped[created_at_T]
     api_key: Mapped[str]
 
-    account: Mapped['AccountModel'] = relationship()
+    account: Mapped['AccountModel'] = relationship(lazy='joined')
     
     def to_pydantic_schema(self):
         dict_copy: dict = deepcopy(self.__dict__)

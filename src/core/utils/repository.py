@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from sqlalchemy import Result, insert, select, update
+from sqlalchemy import Result, delete, insert, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 
@@ -64,3 +64,7 @@ class SqlAlchemyRepository(AbstractRepository):
                 **filters).values(**values).returning(self.model)
         _obj: Result | None = await self.session.execute(stmt)
         return _obj.scalar_one_or_none()
+
+    async def delete_by_query(self, **kwargs) -> None:
+        query = delete(self.model).filter_by(**kwargs)
+        await self.session.execute(query)

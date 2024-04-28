@@ -1,4 +1,3 @@
-from datetime import datetime
 import bcrypt
 import jwt
 
@@ -52,26 +51,9 @@ def validate_password(
 def make_payload(
     account_id: int,
     email: str,
-    iat: datetime
 ) -> dict:
     payload: dict = {
         'account_id': account_id,
         'email': email,
-        'iat': iat
     }
     return payload
-
-
-# def get_current_token_payload(
-#     credentials: HTTPAuthorizationCredentials = Depends(HTTPBearer())
-# ):
-#     token: str = credentials.credentials
-#     payload = decode_jwt(token)
-#     return payload
-
-
-# def get_current_user(
-#     payload: dict = Depends(get_current_token_payload)
-# ):
-#     account_id: int = payload.get('sub')
-#     user = 

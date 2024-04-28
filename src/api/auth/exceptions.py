@@ -34,3 +34,10 @@ def incorrect_email_or_password():
         status_code=status.HTTP_400_BAD_REQUEST,
         detail='Неверный логин или пароль.'
     )
+
+
+def incorrect_jwt_token():
+    return HTTPException(
+        status_code=status.HTTP_400_BAD_REQUEST,
+        detail='Неверный переданный JWT токен.'
+    )
