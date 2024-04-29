@@ -23,7 +23,7 @@ class SecretSchema(BaseModel):
 
 
 class InviteSchema(BaseModel):
-    id: int
+    id: int = None
     email: str
     token: str
     is_confirmed: bool

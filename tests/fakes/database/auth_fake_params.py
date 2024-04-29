@@ -15,7 +15,7 @@ from src.api.auth.v1.utils import hash_password
 
 FAKE_INVITES: list[InviteSchema] = [
     InviteSchema(
-        id=1,
+        # id=1,
         email='user_1@example.com',
         token='123456',
         is_confirmed=False,
@@ -23,7 +23,7 @@ FAKE_INVITES: list[InviteSchema] = [
         invite_type='registration',
     ),
     InviteSchema(
-        id=2,
+        # id=2,
         email='user_2@example.com',
         token='654321',
         is_confirmed=True,
@@ -31,7 +31,7 @@ FAKE_INVITES: list[InviteSchema] = [
         invite_type='registration',
     ),
     InviteSchema(
-        id=3,
+        # id=3,
         email='user_3@example.com',
         token='111111',
         is_confirmed=True,
