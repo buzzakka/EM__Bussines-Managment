@@ -16,10 +16,12 @@ psycopg2-binary = "^2.9.9"
 asyncpg = "^0.29.0"
 greenlet = "^3.0.3"
 python-multipart = "^0.0.9"
+pytest-dotenv = "^0.5.2"
 
 
 [tool.poetry.group.test.dependencies]
 pytest = "^8.2.0"
+pytest-asyncio = "^0.23.6"
 
 [build-system]
 requires = ["poetry-core"]
