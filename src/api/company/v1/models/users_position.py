@@ -14,7 +14,7 @@ class UserPositionModel(Base):
 
     id: Mapped[int_pk_T]
     user_id: Mapped[int] = mapped_column(ForeignKey('user.id'))
-    possition_id: Mapped[str] = mapped_column(ForeignKey('possition.id'))
+    possition_id: Mapped[str] = mapped_column(ForeignKey('position.id'))
 
     created_at: Mapped[created_at_T]
     updated_at: Mapped[updated_at_T]

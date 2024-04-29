@@ -18,6 +18,9 @@ greenlet = "^3.0.3"
 python-multipart = "^0.0.9"
 
 
+[tool.poetry.group.test.dependencies]
+pytest = "^8.2.0"
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
