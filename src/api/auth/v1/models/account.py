@@ -11,7 +11,7 @@ class AccountModel(Base):
 
     id: Mapped[int_pk_T]
     email: Mapped[str] = mapped_column(unique=True)
-    status: Mapped[bool] = mapped_column(default=False)
+    is_active: Mapped[bool] = mapped_column(default=True)
 
     def to_pydantic_schema(self):
         dict_copy: dict = deepcopy(self.__dict__)

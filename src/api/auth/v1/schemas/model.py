@@ -28,12 +28,13 @@ class InviteSchema(BaseModel):
     token: str
     is_confirmed: bool
     created_at: datetime
+    invite_type: str
 
 
 class AccountSchema(BaseModel):
     id: int
     email: str
-    status: str
+    is_active: bool
 
 
 class CredentialSchema(BaseModel):
