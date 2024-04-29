@@ -5,6 +5,8 @@ from src.api.auth.v1.schemas import (
     CheckAccountResponseSchema,
     SignUpRequestSchema,
     SignUpResponseSchema,
+    SignUpCompleteRequestSchema,
+    SignUpCompleteResponseSchema,
 )
 
 
@@ -51,5 +53,34 @@ TEST_ENDPOINT_SIGN_UP: list[tuple[any]] = [
 ]
 
 TEST_ENDPOINT_SIGN_UP_COMPLETE: list[tuple[any]] = [
-        
+    (
+        SignUpCompleteRequestSchema(
+            account='user_2@example.com', password='string', first_name='name',
+            last_name='last', company_name='EM',
+        ).model_dump_json(),
+        SignUpCompleteResponseSchema(
+            user_id=2, email='user_2@example.com', first_name='name',
+            last_name='last', company_name='EM'
+        ).model_dump(),
+        status.HTTP_200_OK,
+        does_not_raise(),
+    ),
+    (
+        SignUpCompleteRequestSchema(
+            account='user_2@example.com', password='string', first_name='name',
+            last_name='last', company_name='EM',
+        ).model_dump_json(),
+        {'detail': 'Пользователь уже зарегистрирован.'},
+        status.HTTP_400_BAD_REQUEST,
+        does_not_raise(),
+    ),
+    (
+        SignUpCompleteRequestSchema(
+            account='example@user.ru', password='string', first_name='name',
+            last_name='last', company_name='EM',
+        ).model_dump_json(),
+        {'detail': 'Адрес аэлектронной почты не подтвержден.'},
+        status.HTTP_400_BAD_REQUEST,
+        does_not_raise(),
+    ),
 ]

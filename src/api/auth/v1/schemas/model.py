@@ -3,7 +3,7 @@ from pydantic import BaseModel
 
 
 class UserSchema(BaseModel):
-    id: int
+    id: int = None
     first_name: str
     last_name: str
     created_at: datetime
@@ -16,7 +16,7 @@ class TokenSchema(BaseModel):
 
 
 class SecretSchema(BaseModel):
-    id: int
+    id: int = None
     user_id: int
     account_id: int
     password_hash: bytes
@@ -32,13 +32,13 @@ class InviteSchema(BaseModel):
 
 
 class AccountSchema(BaseModel):
-    id: int
+    id: int = None
     email: str
     is_active: bool
 
 
 class CredentialSchema(BaseModel):
-    id: int
+    id: int = None
     account_id: int
     created_at: datetime
     api_key: str

@@ -71,7 +71,7 @@ class AccountService(BaseService):
             if _invite is None or not _invite.is_confirmed:
                 raise exceptions.account_is_not_confirmed()
 
-            is_account_exists: bool = await cls.is_account_exists(uow=uow, email=user_data.get('account'))
+            is_account_exists: bool = await uow.account.get_by_query_one_or_none(email=user_data.get('account')) is not None
 
             if is_account_exists:
                 raise exceptions.account_already_registered()

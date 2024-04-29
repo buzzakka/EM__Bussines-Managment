@@ -39,7 +39,6 @@ FAKE_INVITES: list[InviteSchema] = [
 
 FAKE_ACCOUNTS: list[AccountSchema] = [
     AccountSchema(
-        id=1,
         email='user_3@example.com',
         is_active=True,
     )
@@ -47,7 +46,6 @@ FAKE_ACCOUNTS: list[AccountSchema] = [
 
 FAKE_USERS: list[UserSchema] = [
     UserSchema(
-        id=1,
         first_name='Имя',
         last_name='Фамилия',
         created_at=datetime.now(),
@@ -57,7 +55,6 @@ FAKE_USERS: list[UserSchema] = [
 
 FAKE_SECRETS: list[SecretSchema] = [
     SecretSchema(
-        id=1,
         user_id=1,
         account_id=1,
         password_hash=hash_password('qwerty'),
@@ -66,7 +63,6 @@ FAKE_SECRETS: list[SecretSchema] = [
 
 FAKE_COMPANIES: list[CompanySchema] = [
     CompanySchema(
-        id=1,
         name='qwerty',
         created_at=datetime.now(),
         updated_at=datetime.now(),
@@ -75,7 +71,6 @@ FAKE_COMPANIES: list[CompanySchema] = [
 
 FAKE_MEMBER: list[MemberSchema]  = [
     MemberSchema(
-        id=1,
         account_id=1,
         company_id=1,
         is_admin=True,
