@@ -1,4 +1,4 @@
-from fastapi import HTTPException, Request
+from fastapi import HTTPException, Request, status
 from fastapi.responses import JSONResponse
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from starlette.middleware.base import BaseHTTPMiddleware
@@ -16,7 +16,7 @@ class AuthMiddleware(BaseHTTPMiddleware):
                 payload: dict = self.get_payload(request)
                 request.state.payload = payload
             except HTTPException as e:
-                return JSONResponse(status_code=401, content=e.detail)
+                return JSONResponse(status_code=status.HTTP_401_UNAUTHORIZED, content=e.detail)
 
         response = await call_next(request)
         return response

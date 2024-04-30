@@ -2,6 +2,8 @@ from fastapi import Response, status
 from fastapi.testclient import TestClient
 import pytest
 
+from src.api.auth.v1.schemas import UserLoginSchema
+
 from tests.fakes.parameters.auth import (
     TEST_ENDPOINT_CHECK_ACCOUNT,
     TEST_ENDPOINT_SIGN_UP,
@@ -10,7 +12,7 @@ from tests.fakes.parameters.auth import (
 
 
 class TestAuthRouterV1:
-    
+
     @pytest.mark.parametrize(
         "email, expected_result, expected_status, expectation",
         TEST_ENDPOINT_CHECK_ACCOUNT
@@ -24,9 +26,9 @@ class TestAuthRouterV1:
             response: Response = client.get(
                 f'/api/v1/auth/check_account/{email}',
             )
-            
+
             assert response.status_code == expected_status
-            
+
             assert response.json() == expected_result
 
     @pytest.mark.parametrize(
@@ -43,11 +45,11 @@ class TestAuthRouterV1:
                 '/api/v1/auth/sign-up/',
                 data=data
             )
-            
+
             assert response.status_code == expected_status
-            
+
             assert response.json() == expected_result
-    
+
     @pytest.mark.parametrize(
         "data, expected_result, expected_status, expectation",
         TEST_ENDPOINT_SIGN_UP_COMPLETE
@@ -62,7 +64,47 @@ class TestAuthRouterV1:
                 '/api/v1/auth/sign-up-complete/',
                 data=data
             )
-            
+
             assert response.status_code == expected_status
-            
+
             assert response.json() == expected_result
+
+    def test_login_and_logout(
+        self,
+        client: TestClient,
+    ):
+        # Попытка получить доступ к странице, к которой могут получить доступ
+        # только авторизованные пользователи без jwt токена
+        response: Response = client.post(url='/api/v1/auth/logout/')
+
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+        assert response.json() == {'detail': 'Not authenticated'}
+
+        # Аутентификация пользователя
+        response: Response = client.post(
+            url='/api/v1/auth/login/',
+            data=UserLoginSchema(email='user_2@example.com',
+                                 password='string').model_dump_json()
+        )
+
+        token_type: str = response.json()['token_type']
+        access_token: str = response.json()['access_token']
+        token: str = f'{token_type} {access_token}'
+
+        # Попытка разлогиниться с jwt токеном
+        response: Response = client.post(
+            url='/api/v1/auth/logout/',
+            headers={'Authorization': token}
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.json() == None
+
+        # Попытка разлогиниться с удаленным jwt токеном
+        response: Response = client.post(
+            url='/api/v1/auth/logout/',
+            headers={'Authorization': token}
+        )
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.json() == {'detail': 'Неверный переданный JWT токен.'}
