@@ -1,6 +1,8 @@
 from random import randint
 
 from src.core.utils import UnitOfWork, BaseService
+from src.celery_app.tasks import send_invite_token
+
 from src.api.auth import exceptions
 from src.api.auth.models import InviteModel
 
@@ -10,14 +12,18 @@ class InviteService(BaseService):
 
     @classmethod
     async def create_invite_token(cls, uow: UnitOfWork, email: str):
+        token: str = str(randint(100000, 999999))
         filters: dict = {'email': email}
-        values: dict = {'email': email, 'token': str(randint(100000, 999999))}
+        values: dict = {'email': email, 'token': token}
 
         _obj: InviteModel = await cls.update_one_or_create_new(
             uow=uow,
             filters=filters,
             values=values
         )
+
+        send_invite_token.delay(email=email, invite_token=token)
+
         return _obj
 
     @classmethod

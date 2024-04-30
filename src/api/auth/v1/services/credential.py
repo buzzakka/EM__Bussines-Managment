@@ -1,5 +1,5 @@
 from src.core.utils import BaseService, UnitOfWork
-from api.auth import utils
+from src.api.auth import utils
 
 
 class CredentialService(BaseService):
