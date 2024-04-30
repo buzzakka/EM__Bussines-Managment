@@ -1,16 +1,16 @@
 from datetime import datetime
 
-from src.api.auth.v1.schemas import (
+from src.api.auth.schemas import (
     InviteSchema,
     AccountSchema,
     UserSchema,
     SecretSchema,
 )
-from src.api.company.v1.schemas import (
+from src.api.company.schemas import (
     CompanySchema,
     MemberSchema,
 )
-from src.api.auth.v1.utils import hash_password
+from api.auth.utils import hash_password
 
 
 FAKE_INVITES: list[InviteSchema] = [

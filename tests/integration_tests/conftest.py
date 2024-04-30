@@ -10,14 +10,14 @@ from tests.fakes.database.auth_fake_params import (
     FAKE_USERS
 )
 
-from src.api.auth.v1.schemas import InviteSchema
-from src.api.auth.v1.models import (
+from src.api.auth.schemas import InviteSchema
+from src.api.auth.models import (
     InviteModel,
     AccountModel,
     SecretModel,
     UserModel,
 )
-from src.api.company.v1.models import (
+from src.api.company.models import (
     CompanyModel,
     MemberModel
 )

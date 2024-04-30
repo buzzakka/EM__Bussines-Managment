@@ -2,7 +2,7 @@ from fastapi import Response, status
 from fastapi.testclient import TestClient
 import pytest
 
-from src.api.auth.v1.schemas import UserLoginSchema
+from src.api.auth.schemas import UserLoginSchema
 
 from tests.fakes.parameters.auth import (
     TEST_ENDPOINT_CHECK_ACCOUNT,

@@ -5,7 +5,7 @@ from sqlalchemy.orm import Mapped, mapped_column
 from src.core.models.base import Base
 from src.core.models.mixins.custom_types import int_pk_T, created_at_T
 
-from src.api.auth.v1.schemas import InviteSchema
+from src.api.auth.schemas import InviteSchema
 
 
 _invite_types = Literal['registration', 'employment']

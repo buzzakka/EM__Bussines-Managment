@@ -2,9 +2,9 @@ from src.core.utils import UnitOfWork, BaseService
 
 from src.api.auth.v1.services.invite import InviteService
 from src.api.auth.v1.services.credential import CredentialService
-from src.api.auth.v1.models import InviteModel, UserModel, AccountModel, SecretModel
-from src.api.company.v1.models import CompanyModel
-from src.api.auth.v1.schemas import (
+from src.api.auth.models import InviteModel, UserModel, AccountModel, SecretModel
+from src.api.company.models import CompanyModel
+from src.api.auth.schemas import (
     SignUpCompleteResponseSchema,
     SignUpRequestSchema,
     SignUpResponseSchema,
@@ -13,7 +13,7 @@ from src.api.auth.v1.schemas import (
     TokenSchema,
 )
 from src.api.auth import exceptions
-from src.api.auth.v1 import utils
+from src.api.auth import utils
 
 
 class AccountService(BaseService):

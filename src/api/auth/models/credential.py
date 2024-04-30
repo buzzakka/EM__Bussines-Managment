@@ -4,7 +4,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from src.core.models import Base
 from src.core.models.mixins.custom_types import int_pk_T, created_at_T
-from src.api.auth.v1.schemas.model import CredentialSchema
+from src.api.auth.schemas.model import CredentialSchema
 
 
 class CredentialModel(Base):

@@ -1,6 +1,5 @@
 from src.core.utils import BaseService, UnitOfWork
-from src.api.auth.v1.models import SecretModel
-from src.api.auth.v1.utils import encode_jwt, make_payload
+from api.auth import utils
 
 
 class CredentialService(BaseService):
@@ -10,13 +9,13 @@ class CredentialService(BaseService):
     async def add_token(cls, uow: UnitOfWork, email: str):
         async with uow:
             db_payload = await uow.credential.get_payload(email=email)
-            payload: dict = make_payload(
+            payload: dict = utils.make_payload(
                 account_id=db_payload.account_id,
                 company_id=db_payload.company_id,
                 is_admin=db_payload.is_admin
             )
 
-            token: str = encode_jwt(payload=payload)
+            token: str = utils.encode_jwt(payload=payload)
 
             filters: dict = {'account_id': payload['account_id']}
             values: dict = {

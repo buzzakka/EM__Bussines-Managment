@@ -15,7 +15,7 @@ __all__ = [
     'UserLoginSchema',
 ]
 
-from src.api.auth.v1.schemas.model import (
+from src.api.auth.schemas.model import (
     AccountSchema,
     InviteSchema,
     SecretSchema,
@@ -24,7 +24,7 @@ from src.api.auth.v1.schemas.model import (
     CredentialSchema,
 )
 
-from src.api.auth.v1.schemas.registration import (
+from src.api.auth.schemas.registration import (
     SignUpRequestSchema,
     SignUpResponseSchema,
     SignUpCompleteRequestSchema,
@@ -32,4 +32,4 @@ from src.api.auth.v1.schemas.registration import (
     CheckAccountResponseSchema,
 )
 
-from src.api.auth.v1.schemas.auth import UserLoginSchema
+from src.api.auth.schemas.auth import UserLoginSchema

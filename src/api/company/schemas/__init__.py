@@ -4,7 +4,7 @@ __all__ = [
 ]
 
 
-from src.api.company.v1.schemas.model import (
+from src.api.company.schemas.model import (
     CompanySchema,
     MemberSchema,
 )

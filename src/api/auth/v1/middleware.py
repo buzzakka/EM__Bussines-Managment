@@ -4,8 +4,7 @@ from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from starlette.middleware.base import BaseHTTPMiddleware
 
 from src.core.utils import UnitOfWork
-from src.api.auth import exceptions
-from src.api.auth.v1 import utils
+from src.api.auth import exceptions, utils
 from src.api.auth.v1.services import CredentialService
 
 

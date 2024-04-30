@@ -1,4 +1,4 @@
-from src.api.company.v1.models import MemberModel
+from src.api.company.models import MemberModel
 from src.core.utils import SqlAlchemyRepository
 
 

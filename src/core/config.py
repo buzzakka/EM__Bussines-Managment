@@ -1,5 +1,5 @@
 from src.core.settings import BaseConfig, PostgresSettings, RedisSettings
-from src.api.auth.v1.settings.jwt_auth import JWTAuthSettings
+from src.api.auth.settings.jwt_auth import JWTAuthSettings
 
 
 class Settings(BaseConfig):

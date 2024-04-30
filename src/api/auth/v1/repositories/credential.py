@@ -3,8 +3,8 @@ from sqlalchemy.orm import joinedload
 
 
 from src.core.utils import SqlAlchemyRepository
-from src.api.auth.v1.models import CredentialModel, AccountModel
-from src.api.company.v1.models import MemberModel
+from src.api.auth.models import CredentialModel, AccountModel
+from src.api.company.models import MemberModel
 
 
 class CredentialRepository(SqlAlchemyRepository):

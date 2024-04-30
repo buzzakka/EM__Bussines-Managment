@@ -4,9 +4,8 @@ from jwt import InvalidTokenError
 
 from src.core.utils import UnitOfWork
 
-from src.api.auth.v1.models import CredentialModel
-from src.api.auth.v1 import utils
-from src.api.auth import exceptions
+from src.api.auth.models import CredentialModel
+from src.api.auth import utils, exceptions
 
 
 http_bearer: HTTPBearer = HTTPBearer()

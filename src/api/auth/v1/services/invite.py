@@ -2,7 +2,7 @@ from random import randint
 
 from src.core.utils import UnitOfWork, BaseService
 from src.api.auth import exceptions
-from src.api.auth.v1.models import InviteModel
+from src.api.auth.models import InviteModel
 
 
 class InviteService(BaseService):

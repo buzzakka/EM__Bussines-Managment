@@ -1,7 +1,7 @@
 from contextlib import nullcontext as does_not_raise
 from fastapi import status
 
-from src.api.auth.v1.schemas import (
+from src.api.auth.schemas import (
     CheckAccountResponseSchema,
     SignUpRequestSchema,
     SignUpResponseSchema,
