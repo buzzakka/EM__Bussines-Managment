@@ -2,7 +2,7 @@ from src.core.utils import UnitOfWork, BaseService
 
 from src.api.auth.v1.services.invite import InviteService
 from src.api.auth.v1.services.credential import CredentialService
-from src.api.auth.models import InviteModel, UserModel, AccountModel, SecretModel
+from src.api.auth.models import InviteModel, UserModel
 from src.api.company.models import CompanyModel
 from src.api.auth.schemas import (
     SignUpCompleteResponseSchema,

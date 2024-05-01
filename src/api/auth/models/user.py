@@ -14,7 +14,7 @@ from src.api.auth.schemas import UserSchema
 class UserModel(Base):
     __tablename__ = 'user'
 
-    user_id: Mapped[int_pk_T]
+    id: Mapped[int_pk_T]
 
     email: Mapped[str] = mapped_column(unique=True)
     password: Mapped[bytes]

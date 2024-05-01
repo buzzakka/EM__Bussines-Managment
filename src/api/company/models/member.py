@@ -11,11 +11,11 @@ class MemberModel(Base):
     __tablename__ = 'member'
 
     id: Mapped[int_pk_T]
-    account_id: Mapped[int] = mapped_column(ForeignKey('account.id'))
+    user_id: Mapped[int] = mapped_column(ForeignKey('user.id'))
     company_id: Mapped[int] = mapped_column(ForeignKey('company.id'))
     is_admin: Mapped[bool] = mapped_column(default=False)
 
-    account: Mapped['AccountModel'] = relationship()
+    user: Mapped['UserModel'] = relationship()
     company: Mapped['CompanyModel'] = relationship()
     
     def to_pydantic_schema(self):

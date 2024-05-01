@@ -2,8 +2,6 @@ from abc import ABC, abstractmethod
 
 from src.core.database.db import async_session_maker
 from src.api.auth.v1.repositories import (
-    AccountRepository,
-    SecretRepository,
     InviteRepository,
     UserRepository,
     CredentialRepository,
@@ -47,8 +45,6 @@ class UnitOfWork(AbstractUnitOfWork):
 
         self.user = UserRepository(self.session)
         self.invite = InviteRepository(self.session)
-        self.secret = SecretRepository(self.session)
-        self.account = AccountRepository(self.session)
         self.credential = CredentialRepository(self.session)
         
         self.company = CompanyRepository(self.session)

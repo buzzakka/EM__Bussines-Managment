@@ -3,7 +3,6 @@ from pydantic import EmailStr
 
 from src.core.utils import UnitOfWork
 from src.api.auth.v1.dependencies import get_current_account
-from src.api.auth.v1.services import AccountService
 from src.api.auth.schemas import (
     TokenSchema,
     SignUpCompleteRequestSchema,

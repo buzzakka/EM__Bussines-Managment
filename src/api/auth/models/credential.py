@@ -11,13 +11,8 @@ class CredentialModel(Base):
     __tablename__ = 'credential'
 
     id: Mapped[int_pk_T]
-    account_id: Mapped[int] = mapped_column(ForeignKey('account.id'))
+    user_id: Mapped[int] = mapped_column(ForeignKey('user.id'))
     created_at: Mapped[created_at_T]
     api_key: Mapped[str]
 
-    account: Mapped['AccountModel'] = relationship(lazy='joined')
-    
-    def to_pydantic_schema(self) -> CredentialSchema:
-        dict_copy: dict = deepcopy(self.__dict__)
-        dict_copy.pop('_sa_instance_state')
-        return CredentialSchema(**dict_copy)
+    user: Mapped['UserModel'] = relationship(lazy='joined')

@@ -17,9 +17,7 @@ __all__ = [
 ]
 
 from src.api.auth.schemas.model import (
-    AccountSchema,
     InviteSchema,
-    SecretSchema,
     TokenSchema,
     UserSchema,
     CredentialSchema,
