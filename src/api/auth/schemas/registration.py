@@ -2,8 +2,8 @@ from pydantic import BaseModel, EmailStr
 
 
 class CheckAccountResponseSchema(BaseModel):
-    account: EmailStr
-    status: str = 'success'
+    email: EmailStr
+    message: str = 'Адрес электронной почты свободен.'
 
 
 class SignUpRequestSchema(BaseModel):
@@ -11,9 +11,8 @@ class SignUpRequestSchema(BaseModel):
     invite_token: str
 
 
-class SignUpResponseSchema(BaseModel):
-    account: EmailStr
-    is_confirmed: bool = True
+class SignUpResponseSchema(CheckAccountResponseSchema):
+    message: str = 'Адрес электронной почты успешно подтвержден.'
 
 
 class SignUpCompleteRequestSchema(BaseModel):

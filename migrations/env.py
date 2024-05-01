@@ -7,13 +7,13 @@ from alembic import context
 
 from src.core.config import settings
 from src.core.models.base import Base
-from src.api.auth.v1.models import (
+from src.api.auth.models import (
     UserModel,
     InviteModel,
     AccountModel,
     SecretModel,
 )
-from src.api.company.v1.models import (
+from src.api.company.models import (
     CompanyModel,
     MemberModel
 )

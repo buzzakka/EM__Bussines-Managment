@@ -1,3 +1,4 @@
+from datetime import datetime, timezone
 import bcrypt
 import jwt
 
@@ -56,6 +57,7 @@ def make_payload(
     payload: dict = {
         'account_id': account_id,
         'company_id': company_id,
-        'is_admin': is_admin
+        'is_admin': is_admin,
+        'created_at': datetime.now(timezone.utc).isoformat()
     }
     return payload

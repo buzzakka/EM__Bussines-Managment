@@ -5,7 +5,7 @@ from src.core.config import settings
 
 async_engine = create_async_engine(
     url=settings.postgres_settings.get_pg_url(),
-    # echo=True,
+    echo=True,
 )
 
 async_session_maker = async_sessionmaker(

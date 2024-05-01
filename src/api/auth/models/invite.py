@@ -1,14 +1,18 @@
-from copy import deepcopy
-from typing import Literal
+import enum
+from sqlalchemy import Enum
 from sqlalchemy.orm import Mapped, mapped_column
 
 from src.core.models.base import Base
-from src.core.models.mixins.custom_types import int_pk_T, created_at_T
+from src.core.models.mixins.custom_types import (
+    int_pk_T,
+    created_at_T,
+    updated_at_T
+)
 
-from src.api.auth.schemas import InviteSchema
 
-
-_invite_types = Literal['registration', 'employment']
+class InviteTypes(enum.Enum):
+    ACCOUNT: str = 'Account registration'
+    EMPLOYMENT: str = 'Employe registration'
 
 
 class InviteModel(Base):
@@ -17,11 +21,8 @@ class InviteModel(Base):
     id: Mapped[int_pk_T]
     email: Mapped[str]
     token: Mapped[str]
-    invite_type: Mapped[_invite_types] = mapped_column(default='registration')
+    invite_type: Mapped[Enum] = mapped_column(Enum(InviteTypes))
     is_confirmed: Mapped[bool] = mapped_column(default=False)
-    created_at: Mapped[created_at_T]
 
-    def to_pydantic_schema(self) -> InviteSchema:
-        dict_copy: dict = deepcopy(self.__dict__)
-        dict_copy.pop('_sa_instance_state')
-        return InviteSchema(**dict_copy)
+    created_at: Mapped[created_at_T]
+    updated_at: Mapped[updated_at_T]

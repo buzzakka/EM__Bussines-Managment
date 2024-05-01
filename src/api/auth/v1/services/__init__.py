@@ -1,9 +1,9 @@
 __all__ = [
-    'AccountService',
-    'InviteService',
+    'RegisterService',
+    'AuthService',
     'CredentialService',
 ]
 
-from src.api.auth.v1.services.account import AccountService
-from src.api.auth.v1.services.invite import InviteService
+from src.api.auth.v1.services.register import RegisterService
+from src.api.auth.v1.services.auth import AuthService
 from src.api.auth.v1.services.credential import CredentialService

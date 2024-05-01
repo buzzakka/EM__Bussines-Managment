@@ -10,9 +10,9 @@ from src.api.auth.v1.services import CredentialService
 
 class AuthMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
-        if request.scope.get('path') in ['/logout']:
+        if request.scope.get('path') in ['/api/v1/auth/logout']:
             try:
-                payload: dict = self.get_payload(request)
+                payload: dict = await self._get_payload(request)
                 request.state.payload = payload
             except HTTPException as e:
                 return JSONResponse(status_code=status.HTTP_401_UNAUTHORIZED, content=e.detail)
@@ -20,7 +20,7 @@ class AuthMiddleware(BaseHTTPMiddleware):
         response = await call_next(request)
         return response
 
-    async def get_payload(request: Request) -> dict:
+    async def _get_payload(self, request: Request) -> dict:
         http_bearer: HTTPBearer = HTTPBearer()
         credential: HTTPAuthorizationCredentials = await http_bearer(request)
         token: str = credential.credentials
@@ -31,6 +31,6 @@ class AuthMiddleware(BaseHTTPMiddleware):
         ) is not None
 
         if not is_exist_token:
-            raise exceptions.incorrect_jwt_token()          
+            raise exceptions.incorrect_jwt_token()
         
         return utils.decode_jwt(token)      

@@ -1,9 +1,9 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Request
 from pydantic import EmailStr
 
 from src.core.utils import UnitOfWork
-from src.api.auth.v1.dependencies import get_current_account
-from src.api.auth.v1.services import AccountService
+
+from src.api.auth.v1.services import RegisterService, AuthService
 from src.api.auth.schemas import (
     TokenSchema,
     SignUpCompleteRequestSchema,
@@ -29,7 +29,7 @@ async def check_account_with_email(
     account: EmailStr,
     uow: UnitOfWork = Depends(UnitOfWork)
 ):
-    check_account_response: CheckAccountResponseSchema = await AccountService.check_account(
+    check_account_response: CheckAccountResponseSchema = await RegisterService.check_account(
         uow=uow,
         email=account
     )
@@ -44,7 +44,7 @@ async def sign_up(
     sign_up_data: SignUpRequestSchema,
     uow: UnitOfWork = Depends(UnitOfWork)
 ):
-    sign_up_response: SignUpResponseSchema = await AccountService.sign_up_company(
+    sign_up_response: SignUpResponseSchema = await RegisterService.sign_up_company(
         uow=uow,
         sign_up_data=sign_up_data
     )
@@ -52,17 +52,17 @@ async def sign_up(
     return sign_up_response
 
 
-@router.get('/sign-up/{invite_id}/{invite_token}')
-async def check_account_with_token(
-    invite_id: int,
-    invite_token: str,
-    uow: UnitOfWork = Depends(UnitOfWork)
-):
-    await AccountService.sign_up_emloyment_user(
-        uow=uow,
-        invite_id=invite_id,
-        invite_token=invite_token,
-    )
+# @router.get('/sign-up/{invite_id}/{invite_token}')
+# async def check_account_with_token(
+#     invite_id: int,
+#     invite_token: str,
+#     uow: UnitOfWork = Depends(UnitOfWork)
+# ):
+#     await AccountService.sign_up_emloyment_user(
+#         uow=uow,
+#         invite_id=invite_id,
+#         invite_token=invite_token,
+#     )
 
 
 @router.post(
@@ -73,43 +73,43 @@ async def sign_up_complete(
     user_data: SignUpCompleteRequestSchema,
     uow: UnitOfWork = Depends(UnitOfWork),
 ):
-    sign_up_complete_response: dict = await AccountService.register_company(
+    sign_up_complete_response: dict = await RegisterService.register_company(
         uow=uow,
         **user_data.model_dump()
     )
     return sign_up_complete_response
 
 
-@router.post(
-    path='/sign-up-complete-employment'
-)
-async def sign_up_complete_employment(
-    user_data: SignUpCompleteEmploymentRequestSchema,
-    uow: UnitOfWork = Depends(UnitOfWork),
-):
-    response: dict = await AccountService.register_employment_user(
-        uow=uow,
-        **user_data.model_dump()
-    )
-    return response
+# @router.post(
+#     path='/sign-up-complete-employment'
+# )
+# async def sign_up_complete_employment(
+#     user_data: SignUpCompleteEmploymentRequestSchema,
+#     uow: UnitOfWork = Depends(UnitOfWork),
+# ):
+#     response: dict = await AccountService.register_employment_user(
+#         uow=uow,
+#         **user_data.model_dump()
+#     )
+#     return response
 
 
 @router.post('/login', response_model=TokenSchema)
-async def auth_user(
+async def login(
     user: UserLoginSchema,
     uow: UnitOfWork = Depends(UnitOfWork)
 ):
-    login_response: TokenSchema = await AccountService.login(
+    login_response: TokenSchema = await AuthService.login(
         uow=uow,
         user=user
     )
-
     return login_response
 
 @router.post('/logout')
-async def logout_user(
+async def logout(
+    request: Request,
     uow: UnitOfWork = Depends(UnitOfWork),
-    account = Depends(get_current_account)
 ):
-    await AccountService.logout(uow=uow, account_id=account.id)
+    account_id: int = request.state.payload['account_id']
+    await AuthService.logout(uow=uow, account_id=account_id)
     return

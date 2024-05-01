@@ -42,6 +42,7 @@ def incorrect_jwt_token() -> HTTPException:
         detail='Неверный переданный JWT токен.'
     )
 
+
 def page_not_found() -> HTTPException:
     raise HTTPException(
             status_code=404,

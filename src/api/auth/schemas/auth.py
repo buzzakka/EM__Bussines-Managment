@@ -6,7 +6,6 @@ class UserLoginSchema(BaseModel):
     password: str
 
 
-class PayloadSchema(BaseModel):
-    account_id: int
-    company_id: int
-    is_admin: bool
+class TokenSchema(BaseModel):
+    access_token: str
+    token_type: str = 'Bearer'

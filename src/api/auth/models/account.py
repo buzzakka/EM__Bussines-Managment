@@ -1,9 +1,7 @@
-from copy import deepcopy
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from src.core.models.base import Base
 from src.core.models.mixins.custom_types import int_pk_T
-from src.api.auth.schemas import AccountSchema
 
 
 class AccountModel(Base):
@@ -11,9 +9,11 @@ class AccountModel(Base):
 
     id: Mapped[int_pk_T]
     email: Mapped[str] = mapped_column(unique=True)
-    is_active: Mapped[bool] = mapped_column(default=True)
+    is_active: Mapped[bool] = mapped_column(default=False)
 
-    def to_pydantic_schema(self) -> AccountSchema:
-        dict_copy: dict = deepcopy(self.__dict__)
-        dict_copy.pop('_sa_instance_state')
-        return AccountSchema(**dict_copy)
+    secret = relationship(
+        'SecretModel', back_populates='account', uselist=False
+    )
+    credential = relationship(
+        'CredentialModel', back_populates='account', uselist=False
+    )
