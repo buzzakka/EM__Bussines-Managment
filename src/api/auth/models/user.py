@@ -20,7 +20,7 @@ class UserModel(Base):
     created_at: Mapped[created_at_T]
     updated_at: Mapped[updated_at_T]
 
-    def to_pydantic_schema(self):
+    def to_pydantic_schema(self) -> UserSchema:
         dict_copy: dict = deepcopy(self.__dict__)
         dict_copy.pop('_sa_instance_state')
         return UserSchema(**dict_copy)

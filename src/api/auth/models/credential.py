@@ -17,7 +17,7 @@ class CredentialModel(Base):
 
     account: Mapped['AccountModel'] = relationship(lazy='joined')
     
-    def to_pydantic_schema(self):
+    def to_pydantic_schema(self) -> CredentialSchema:
         dict_copy: dict = deepcopy(self.__dict__)
         dict_copy.pop('_sa_instance_state')
         return CredentialSchema(**dict_copy)

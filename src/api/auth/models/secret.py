@@ -19,7 +19,7 @@ class SecretModel(Base):
     account: Mapped['AccountModel'] = relationship(uselist=False)
     user: Mapped['UserModel'] = relationship()
 
-    def to_pydantic_schema(self):
+    def to_pydantic_schema(self) -> SecretSchema:
         dict_copy: dict = deepcopy(self.__dict__)
         dict_copy.pop('_sa_instance_state')
         return SecretSchema(**dict_copy)

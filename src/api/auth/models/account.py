@@ -13,7 +13,7 @@ class AccountModel(Base):
     email: Mapped[str] = mapped_column(unique=True)
     is_active: Mapped[bool] = mapped_column(default=True)
 
-    def to_pydantic_schema(self):
+    def to_pydantic_schema(self) -> AccountSchema:
         dict_copy: dict = deepcopy(self.__dict__)
         dict_copy.pop('_sa_instance_state')
         return AccountSchema(**dict_copy)
