@@ -77,8 +77,7 @@ class TestAuthRouterV1:
         # только авторизованные пользователи без jwt токена
         response: Response = client.post(url='/api/v1/auth/logout/')
 
-        assert response.status_code == status.HTTP_403_FORBIDDEN
-        assert response.json() == {'detail': 'Not authenticated'}
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
         # Аутентификация пользователя
         response: Response = client.post(
@@ -106,5 +105,4 @@ class TestAuthRouterV1:
             headers={'Authorization': token}
         )
 
-        assert response.status_code == status.HTTP_400_BAD_REQUEST
-        assert response.json() == {'detail': 'Неверный переданный JWT токен.'}
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED

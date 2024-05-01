@@ -11,8 +11,8 @@ from src.core.models.mixins.custom_types import (
 
 
 class InviteTypes(enum.Enum):
-    ACCOUNT: str = 'Account registration'
-    EMPLOYMENT: str = 'Employe registration'
+    ACCOUNT: str = 'ACCOUNT'
+    EMPLOYMENT: str = 'EMPLOYMENT'
 
 
 class InviteModel(Base):

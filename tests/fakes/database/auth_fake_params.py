@@ -1,76 +1,71 @@
 from datetime import datetime
 
-from src.api.auth.schemas import (
-    InviteSchema,
-    AccountSchema,
-    UserSchema,
-    SecretSchema,
+from tests.fakes.schemas import (
+    InviteTestSchema,
+    AccountTestSchema,
+    UserTestSchema,
+    SecretTestSchema,
+    MemberTestSchema,
+    CompanyTestSchema
 )
-from src.api.company.schemas import (
-    CompanySchema,
-    MemberSchema,
-)
-from api.auth.utils import hash_password
+
+from src.api.auth.utils import hash_password
+from src.api.auth.models.invite import InviteTypes
 
 
-FAKE_INVITES: list[InviteSchema] = [
-    InviteSchema(
+FAKE_INVITES: list[InviteTestSchema] = [
+    InviteTestSchema(
         email='user_1@example.com',
         token='123456',
         is_confirmed=False,
-        created_at=datetime.now(),
-        invite_type='registration',
+        invite_type=InviteTypes.ACCOUNT,
     ),
-    InviteSchema(
+    InviteTestSchema(
         email='user_2@example.com',
         token='654321',
         is_confirmed=True,
-        created_at=datetime.now(),
-        invite_type='registration',
+        invite_type=InviteTypes.ACCOUNT,
     ),
-    InviteSchema(
+    InviteTestSchema(
         email='user_3@example.com',
         token='111111',
         is_confirmed=True,
-        created_at=datetime.now(),
-        invite_type='registration',
+        invite_type=InviteTypes.ACCOUNT,
     )
 ]
 
-FAKE_ACCOUNTS: list[AccountSchema] = [
-    AccountSchema(
+FAKE_ACCOUNTS: list[AccountTestSchema] = [
+    AccountTestSchema(
         email='user_3@example.com',
         is_active=True,
     )
 ]
 
-FAKE_USERS: list[UserSchema] = [
-    UserSchema(
+FAKE_USERS: list[UserTestSchema] = [
+    UserTestSchema(
         first_name='Имя',
         last_name='Фамилия',
-        created_at=datetime.now(),
-        updated_at=datetime.now(),
     )
 ]
 
-FAKE_SECRETS: list[SecretSchema] = [
-    SecretSchema(
+FAKE_SECRETS: list[SecretTestSchema] = [
+    SecretTestSchema(
         user_id=1,
         account_id=1,
         password_hash=hash_password('qwerty'),
     )
 ]
 
-FAKE_COMPANIES: list[CompanySchema] = [
-    CompanySchema(
+FAKE_COMPANIES: list[CompanyTestSchema] = [
+    CompanyTestSchema(
         name='qwerty',
         created_at=datetime.now(),
         updated_at=datetime.now(),
     )
 ]
 
-FAKE_MEMBER: list[MemberSchema]  = [
-    MemberSchema(
+FAKE_MEMBER: list[MemberTestSchema] = [
+    MemberTestSchema(
         account_id=1,
         company_id=1,
         is_admin=True,
