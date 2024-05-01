@@ -36,80 +36,80 @@ async def check_account_with_email(
     return check_account_response
 
 
-@router.post(
-    path='/sign-up',
-    response_model=SignUpResponseSchema
-)
-async def sign_up(
-    sign_up_data: SignUpRequestSchema,
-    uow: UnitOfWork = Depends(UnitOfWork)
-):
-    sign_up_response: SignUpResponseSchema = await AccountService.sign_up_company(
-        uow=uow,
-        sign_up_data=sign_up_data
-    )
+# @router.post(
+#     path='/sign-up',
+#     response_model=SignUpResponseSchema
+# )
+# async def sign_up(
+#     sign_up_data: SignUpRequestSchema,
+#     uow: UnitOfWork = Depends(UnitOfWork)
+# ):
+#     sign_up_response: SignUpResponseSchema = await AccountService.sign_up_company(
+#         uow=uow,
+#         sign_up_data=sign_up_data
+#     )
 
-    return sign_up_response
-
-
-@router.get('/sign-up/{invite_id}/{invite_token}')
-async def check_account_with_token(
-    invite_id: int,
-    invite_token: str,
-    uow: UnitOfWork = Depends(UnitOfWork)
-):
-    await AccountService.sign_up_emloyment_user(
-        uow=uow,
-        invite_id=invite_id,
-        invite_token=invite_token,
-    )
+#     return sign_up_response
 
 
-@router.post(
-    path='/sign-up-complete',
-    response_model=SignUpCompleteResponseSchema
-)
-async def sign_up_complete(
-    user_data: SignUpCompleteRequestSchema,
-    uow: UnitOfWork = Depends(UnitOfWork),
-):
-    sign_up_complete_response: dict = await AccountService.register_company(
-        uow=uow,
-        **user_data.model_dump()
-    )
-    return sign_up_complete_response
+# @router.get('/sign-up/{invite_id}/{invite_token}')
+# async def check_account_with_token(
+#     invite_id: int,
+#     invite_token: str,
+#     uow: UnitOfWork = Depends(UnitOfWork)
+# ):
+#     await AccountService.sign_up_emloyment_user(
+#         uow=uow,
+#         invite_id=invite_id,
+#         invite_token=invite_token,
+#     )
 
 
-@router.post(
-    path='/sign-up-complete-employment'
-)
-async def sign_up_complete_employment(
-    user_data: SignUpCompleteEmploymentRequestSchema,
-    uow: UnitOfWork = Depends(UnitOfWork),
-):
-    response: dict = await AccountService.register_employment_user(
-        uow=uow,
-        **user_data.model_dump()
-    )
-    return response
+# @router.post(
+#     path='/sign-up-complete',
+#     response_model=SignUpCompleteResponseSchema
+# )
+# async def sign_up_complete(
+#     user_data: SignUpCompleteRequestSchema,
+#     uow: UnitOfWork = Depends(UnitOfWork),
+# ):
+#     sign_up_complete_response: dict = await AccountService.register_company(
+#         uow=uow,
+#         **user_data.model_dump()
+#     )
+#     return sign_up_complete_response
 
 
-@router.post('/login', response_model=TokenSchema)
-async def auth_user(
-    user: UserLoginSchema,
-    uow: UnitOfWork = Depends(UnitOfWork)
-):
-    login_response: TokenSchema = await AccountService.login(
-        uow=uow,
-        user=user
-    )
+# @router.post(
+#     path='/sign-up-complete-employment'
+# )
+# async def sign_up_complete_employment(
+#     user_data: SignUpCompleteEmploymentRequestSchema,
+#     uow: UnitOfWork = Depends(UnitOfWork),
+# ):
+#     response: dict = await AccountService.register_employment_user(
+#         uow=uow,
+#         **user_data.model_dump()
+#     )
+#     return response
 
-    return login_response
 
-@router.post('/logout')
-async def logout_user(
-    uow: UnitOfWork = Depends(UnitOfWork),
-    account = Depends(get_current_account)
-):
-    await AccountService.logout(uow=uow, account_id=account.id)
-    return
+# @router.post('/login', response_model=TokenSchema)
+# async def auth_user(
+#     user: UserLoginSchema,
+#     uow: UnitOfWork = Depends(UnitOfWork)
+# ):
+#     login_response: TokenSchema = await AccountService.login(
+#         uow=uow,
+#         user=user
+#     )
+
+#     return login_response
+
+# @router.post('/logout')
+# async def logout_user(
+#     uow: UnitOfWork = Depends(UnitOfWork),
+#     account = Depends(get_current_account)
+# ):
+#     await AccountService.logout(uow=uow, account_id=account.id)
+#     return
