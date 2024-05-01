@@ -33,7 +33,7 @@ class AccountService(BaseService):
         return CheckAccountResponseSchema(account=email)
 
     @classmethod
-    async def sign_up(
+    async def sign_up_company(
         cls,
         uow: UnitOfWork,
         sign_up_data: SignUpRequestSchema
@@ -62,31 +62,26 @@ class AccountService(BaseService):
     async def register_company(
         cls,
         uow: UnitOfWork,
-        user_data: dict
+        account: str, password: str, first_name: str, last_name: str, company_name: str,
     ) -> None:
         async with uow:
-            invite_info: dict = cls._generate_invite_info(user_data)
-            _invite: InviteModel = await uow.invite.get_by_query_one_or_none(**invite_info)
+            await cls._get_invite_obj_or_raise(uow=uow, email=account)
 
-            if _invite is None or not _invite.is_confirmed:
-                raise exceptions.account_is_not_confirmed()
+            await cls._check_if_account_exists_or_raise(uow=uow, email=account)
 
-            is_account_exists: bool = await uow.account.get_by_query_one_or_none(email=user_data.get('account')) is not None
+            user_obj: UserModel = await uow.user.add_one_and_get_obj(
+                first_name=first_name,
+                last_name=last_name
+            )
 
-            if is_account_exists:
-                raise exceptions.account_already_registered()
+            account_obj: AccountModel = await uow.account.add_one_and_get_obj(email=account)
 
-            user_info: dict = cls._generate_user_info(user_data)
-            user_obj: UserModel = await uow.user.add_one_and_get_obj(**user_info)
+            await cls._add_secret_obj(uow=uow, user_obj=user_obj, account_obj=account_obj, password=password)
 
-            account_obj: AccountModel = await uow.account.add_one_and_get_obj(email=user_data.get('account'))
+            company_obj: CompanyModel = await uow.company.add_one_and_get_obj(
+                name=company_name
+            )
 
-            secret_info: dict = cls._generate_secret_info(
-                user_obj, account_obj, user_data.get('password'))
-            await uow.secret.add_one(**secret_info)
-
-            company_obj: CompanyModel = await uow.company.add_one_and_get_obj(name=user_data.get('company_name'))
-            
             await uow.member.add_one(account_id=account_obj.id, company_id=company_obj.id, is_admin=True)
 
             response_data: SignUpCompleteResponseSchema = SignUpCompleteResponseSchema(
@@ -98,6 +93,33 @@ class AccountService(BaseService):
             )
 
             return response_data
+
+    @classmethod
+    async def sign_up_emloyment_user(
+        cls,
+        uow: UnitOfWork,
+        invite_id: int,
+        invite_token: str,
+    ):
+        async with uow:
+            invite_obj: InviteModel = await uow.invite.get_by_query_one_or_none(
+                id=invite_id,
+                token=invite_token,
+                invite_type='employment',
+            )
+            if invite_obj is None:
+                raise exceptions.page_not_found()
+
+            if invite_obj.is_confirmed:
+                raise exceptions.invite_token_already_confirmed()
+
+            invite_obj.is_confirmed = True
+
+    @classmethod
+    async def register_employment_user(cls, uow: UnitOfWork, email: str, password: str):
+        await cls._get_invite_obj_or_raise(uow=uow, email=email, invite_type='employment')
+        
+        await cls._check_if_account_exists_or_raise(uow=uow, email=email)
 
     @classmethod
     async def authentication(cls, uow: UnitOfWork, email: str, password: str) -> SecretModel:
@@ -120,28 +142,42 @@ class AccountService(BaseService):
             await uow.credential.delete_by_query(account_id=account_id)
 
     @classmethod
-    def _generate_invite_info(cls, user_data: dict) -> dict:
-        return {
-            'email': user_data.get('account'),
-            'is_confirmed': True
-        }
-
-    @classmethod
-    def _generate_user_info(cls, user_data: dict) -> dict:
-        return {
-            'first_name': user_data.get('first_name'),
-            'last_name': user_data.get('last_name'),
-        }
-
-    @classmethod
-    def _generate_secret_info(
+    async def _get_invite_obj_or_raise(
         cls,
+        uow: UnitOfWork,
+        email: str,
+        invite_type: str = 'registration'
+    ) -> InviteModel:
+        invite_info: dict = {
+            'email': email,
+            'is_confirmed': True,
+            'invite_type': invite_type
+        }
+        _invite_obj: InviteModel = await uow.invite.get_by_query_one_or_none(**invite_info)
+
+        if _invite_obj is None or not _invite_obj.is_confirmed:
+            raise exceptions.account_is_not_confirmed()
+
+        return _invite_obj
+
+    @classmethod
+    async def _check_if_account_exists_or_raise(cls, uow: UnitOfWork, email: str) -> AccountModel:
+        is_account_exists: bool = await uow.account.get_by_query_one_or_none(email=email) is not None
+
+        if is_account_exists:
+            raise exceptions.account_already_registered()
+
+    @classmethod
+    async def _add_secret_obj(
+        cls,
+        uow: UnitOfWork,
         user_obj: UserModel,
         account_obj: AccountModel,
-        password: str
-    ) -> dict:
-        return {
+        password: str,
+    ) -> None:
+        secret: dict = {
             'user_id': user_obj.id,
             'account_id': account_obj.id,
             'password_hash': utils.hash_password(password)
         }
+        await uow.secret.add_one(**secret)

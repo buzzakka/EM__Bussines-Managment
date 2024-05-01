@@ -30,3 +30,8 @@ class SignUpCompleteResponseSchema(BaseModel):
     first_name: str
     last_name: str
     company_name: str
+
+
+class SignUpCompleteEmploymentRequestSchema(BaseModel):
+    email: str
+    password: str

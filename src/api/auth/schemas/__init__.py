@@ -11,6 +11,7 @@ __all__ = [
     'SignUpCompleteRequestSchema',
     'SignUpCompleteResponseSchema',
     'CheckAccountResponseSchema',
+    'SignUpCompleteEmploymentRequestSchema',
     
     'UserLoginSchema',
 ]
@@ -30,6 +31,7 @@ from src.api.auth.schemas.registration import (
     SignUpCompleteRequestSchema,
     SignUpCompleteResponseSchema,
     CheckAccountResponseSchema,
+    SignUpCompleteEmploymentRequestSchema,
 )
 
 from src.api.auth.schemas.auth import UserLoginSchema
