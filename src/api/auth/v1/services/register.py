@@ -84,26 +84,28 @@ class RegisterService(BaseService):
                 company_name=company_obj.name
             )
 
-    # @classmethod
-    # async def sign_up_emloyment_user(
-    #     cls,
-    #     uow: UnitOfWork,
-    #     invite_id: int,
-    #     invite_token: str,
-    # ):
-    #     async with uow:
-    #         invite_obj: InviteModel = await uow.invite.get_by_query_one_or_none(
-    #             id=invite_id,
-    #             token=invite_token,
-    #             invite_type='employment',
-    #         )
-    #         if invite_obj is None:
-    #             raise exceptions.page_not_found()
+    @classmethod
+    async def sign_up_employee(
+        cls,
+        uow: UnitOfWork,
+        invite_id: int,
+        invite_token: str,
+    ):
+        async with uow:
+            invite_obj: InviteModel = await uow.invite.get_by_query_one_or_none(
+                id=invite_id,
+                token=invite_token,
+                invite_type=InviteTypes.EMPLOYMENT,
+            )
+            if invite_obj is None:
+                raise exceptions.page_not_found()
 
-    #         if invite_obj.is_confirmed:
-    #             raise exceptions.invite_token_already_confirmed()
+            if invite_obj.is_confirmed:
+                raise exceptions.invite_token_already_confirmed()
 
-    #         invite_obj.is_confirmed = True
+            invite_obj.is_confirmed = True
+            
+            return SignUpResponseSchema(email=invite_obj.email)
 
     # @classmethod
     # async def register_employment_user(cls, uow: UnitOfWork, email: str, password: str):
