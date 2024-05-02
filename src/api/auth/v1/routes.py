@@ -84,18 +84,18 @@ async def check_account_with_token(
     return response
 
 
-@router.post(
-    path='/sign-up-employee'
-)
-async def sign_up_complete_employment(
-    user_data: SignUpCompleteEmploymentRequestSchema,
-    uow: UnitOfWork = Depends(UnitOfWork),
-):
-    response: dict = await RegisterService.register_employee(
-        uow=uow,
-        **user_data.model_dump()
-    )
-    return response
+# @router.post(
+#     path='/sign-up-employee'
+# )
+# async def sign_up_complete_employment(
+#     user_data: SignUpCompleteEmploymentRequestSchema,
+#     uow: UnitOfWork = Depends(UnitOfWork),
+# ):
+#     response: dict = await RegisterService.register_employee(
+#         uow=uow,
+#         **user_data.model_dump()
+#     )
+#     return response
 
 
 @router.post('/login', response_model=TokenSchema)
@@ -109,7 +109,7 @@ async def login(
     )
     return login_response
 
-@router.post('/logout')
+@router.post('/logout', tags=['protected'])
 async def logout(
     request: Request,
     uow: UnitOfWork = Depends(UnitOfWork),

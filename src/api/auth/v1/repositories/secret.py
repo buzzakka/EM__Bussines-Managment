@@ -8,9 +8,9 @@ from src.api.auth.models import AccountModel, SecretModel
 class SecretRepository(SqlAlchemyRepository):
     model = SecretModel
 
-    async def get_account_id_and_password(self, email: str):
+    async def get_account_info_and_password(self, email: str):
         query = (
-            select(SecretModel.account_id, SecretModel.password_hash)
+            select(SecretModel.account_id, SecretModel.password_hash, AccountModel.is_active)
             .join(AccountModel)
             .filter(AccountModel.email == email)
         )

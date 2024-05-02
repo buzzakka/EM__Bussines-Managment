@@ -11,39 +11,40 @@ from src.api.auth import utils, exceptions
 class AuthService(BaseService):
 
     repository: str = 'account'
-    
+
     @classmethod
     async def login(cls, uow: UnitOfWork, user: UserLoginSchema) -> TokenSchema:
         async with uow:
             await cls._check_account(uow=uow, email=user.email, password=user.password)
-            
+
             token: str = await cls._create_and_return_jwt(uow=uow, email=user.email)
             return TokenSchema(access_token=token)
-    
+
     @classmethod
     async def logout(cls, uow: UnitOfWork, account_id: int):
         async with uow:
             await uow.credential.delete_by_query(account_id=account_id)
-    
+
     @classmethod
     async def _check_account(cls, uow: UnitOfWork, email: str, password: str):
-        account_info: SecretModel = await uow.secret.get_account_id_and_password(email=email)
+        account_info: SecretModel = await uow.secret.get_account_info_and_password(email=email)
 
-        if account_info is None:
+        if account_info is None or not account_info.is_active:
             raise exceptions.incorrect_email_or_password()
 
-        is_correct_password: bool = utils.validate_password(password, account_info.password_hash)
-        
+        is_correct_password: bool = utils.validate_password(
+            password, account_info.password_hash)
+
         if not is_correct_password:
             raise exceptions.incorrect_email_or_password()
-    
+
     @classmethod
     async def _create_and_return_jwt(cls, uow: UnitOfWork, email: str):
         db_payload = await uow.credential.get_payload(email=email)
-        
+
         if db_payload is None:
             raise exceptions.incorrect_email_or_password()
-        
+
         payload: dict = utils.make_payload(
             account_id=db_payload.account_id,
             company_id=db_payload.company_id,
@@ -63,6 +64,5 @@ class AuthService(BaseService):
             )
         else:
             credential_obj.api_key = token
-        
+
         return token
-        
