@@ -70,7 +70,7 @@ async def sign_up_complete(
     return sign_up_complete_response
 
 
-@router.get('/sign-up-employee/')
+@router.get('/sign-up-employee')
 async def check_account_with_token(
     invite_id: int,
     invite_token: str,
@@ -84,18 +84,18 @@ async def check_account_with_token(
     return response
 
 
-# @router.post(
-#     path='/sign-up-complete-employment'
-# )
-# async def sign_up_complete_employment(
-#     user_data: SignUpCompleteEmploymentRequestSchema,
-#     uow: UnitOfWork = Depends(UnitOfWork),
-# ):
-#     response: dict = await AccountService.register_employment_user(
-#         uow=uow,
-#         **user_data.model_dump()
-#     )
-#     return response
+@router.post(
+    path='/sign-up-employee'
+)
+async def sign_up_complete_employment(
+    user_data: SignUpCompleteEmploymentRequestSchema,
+    uow: UnitOfWork = Depends(UnitOfWork),
+):
+    response: dict = await RegisterService.register_employee(
+        uow=uow,
+        **user_data.model_dump()
+    )
+    return response
 
 
 @router.post('/login', response_model=TokenSchema)

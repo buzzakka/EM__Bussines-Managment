@@ -5,6 +5,7 @@ from starlette.middleware.base import BaseHTTPMiddleware
 
 from src.core.utils import UnitOfWork
 from src.api.auth import exceptions, utils
+from src.api.auth.models import CredentialModel
 from src.api.auth.v1.services import CredentialService
 
 
@@ -25,12 +26,12 @@ class AuthMiddleware(BaseHTTPMiddleware):
         credential: HTTPAuthorizationCredentials = await http_bearer(request)
         token: str = credential.credentials
         
-        is_exist_token: bool = await CredentialService.get_by_query_one_or_none(
+        cred_obj: CredentialModel = await CredentialService.get_by_query_one_or_none(
             uow=UnitOfWork(),
             api_key=token,
-        ) is not None
+        )
 
-        if not is_exist_token:
+        if cred_obj is None or not cred_obj.account.is_active:
             raise exceptions.incorrect_jwt_token()
         
         return utils.decode_jwt(token)      

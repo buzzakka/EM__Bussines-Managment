@@ -67,6 +67,7 @@ class RegisterService(BaseService):
             )
 
             account_obj: AccountModel = await uow.account.add_one_and_get_obj(email=account)
+            account_obj.is_active = True
 
             await cls._add_secret_obj(uow=uow, user_obj=user_obj, account_obj=account_obj, password=password)
 
@@ -107,21 +108,16 @@ class RegisterService(BaseService):
             
             return SignUpResponseSchema(email=invite_obj.email)
 
-    # @classmethod
-    # async def register_employment_user(cls, uow: UnitOfWork, email: str, password: str):
-    #     await cls._get_invite_obj_or_raise(uow=uow, email=email, invite_type='employment')
+    @classmethod
+    async def register_employee(
+        cls,
+        uow: UnitOfWork,
+        email: str,
+        password: str
+    ):
+        await cls._get_invite_obj_or_raise(uow=uow, email=email, invite_type='employment')
 
-    #     await cls._check_if_account_exists_or_raise(uow=uow, email=email)
-
-    # @classmethod
-    # async def authentication(cls, uow: UnitOfWork, email: str, password: str) -> SecretModel:
-    #     async with uow:
-    #         account_info: SecretModel = await uow.secret.get_account_info_and_password_or_none(email=email)
-
-    #         if account_info is None or not utils.validate_password(password, account_info.password_hash):
-    #             raise exceptions.incorrect_email_or_password()
-
-    #         return account_info
+        await cls._check_if_account_exists_or_raise(uow=uow, email=email)
 
     @classmethod
     async def _create_invite_token(cls, uow: UnitOfWork, email: str, invite_type: str):
