@@ -2,10 +2,11 @@ from fastapi import Depends
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from jwt import InvalidTokenError
 
+from core import exceptions
 from src.core.utils import UnitOfWork
 
 from src.api.auth.models import CredentialModel
-from src.api.auth import utils, exceptions
+from src.api.auth import utils
 
 
 http_bearer: HTTPBearer = HTTPBearer()

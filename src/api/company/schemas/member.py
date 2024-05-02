@@ -1,7 +1,12 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr
 
 
-class NewMemberSchema(BaseModel):
-    email: str
+class AddMemberRequestSchema(BaseModel):
+    email: EmailStr
     first_name: str
     last_name: str
+
+
+class AddMemberResponseSchema(BaseModel):
+    user: AddMemberRequestSchema
+    message: str = 'Пользователь успешно создан'

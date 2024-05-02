@@ -1,3 +1,4 @@
+from src.core import exceptions
 from src.core.utils import UnitOfWork, BaseService
 
 from src.api.auth.models import CredentialModel, SecretModel
@@ -5,7 +6,7 @@ from src.api.auth.schemas import (
     UserLoginSchema,
     TokenSchema,
 )
-from src.api.auth import utils, exceptions
+from src.api.auth import utils
 
 
 class AuthService(BaseService):

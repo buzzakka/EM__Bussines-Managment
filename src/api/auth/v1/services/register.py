@@ -11,7 +11,7 @@ from src.api.auth.schemas import (
     CheckAccountResponseSchema,
 )
 from src.api.auth.models.invite import InviteTypes
-from src.api.auth import exceptions
+from src.core import exceptions
 from src.api.auth import utils
 
 
@@ -55,7 +55,7 @@ class RegisterService(BaseService):
         cls,
         uow: UnitOfWork,
         account: str, password: str, first_name: str, last_name: str, company_name: str,
-    ) -> None:
+    ) -> SignUpCompleteResponseSchema:
         async with uow:
             await cls._get_invite_obj_or_raise(uow=uow, email=account, invite_type=InviteTypes.ACCOUNT)
 
@@ -108,19 +108,19 @@ class RegisterService(BaseService):
             
             return SignUpResponseSchema(email=invite_obj.email)
 
-    @classmethod
-    async def register_employee(
-        cls,
-        uow: UnitOfWork,
-        email: str,
-        password: str
-    ):
-        await cls._get_invite_obj_or_raise(uow=uow, email=email, invite_type='employment')
+    # @classmethod
+    # async def register_employee(
+    #     cls,
+    #     uow: UnitOfWork,
+    #     email: str,
+    #     password: str
+    # ):
+    #     await cls._get_invite_obj_or_raise(uow=uow, email=email, invite_type='employment')
 
-        await cls._check_if_account_exists_or_raise(uow=uow, email=email)
+    #     await cls._check_if_account_exists_or_raise(uow=uow, email=email)
 
-    @classmethod
-    async def _create_invite_token(cls, uow: UnitOfWork, email: str, invite_type: str):
+    @staticmethod
+    async def _create_invite_token(uow: UnitOfWork, email: str, invite_type: str):
         token: str = str(randint(100000, 999999))
 
         invite_obj: InviteModel = await uow.invite.get_by_query_one_or_none(email=email)
@@ -135,8 +135,8 @@ class RegisterService(BaseService):
 
         return invite_obj
 
-    @classmethod
-    async def _confirm_invite_token(cls, uow: UnitOfWork, email: str, invite_token: str) -> None:
+    @staticmethod
+    async def _confirm_invite_token(uow: UnitOfWork, email: str, invite_token: str) -> None:
         invite_obj: InviteModel = await uow.invite.get_by_query_one_or_none(
             email=email,
             token=invite_token
@@ -150,13 +150,12 @@ class RegisterService(BaseService):
 
         invite_obj.is_confirmed = True
 
-    @classmethod
-    async def _is_account_exists(cls, uow: UnitOfWork, email: str) -> AccountModel:
+    @staticmethod
+    async def _is_account_exists(uow: UnitOfWork, email: str) -> AccountModel:
         return await uow.account.get_by_query_one_or_none(email=email) is not None
 
-    @classmethod
+    @staticmethod
     async def _get_invite_obj_or_raise(
-        cls,
         uow: UnitOfWork,
         email: str,
         invite_type: str
@@ -173,16 +172,15 @@ class RegisterService(BaseService):
 
         return _invite_obj
 
-    @classmethod
-    async def _check_if_account_exists_or_raise(cls, uow: UnitOfWork, email: str) -> AccountModel:
+    @staticmethod
+    async def _check_if_account_exists_or_raise(uow: UnitOfWork, email: str) -> AccountModel:
         is_account_exists: bool = await uow.account.get_by_query_one_or_none(email=email) is not None
 
         if is_account_exists:
             raise exceptions.account_already_registered()
 
-    @classmethod
+    @staticmethod
     async def _add_secret_obj(
-        cls,
         uow: UnitOfWork,
         user_obj: UserModel,
         account_obj: AccountModel,
