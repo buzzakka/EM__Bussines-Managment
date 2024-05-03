@@ -1,10 +1,10 @@
 from fastapi import HTTPException, status
 
 
-def account_already_registered() -> HTTPException:
+def account_already_registered(email: str) -> HTTPException:
     return HTTPException(
         status_code=status.HTTP_400_BAD_REQUEST,
-        detail='Пользователь уже зарегистрирован.'
+        detail=f'Пользователь {email} уже зарегистрирован.'
     )
 
 
@@ -36,6 +36,13 @@ def incorrect_email_or_password() -> HTTPException:
     )
 
 
+def incorrect_email(email: str) -> HTTPException:
+    return HTTPException(
+        status_code=status.HTTP_400_BAD_REQUEST,
+        detail=f'Пользователь {email} не найден.'
+    )
+
+
 def incorrect_jwt_token() -> HTTPException:
     return HTTPException(
         status_code=status.HTTP_400_BAD_REQUEST,
@@ -45,6 +52,6 @@ def incorrect_jwt_token() -> HTTPException:
 
 def page_not_found() -> HTTPException:
     raise HTTPException(
-            status_code=404,
-            detail='Страница не найдена',
-        )
+        status_code=404,
+        detail='Страница не найдена',
+    )

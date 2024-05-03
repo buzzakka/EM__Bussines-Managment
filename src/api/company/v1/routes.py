@@ -1,9 +1,15 @@
 from fastapi import APIRouter, Depends, Request
+from pydantic import Field, EmailStr
 
 from src.core.utils import UnitOfWork
 
 from src.api.company.v1.services import MemberService
-from src.api.company.schemas import AddMemberRequestSchema, AddMemberResponseSchema
+from src.api.company.schemas import (
+    AddMemberRequestSchema,
+    AddMemberResponseSchema,
+    UpdateUsersEmailByAdminResponseSchema,
+    UpdateUsersEmailByAdminRequestSchema
+)
 
 
 router: APIRouter = APIRouter(
@@ -29,5 +35,22 @@ async def add_new_member(
         first_name=member.first_name,
         last_name=member.last_name,
         company_id=payload['company_id']
+    )
+    return response
+
+
+@router.post('/update-users-email', tags=['protected', 'for_admins'])
+async def update_users_email(
+    request: Request,
+    emails: UpdateUsersEmailByAdminRequestSchema,
+    uow: UnitOfWork = Depends(UnitOfWork),
+):
+    payload: dict = request.state.payload
+    company_id: int = payload['company_id']
+    response: UpdateUsersEmailByAdminResponseSchema = await MemberService.update_users_email_by_admin(
+        uow=uow,
+        email=emails.email,
+        new_email=emails.new_email,
+        company_id=company_id
     )
     return response

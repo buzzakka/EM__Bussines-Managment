@@ -1,9 +1,14 @@
+from src.core import exceptions
 from src.core.utils import BaseService, UnitOfWork
 from src.celery_app.tasks import send_invite_link
 
 from src.api.auth.v1.services import RegisterService
 from src.api.auth.models import UserModel, AccountModel, InviteTypes, InviteModel
-from src.api.company.schemas import AddMemberResponseSchema, AddMemberRequestSchema
+from src.api.company.schemas import (
+    AddMemberResponseSchema,
+    AddMemberRequestSchema,
+    UpdateUsersEmailByAdminResponseSchema
+)
 
 
 class MemberService(BaseService):
@@ -46,7 +51,7 @@ class MemberService(BaseService):
                 invite_type=InviteTypes.EMPLOYMENT
             )
 
-            cls.send_invite_link(email=email, invite_token=invite_obj.token)
+            cls._send_invite_link(email=email, invite_token=invite_obj.token)
 
             return AddMemberResponseSchema(
                 user=AddMemberRequestSchema(
@@ -54,7 +59,29 @@ class MemberService(BaseService):
                 )
             )
 
+    @classmethod
+    async def update_users_email_by_admin(
+        cls,
+        uow: UnitOfWork,
+        email: str, new_email: str, company_id: str
+    ):
+        async with uow:
+            account_obj: AccountModel = await uow.member.get_account_by_company_id_and_email_or_none(
+                company_id=company_id,
+                email=email,
+            )
+
+            if account_obj is None:
+                raise exceptions.incorrect_email(email=email)
+            
+            if await uow.account.get_by_query_one_or_none(email=new_email) is not None:
+                raise exceptions.account_already_registered(new_email)
+            
+            account_obj.email = new_email
+            
+            return UpdateUsersEmailByAdminResponseSchema(new_email=new_email)
+
     @staticmethod
-    def send_invite_link(email: str, invite_token: str) -> None:
+    def _send_invite_link(email: str, invite_token: str) -> None:
         invite_link: str = f'http://127.0.0.1:8000/api/v1/auth/sign-up?{email=}&{invite_token=}'
         send_invite_link.delay(to_email=email, invite_link=invite_link)
