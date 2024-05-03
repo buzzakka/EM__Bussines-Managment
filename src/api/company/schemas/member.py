@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, UUID4
 
 
 class AddMemberRequestSchema(BaseModel):
@@ -13,7 +13,7 @@ class AddMemberResponseSchema(BaseModel):
 
 
 class UpdateUsersEmailByAdminRequestSchema(BaseModel):
-    email: EmailStr
+    account_id: UUID4
     new_email: EmailStr
 
 

@@ -55,3 +55,10 @@ def page_not_found() -> HTTPException:
         status_code=404,
         detail='Страница не найдена',
     )
+
+
+def incorrect_account_id() -> HTTPException:
+    raise HTTPException(
+        status_code=404,
+        detail='Неверный account_id',
+    )

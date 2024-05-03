@@ -63,19 +63,19 @@ class MemberService(BaseService):
     async def update_users_email_by_admin(
         cls,
         uow: UnitOfWork,
-        email: str, new_email: str, company_id: str
+        account_id: str, new_email: str, company_id: str
     ):
         async with uow:
-            account_obj: AccountModel = await uow.member.get_account_by_company_id_and_email_or_none(
+            account_obj: AccountModel = await uow.member.get_account_by_company_id_and_account_id_or_none(
                 company_id=company_id,
-                email=email,
+                account_id=account_id,
             )
 
             if account_obj is None:
-                raise exceptions.incorrect_email(email=email)
+                raise exceptions.incorrect_account_id()
             
             if await uow.account.get_by_query_one_or_none(email=new_email) is not None:
-                raise exceptions.account_already_registered(new_email)
+                raise exceptions.account_already_registered(email=new_email)
             
             account_obj.email = new_email
             

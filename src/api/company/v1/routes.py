@@ -42,15 +42,15 @@ async def add_new_member(
 @router.post('/update-users-email', tags=['protected', 'for_admins'])
 async def update_users_email(
     request: Request,
-    emails: UpdateUsersEmailByAdminRequestSchema,
+    data: UpdateUsersEmailByAdminRequestSchema,
     uow: UnitOfWork = Depends(UnitOfWork),
 ):
     payload: dict = request.state.payload
     company_id: int = payload['company_id']
     response: UpdateUsersEmailByAdminResponseSchema = await MemberService.update_users_email_by_admin(
         uow=uow,
-        email=emails.email,
-        new_email=emails.new_email,
+        account_id=data.account_id,
+        new_email=data.new_email,
         company_id=company_id
     )
     return response
