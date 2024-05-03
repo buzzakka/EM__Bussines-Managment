@@ -2,13 +2,13 @@ from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from src.core.models.base import Base
-from src.core.models.mixins.custom_types import int_pk_T
+from src.core.models.mixins.custom_types import uuid_pk_T
 
 
 class SecretModel(Base):
     __tablename__ = 'secret'
 
-    id: Mapped[int_pk_T]
+    id: Mapped[uuid_pk_T]
     user_id: Mapped[int] = mapped_column(ForeignKey('user.id'), unique=True)
     account_id: Mapped[int] = mapped_column(
         ForeignKey('account.id'), unique=True

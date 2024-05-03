@@ -2,7 +2,7 @@ from sqlalchemy.orm import Mapped, relationship
 
 from src.core.models.base import Base
 from src.core.models.mixins.custom_types import (
-    int_pk_T,
+    uuid_pk_T,
     created_at_T,
     updated_at_T
 )
@@ -11,7 +11,7 @@ from src.core.models.mixins.custom_types import (
 class UserModel(Base):
     __tablename__ = 'user'
 
-    id: Mapped[int_pk_T]
+    id: Mapped[uuid_pk_T]
     first_name: Mapped[str]
     last_name: Mapped[str]
 
