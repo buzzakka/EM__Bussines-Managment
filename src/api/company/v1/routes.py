@@ -14,7 +14,7 @@ router: APIRouter = APIRouter(
 
 @router.post(
     '/add-member',
-    tags=['protected'],
+    tags=['protected', 'for_admins'],
     response_model=AddMemberResponseSchema
 )
 async def add_new_member(

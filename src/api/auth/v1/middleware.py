@@ -11,17 +11,30 @@ from src.api.auth.v1.services import CredentialService
 
 
 class AuthMiddleware(BaseHTTPMiddleware):
-    def __init__(self, router: APIRouter, tag: str = 'protected', *args, **kwargs):
+    def __init__(
+        self, 
+        router: APIRouter, 
+        protected_tag: str = 'protected',
+        for_admin_tag: str = 'for_admins',
+        *args, 
+        **kwargs):
         self.protected_paths: list[str] = [
-            route.path for route in router.routes if tag in route.__dict__['tags']
+            route.path for route in router.routes if protected_tag in route.__dict__['tags']
+        ]
+        self.only_for_admins: list[str] = [
+            route.path for route in router.routes if for_admin_tag in route.__dict__['tags']
         ]
         super().__init__(*args, **kwargs)
 
     async def dispatch(self, request: Request, call_next):
-        if request.scope.get('path') in self.protected_paths:
+        path: str = request.scope.get('path')
+        if path in self.protected_paths:
             try:
                 payload: dict = await self._get_payload(request)
                 request.state.payload = payload
+                
+                if path in self.only_for_admins:
+                    self._check_is_admin(payload=payload)
             except HTTPException as e:
                 return JSONResponse(status_code=status.HTTP_401_UNAUTHORIZED, content=e.detail)
 
@@ -42,3 +55,8 @@ class AuthMiddleware(BaseHTTPMiddleware):
             raise exceptions.incorrect_jwt_token()
 
         return utils.decode_jwt(token)
+    
+    def _check_is_admin(self, payload: dict):
+        if not payload['is_admin']:
+            raise exceptions.page_not_found()
+        
