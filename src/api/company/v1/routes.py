@@ -1,8 +1,9 @@
 from fastapi import APIRouter, Depends, Request
 
 from src.core.utils import UnitOfWork
-from src.api.company.schemas import AddMemberRequestSchema, AddMemberResponseSchema
+
 from src.api.company.v1.services import MemberService
+from src.api.company.schemas import AddMemberRequestSchema, AddMemberResponseSchema
 
 
 router: APIRouter = APIRouter(
@@ -11,8 +12,11 @@ router: APIRouter = APIRouter(
 )
 
 
-
-@router.post('/add-member', tags=['protected'] ,response_model=AddMemberResponseSchema)
+@router.post(
+    '/add-member',
+    tags=['protected'],
+    response_model=AddMemberResponseSchema
+)
 async def add_new_member(
     request: Request,
     member: AddMemberRequestSchema,

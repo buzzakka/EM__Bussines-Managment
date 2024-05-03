@@ -1,7 +1,8 @@
 from src.core.utils import BaseService, UnitOfWork
+from src.celery_app.tasks import send_invite_link
 
 from src.api.auth.v1.services import RegisterService
-from src.api.auth.models import UserModel, AccountModel, InviteTypes
+from src.api.auth.models import UserModel, AccountModel, InviteTypes, InviteModel
 from src.api.company.schemas import AddMemberResponseSchema, AddMemberRequestSchema
 
 
@@ -40,12 +41,19 @@ class MemberService(BaseService):
                 is_admin=False
             )
 
-            await RegisterService._create_invite_token(
+            invite_obj: InviteModel = await RegisterService._create_invite_token(
                 uow=uow,
                 email=email,
                 invite_type=InviteTypes.EMPLOYMENT
             )
             
+            cls.send_invite_link(email=email, invite_token=invite_obj.token)
+            
             return AddMemberResponseSchema(
                 user=AddMemberRequestSchema(email=email, first_name=first_name, last_name=last_name)
             )
+    
+    @staticmethod
+    def send_invite_link(email: str, invite_token: str) -> None:
+        invite_link: str = f'http://127.0.0.1:8000/api/v1/auth/sign-up?{email=}&{invite_token=}'
+        send_invite_link.delay(to_email=email, invite_link=invite_link)

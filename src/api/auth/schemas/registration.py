@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, UUID4
 
 
 class CheckAccountResponseSchema(BaseModel):
@@ -24,7 +24,7 @@ class SignUpCompleteRequestSchema(BaseModel):
 
 
 class SignUpCompleteResponseSchema(BaseModel):
-    user_id: int
+    user_id: UUID4
     email: EmailStr
     first_name: str
     last_name: str

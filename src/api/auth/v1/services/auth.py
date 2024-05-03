@@ -47,8 +47,8 @@ class AuthService(BaseService):
             raise exceptions.incorrect_email_or_password()
 
         payload: dict = utils.make_payload(
-            account_id=db_payload.account_id,
-            company_id=db_payload.company_id,
+            account_id=str(db_payload.account_id),
+            company_id=str(db_payload.company_id),
             is_admin=db_payload.is_admin
         )
 
