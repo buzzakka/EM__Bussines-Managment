@@ -1,6 +1,7 @@
 from random import randint
 
 from src.core.utils import UnitOfWork, BaseService
+from src.celery_app.tasks import send_invite_token
 
 from src.api.auth.models import InviteModel, UserModel, AccountModel
 from src.api.company.models import CompanyModel
@@ -28,7 +29,13 @@ class RegisterService(BaseService):
             if is_account_exists:
                 raise exceptions.account_already_registered()
 
-            await cls._create_invite_token(uow=uow, email=email, invite_type=InviteTypes.ACCOUNT)
+            invite_obj: InviteModel = await cls._create_invite_token(
+                uow=uow, 
+                email=email, 
+                invite_type=InviteTypes.ACCOUNT
+            )
+            
+            send_invite_token.delay(to_email=email, invite_token=invite_obj.token)
 
             return CheckAccountResponseSchema(email=email)
 
