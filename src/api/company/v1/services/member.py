@@ -7,7 +7,8 @@ from src.api.auth.models import UserModel, AccountModel, InviteTypes, InviteMode
 from src.api.company.schemas import (
     AddMemberResponseSchema,
     AddMemberRequestSchema,
-    UpdateUsersEmailByAdminResponseSchema
+    UpdateUsersEmailByAdminResponseSchema,
+    UpdateUsersNameByAdminResponseSchema
 )
 
 
@@ -73,13 +74,33 @@ class MemberService(BaseService):
 
             if account_obj is None:
                 raise exceptions.incorrect_account_id()
-            
+
             if await uow.account.get_by_query_one_or_none(email=new_email) is not None:
                 raise exceptions.account_already_registered(email=new_email)
-            
+
             account_obj.email = new_email
-            
+
             return UpdateUsersEmailByAdminResponseSchema(new_email=new_email)
+
+    @classmethod
+    async def update_users_name(
+        cls,
+        uow: UnitOfWork,
+        company_id: str, account_id: str, first_name: str, last_name: str
+    ):
+        async with uow:
+            user_obj: UserModel = await uow.member.get_user_by_company_id_and_account_id_or_none(
+                company_id=company_id,
+                account_id=account_id,
+            )
+            if user_obj is None:
+                raise exceptions.incorrect_account_id()
+            
+            user_obj.first_name = first_name
+            user_obj.last_name = last_name
+            
+            return UpdateUsersNameByAdminResponseSchema(account_id=account_id)
+        
 
     @staticmethod
     def _send_invite_link(email: str, invite_token: str) -> None:

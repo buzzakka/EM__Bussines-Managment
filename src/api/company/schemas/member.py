@@ -20,3 +20,14 @@ class UpdateUsersEmailByAdminRequestSchema(BaseModel):
 class UpdateUsersEmailByAdminResponseSchema(BaseModel):
     new_email: str
     message: str = 'Адрес электронной почты успешно изменён!'
+
+
+class UpdateUsersNameByAdminRequeestSchema(BaseModel):
+    account_id: UUID4
+    first_name: str
+    last_name: str
+
+
+class UpdateUsersNameByAdminResponseSchema(BaseModel):
+    account_id: UUID4
+    message: str = 'Фамилия и имя пользователя изменены!'

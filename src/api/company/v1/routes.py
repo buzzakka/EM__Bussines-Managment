@@ -8,7 +8,8 @@ from src.api.company.schemas import (
     AddMemberRequestSchema,
     AddMemberResponseSchema,
     UpdateUsersEmailByAdminResponseSchema,
-    UpdateUsersEmailByAdminRequestSchema
+    UpdateUsersEmailByAdminRequestSchema,
+    UpdateUsersNameByAdminRequeestSchema,
 )
 
 
@@ -52,5 +53,23 @@ async def update_users_email(
         account_id=data.account_id,
         new_email=data.new_email,
         company_id=company_id
+    )
+    return response
+
+
+@router.post('/update-users-name', tags=['protected', 'for_admins'])
+async def update_users_email(
+    request: Request,
+    data: UpdateUsersNameByAdminRequeestSchema,
+    uow: UnitOfWork = Depends(UnitOfWork),
+):
+    payload: dict = request.state.payload
+    company_id: int = payload['company_id']
+    response: UpdateUsersEmailByAdminResponseSchema = await MemberService.update_users_name(
+        uow=uow,
+        company_id=company_id,
+        account_id=data.account_id,
+        first_name=data.first_name,
+        last_name=data.last_name
     )
     return response

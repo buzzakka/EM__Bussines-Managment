@@ -3,4 +3,6 @@ from src.api.company.schemas.member import (
     AddMemberResponseSchema,
     UpdateUsersEmailByAdminRequestSchema,
     UpdateUsersEmailByAdminResponseSchema,
+    UpdateUsersNameByAdminRequeestSchema,
+    UpdateUsersNameByAdminResponseSchema,
 )
