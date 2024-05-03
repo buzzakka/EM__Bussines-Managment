@@ -19,7 +19,7 @@ class InviteModel(Base):
     __tablename__ = 'invite'
 
     id: Mapped[uuid_pk_T]
-    email: Mapped[str]
+    email: Mapped[str] = mapped_column(unique=True)
     token: Mapped[str]
     invite_type: Mapped[Enum] = mapped_column(Enum(InviteTypes))
     is_confirmed: Mapped[bool] = mapped_column(default=False)

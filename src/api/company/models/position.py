@@ -12,7 +12,7 @@ class PositionModel(Base):
     __tablename__ = 'position'
 
     id: Mapped[uuid_pk_T]
-    title: Mapped[str]
+    title: Mapped[str] = mapped_column(unique=True)
     description: Mapped[str] = mapped_column(default=None, nullable=True)
 
     created_at: Mapped[created_at_T]
