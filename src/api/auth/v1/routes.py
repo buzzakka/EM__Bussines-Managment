@@ -12,7 +12,8 @@ from src.api.auth.schemas import (
     UserLoginSchema,
     SignUpCompleteResponseSchema,
     CheckAccountResponseSchema,
-    SignUpCompleteEmploymentRequestSchema
+    SignUpCompleteEmploymeeRequestSchema,
+    SignUpCompleteEmployeeResponseSchema,
 )
 
 router: APIRouter = APIRouter(
@@ -72,30 +73,31 @@ async def sign_up_complete(
 
 @router.get('/sign-up-employee')
 async def check_account_with_token(
-    invite_id: int,
+    email: str,
     invite_token: str,
     uow: UnitOfWork = Depends(UnitOfWork)
 ):
     response: dict = await RegisterService.sign_up_employee(
         uow=uow,
-        invite_id=invite_id,
+        email=email,
         invite_token=invite_token,
     )
     return response
 
 
-# @router.post(
-#     path='/sign-up-employee'
-# )
-# async def sign_up_complete_employment(
-#     user_data: SignUpCompleteEmploymentRequestSchema,
-#     uow: UnitOfWork = Depends(UnitOfWork),
-# ):
-#     response: dict = await RegisterService.register_employee(
-#         uow=uow,
-#         **user_data.model_dump()
-#     )
-#     return response
+@router.post(
+    path='/sign-up-employee',
+    response_model=SignUpCompleteEmployeeResponseSchema
+)
+async def sign_up_complete_employmee(
+    user_data: SignUpCompleteEmploymeeRequestSchema,
+    uow: UnitOfWork = Depends(UnitOfWork),
+):
+    response: dict = await RegisterService.register_employee(
+        uow=uow,
+        **user_data.model_dump()
+    )
+    return response
 
 
 @router.post('/login', response_model=TokenSchema)
@@ -108,6 +110,7 @@ async def login(
         user=user
     )
     return login_response
+
 
 @router.post('/logout', tags=['protected'])
 async def logout(

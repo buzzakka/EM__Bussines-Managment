@@ -31,6 +31,11 @@ class SignUpCompleteResponseSchema(BaseModel):
     company_name: str
 
 
-class SignUpCompleteEmploymentRequestSchema(BaseModel):
+class SignUpCompleteEmploymeeRequestSchema(BaseModel):
     email: str
     password: str
+
+
+class SignUpCompleteEmployeeResponseSchema(BaseModel):
+    account_id: UUID4
+    email: EmailStr

@@ -6,7 +6,6 @@ from src.api.auth.models import UserModel, AccountModel, InviteTypes, InviteMode
 from src.api.company.schemas import AddMemberResponseSchema, AddMemberRequestSchema
 
 
-
 class MemberService(BaseService):
 
     @classmethod
@@ -46,13 +45,15 @@ class MemberService(BaseService):
                 email=email,
                 invite_type=InviteTypes.EMPLOYMENT
             )
-            
+
             cls.send_invite_link(email=email, invite_token=invite_obj.token)
-            
+
             return AddMemberResponseSchema(
-                user=AddMemberRequestSchema(email=email, first_name=first_name, last_name=last_name)
+                user=AddMemberRequestSchema(
+                    email=email, first_name=first_name, last_name=last_name
+                )
             )
-    
+
     @staticmethod
     def send_invite_link(email: str, invite_token: str) -> None:
         invite_link: str = f'http://127.0.0.1:8000/api/v1/auth/sign-up?{email=}&{invite_token=}'

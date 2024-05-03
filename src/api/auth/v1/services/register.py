@@ -3,13 +3,14 @@ from random import randint
 from src.core.utils import UnitOfWork, BaseService
 from src.celery_app.tasks import send_invite_token
 
-from src.api.auth.models import InviteModel, UserModel, AccountModel
+from src.api.auth.models import InviteModel, UserModel, AccountModel, SecretModel
 from src.api.company.models import CompanyModel
 from src.api.auth.schemas import (
     SignUpCompleteResponseSchema,
     SignUpRequestSchema,
     SignUpResponseSchema,
     CheckAccountResponseSchema,
+    SignUpCompleteEmployeeResponseSchema,
 )
 from src.api.auth.models.invite import InviteTypes
 from src.core import exceptions
@@ -30,12 +31,13 @@ class RegisterService(BaseService):
                 raise exceptions.account_already_registered()
 
             invite_obj: InviteModel = await cls._create_invite_token(
-                uow=uow, 
-                email=email, 
+                uow=uow,
+                email=email,
                 invite_type=InviteTypes.ACCOUNT
             )
-            
-            send_invite_token.delay(to_email=email, invite_token=invite_obj.token)
+
+            send_invite_token.delay(
+                to_email=email, invite_token=invite_obj.token)
 
             return CheckAccountResponseSchema(email=email)
 
@@ -64,7 +66,7 @@ class RegisterService(BaseService):
         account: str, password: str, first_name: str, last_name: str, company_name: str,
     ) -> SignUpCompleteResponseSchema:
         async with uow:
-            await cls._get_invite_obj_or_raise(uow=uow, email=account, invite_type=InviteTypes.ACCOUNT)
+            await cls._get_confirmed_invite_obj_or_raise(uow=uow, email=account, invite_type=InviteTypes.ACCOUNT)
 
             await cls._check_if_account_exists_or_raise(uow=uow, email=account)
 
@@ -96,12 +98,12 @@ class RegisterService(BaseService):
     async def sign_up_employee(
         cls,
         uow: UnitOfWork,
-        invite_id: int,
+        email: str,
         invite_token: str,
     ):
         async with uow:
             invite_obj: InviteModel = await uow.invite.get_by_query_one_or_none(
-                id=invite_id,
+                email=email,
                 token=invite_token,
                 invite_type=InviteTypes.EMPLOYMENT,
             )
@@ -112,19 +114,37 @@ class RegisterService(BaseService):
                 raise exceptions.invite_token_already_confirmed()
 
             invite_obj.is_confirmed = True
-            
+
             return SignUpResponseSchema(email=invite_obj.email)
 
-    # @classmethod
-    # async def register_employee(
-    #     cls,
-    #     uow: UnitOfWork,
-    #     email: str,
-    #     password: str
-    # ):
-    #     await cls._get_invite_obj_or_raise(uow=uow, email=email, invite_type='employment')
+    @classmethod
+    async def register_employee(
+        cls,
+        uow: UnitOfWork,
+        email: str,
+        password: str
+    ):
+        async with uow:
+            account_obj: AccountModel = await uow.account.get_by_query_one_or_none(email=email)
+            if not account_obj or account_obj.is_active:
+                raise exceptions.account_already_registered()
 
-    #     await cls._check_if_account_exists_or_raise(uow=uow, email=email)
+            invite_obj: InviteModel = await cls._get_confirmed_invite_obj_or_raise(
+                uow=uow, email=email, invite_type=InviteTypes.EMPLOYMENT
+            )
+            if not invite_obj.is_confirmed:
+                raise exceptions.account_is_not_confirmed()
+
+            account_obj.is_active = True
+
+            await uow.secret.change_password(
+                account_id=account_obj.id,
+                new_password=utils.hash_password(password)
+            )
+            return SignUpCompleteEmployeeResponseSchema(
+                account_id=account_obj.id,
+                email=email
+            )
 
     @staticmethod
     async def _create_invite_token(uow: UnitOfWork, email: str, invite_type: str):
@@ -162,7 +182,7 @@ class RegisterService(BaseService):
         return await uow.account.get_by_query_one_or_none(email=email) is not None
 
     @staticmethod
-    async def _get_invite_obj_or_raise(
+    async def _get_confirmed_invite_obj_or_raise(
         uow: UnitOfWork,
         email: str,
         invite_type: str
