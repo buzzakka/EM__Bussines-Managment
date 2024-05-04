@@ -11,6 +11,7 @@ from src.api.auth.v1.repositories import (
 from src.api.company.v1.repositories import (
     CompanyRepository,
     MemberRepository,
+    PositionRepository,
 )
 
 
@@ -53,6 +54,7 @@ class UnitOfWork(AbstractUnitOfWork):
         
         self.company = CompanyRepository(self.session)
         self.member = MemberRepository(self.session)
+        self.position = PositionRepository(self.session)
 
         return self
 

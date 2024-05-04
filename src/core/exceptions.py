@@ -52,13 +52,20 @@ def incorrect_jwt_token() -> HTTPException:
 
 def page_not_found() -> HTTPException:
     raise HTTPException(
-        status_code=404,
+        status_code=status.HTTP_404_NOT_FOUND,
         detail='Страница не найдена',
     )
 
 
 def incorrect_account_id() -> HTTPException:
     raise HTTPException(
-        status_code=404,
+        status_code=status.HTTP_404_NOT_FOUND,
         detail='Неверный account_id',
+    )
+
+
+def incorrect_position_id() -> HTTPException:
+    raise HTTPException(
+        status_code=status.HTTP_404_NOT_FOUND,
+        detail='Неверный position_id'
     )

@@ -6,3 +6,10 @@ from src.api.company.schemas.member import (
     UpdateUsersNameByAdminRequeestSchema,
     UpdateUsersNameByAdminResponseSchema,
 )
+
+from src.api.company.schemas.position import (
+    AddPositionRequestSchema,
+    AddPositionResponseSchema,
+    UpdatePositionRequestSchema,
+    UpdatePositionResponseSchema,
+)
