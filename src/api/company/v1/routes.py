@@ -126,7 +126,7 @@ async def update_position(
 
 
 @router.post(
-    '/create-struct',
+    '/struct',
     tags=['protected', 'for_admins'],
 )
 async def create_struct(
@@ -142,3 +142,17 @@ async def create_struct(
         **data.model_dump()
     )
     return
+
+
+@router.delete(
+    '/struct',
+    tags=['protected', 'for_admins']
+)
+async def delete_struct(
+    request: Request,
+    struct_id: str,
+    uow: UnitOfWork = Depends(UnitOfWork),
+):
+    payload: str = request.state.payload
+    company_id: int = payload['company_id']
+    await PositionService.delete_struct(uow, struct_id=struct_id)

@@ -1,4 +1,5 @@
-from sqlalchemy import Result
+from typing import Any
+from sqlalchemy import Result, Sequence
 from src.core.models.base import Base
 from src.core.utils.unit_of_work import UnitOfWork
 
@@ -35,6 +36,16 @@ class BaseService:
         async with uow:
             _obj: Base = await uow.__dict__[cls.repository].get_by_query_one_or_none(**kwargs)
             return _obj
+    
+    @classmethod
+    async def get_by_query_all(
+            cls,
+            uow: UnitOfWork,
+            **kwargs
+    ) -> Sequence[Any]:
+        async with uow:
+            _result = await uow.__dict__[cls.base_repository].get_by_query_all(**kwargs)
+            return _result
 
     @classmethod
     async def update_one_by_id(

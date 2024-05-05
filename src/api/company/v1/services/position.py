@@ -1,3 +1,4 @@
+from sqlalchemy import Result
 from src.core.utils import UnitOfWork, BaseService
 from src.core import exceptions
 
@@ -77,9 +78,26 @@ class PositionService(BaseService):
                     raise exceptions.incorrect_param('parent_id')
             else:
                 parent_obj = None
-            
-            new_struct = StructAdmModel(company_id=company_id, name=name, parent=parent_obj)
 
-            uow.session.add(new_struct)
+            struct_obj: StructAdmModel = await uow.struct_adm.add_new_struct(
+                company_id=company_id,
+                name=name,
+                parent_obj=parent_obj
+            )
 
-        return new_struct
+        return struct_obj
+
+    @classmethod
+    async def delete_struct(
+        cls,
+        uow: UnitOfWork,
+        struct_id: str, company_id: str
+    ):
+        async with uow:
+            struct_obj: StructAdmModel = await uow.struct_adm.get_by_query_one_or_none(
+                id=struct_id, company_id=company_id
+            )
+            if struct_obj is None:
+                raise exceptions.incorrect_param('struct_id')
+
+            await uow.struct_adm.delete_struct_and_descendants(struct_obj)
