@@ -57,16 +57,16 @@ class BaseService:
         async with uow:
             _obj = await uow.__dict__[cls.repository].update_one_by_id(_id=_id, values=values)
             return _obj
-
+        
     @classmethod
-    async def update_one_or_create_new(
+    async def update_one_by_filters(
         cls,
         uow: UnitOfWork,
         filters: dict,
         values: dict
     ) -> Base | None:
         async with uow:
-            _obj: Base = await uow.__dict__[cls.repository].update_one_or_create_new(filters=filters, values=values)
+            _obj = await uow.__dict__[cls.repository].update_one_by_filters(filters=filters, values=values)
             return _obj
 
     @classmethod

@@ -23,3 +23,17 @@ class UpdatePositionResponseSchema(AddPositionResponseSchema):
 class AddStructReqeustSchema(BaseModel):
     name: str
     parent_id: UUID4 = None
+
+
+class DeleteStructRequestSchema(BaseModel):
+    struct_id: UUID4
+
+
+class UpdateStructRequestSchema(BaseModel):
+    struct_id: UUID4
+    new_name: str
+
+
+class UpdateStructResponseSchema(BaseModel):
+    new_item: UpdateStructRequestSchema
+    message: str = 'Объект успешно изменён!'

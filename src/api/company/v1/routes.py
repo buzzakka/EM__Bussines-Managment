@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, Request
-from pydantic import Field, EmailStr
+from pydantic import Field, EmailStr, UUID4
 
 from src.core.utils import UnitOfWork
 
@@ -14,7 +14,10 @@ from src.api.company.schemas import (
     AddPositionResponseSchema,
     UpdatePositionRequestSchema,
     UpdatePositionResponseSchema,
-    AddStructReqeustSchema
+    AddStructReqeustSchema,
+    UpdateStructRequestSchema,
+    DeleteStructRequestSchema,
+    UpdateStructResponseSchema
 )
 
 
@@ -146,13 +149,33 @@ async def create_struct(
 
 @router.delete(
     '/struct',
-    tags=['protected', 'for_admins']
+    tags=['protected', 'for_admins'],
 )
 async def delete_struct(
     request: Request,
-    struct_id: str,
+    data: DeleteStructRequestSchema,
     uow: UnitOfWork = Depends(UnitOfWork),
 ):
     payload: str = request.state.payload
     company_id: int = payload['company_id']
-    await PositionService.delete_struct(uow, struct_id=struct_id)
+    await PositionService.delete_struct(uow, struct_id=data.struct_id, company_id=company_id)
+
+
+@router.patch(
+    '/struct',
+    tags=['protected', 'for_admins']
+)
+async def update_struct(
+    request: Request,
+    data: UpdateStructRequestSchema,
+    uow: UnitOfWork = Depends(UnitOfWork)
+):
+    payload: str = request.state.payload
+    company_id: int = payload['company_id']
+    response = await PositionService.update_struct(
+        uow=uow,
+        id=data.struct_id,
+        company_id=company_id,
+        new_name=data.new_name
+    )
+    return response

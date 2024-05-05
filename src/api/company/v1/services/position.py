@@ -5,7 +5,9 @@ from src.core import exceptions
 from src.api.company.schemas import (
     AddPositionResponseSchema,
     AddPositionRequestSchema,
-    UpdatePositionResponseSchema
+    UpdatePositionResponseSchema,
+    UpdateStructRequestSchema,
+    UpdateStructResponseSchema,
 )
 from src.api.company.models import PositionModel, StructAdmModel
 
@@ -101,3 +103,22 @@ class PositionService(BaseService):
                 raise exceptions.incorrect_param('struct_id')
 
             await uow.struct_adm.delete_struct_and_descendants(struct_obj)
+
+    @classmethod
+    async def update_struct(
+        cls,
+        uow: UnitOfWork,
+        id: str, company_id: str, new_name: str
+    ):
+        async with uow:
+            struct_obj: StructAdmModel = await uow.struct_adm.update_one_by_filters(
+                filters={'id': id, 'company_id': company_id},
+                values={'name': new_name}
+            )
+            
+            if struct_obj is None:
+                raise exceptions.incorrect_param('struct_id')
+            
+            return UpdateStructResponseSchema(
+                new_item=UpdateStructRequestSchema(struct_id=id, new_name=new_name),
+            )
