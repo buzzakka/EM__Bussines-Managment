@@ -57,6 +57,13 @@ def page_not_found() -> HTTPException:
     )
 
 
+def incorrect_param(name: str) -> HTTPException:
+    raise HTTPException(
+        status_code=status.HTTP_404_NOT_FOUND,
+        detail=f'Неверный {name}',
+    )
+ 
+
 def incorrect_account_id() -> HTTPException:
     raise HTTPException(
         status_code=status.HTTP_404_NOT_FOUND,
@@ -65,6 +72,13 @@ def incorrect_account_id() -> HTTPException:
 
 
 def incorrect_position_id() -> HTTPException:
+    raise HTTPException(
+        status_code=status.HTTP_404_NOT_FOUND,
+        detail='Неверный position_id'
+    )
+
+
+def incorrect_struct_adm_parrent_id() -> HTTPException:
     raise HTTPException(
         status_code=status.HTTP_404_NOT_FOUND,
         detail='Неверный position_id'

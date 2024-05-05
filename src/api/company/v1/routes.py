@@ -14,6 +14,7 @@ from src.api.company.schemas import (
     AddPositionResponseSchema,
     UpdatePositionRequestSchema,
     UpdatePositionResponseSchema,
+    AddStructReqeustSchema
 )
 
 
@@ -121,3 +122,23 @@ async def update_position(
         new_description=data.new_position.description,
     )
     return response
+
+
+
+@router.post(
+    '/create-struct',
+    tags=['protected', 'for_admins'],
+)
+async def create_struct(
+    request: Request,
+    data: AddStructReqeustSchema,
+    uow: UnitOfWork = Depends(UnitOfWork),
+):
+    payload: str = request.state.payload
+    company_id: int = payload['company_id']
+    await PositionService.add_struct(
+        uow=uow,
+        company_id=company_id,
+        **data.model_dump()
+    )
+    return

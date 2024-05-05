@@ -6,7 +6,7 @@ from src.api.company.schemas import (
     AddPositionRequestSchema,
     UpdatePositionResponseSchema
 )
-from src.api.company.models import PositionModel
+from src.api.company.models import PositionModel, StructAdmModel
 
 
 class PositionService(BaseService):
@@ -61,3 +61,25 @@ class PositionService(BaseService):
                 )
             )
             return new_pos
+
+    @classmethod
+    async def add_struct(
+        cls,
+        uow: UnitOfWork,
+        company_id: str, name: str, parent_id: int | None = None
+    ):
+        async with uow:
+            if parent_id is not None:
+                parent_obj: StructAdmModel = await uow.struct_adm.get_by_query_one_or_none(
+                    company_id=company_id, id=parent_id
+                )
+                if parent_obj is None:
+                    raise exceptions.incorrect_param('parent_id')
+            else:
+                parent_obj = None
+            
+            new_struct = StructAdmModel(company_id=company_id, name=name, parent=parent_obj)
+
+            uow.session.add(new_struct)
+
+        return new_struct

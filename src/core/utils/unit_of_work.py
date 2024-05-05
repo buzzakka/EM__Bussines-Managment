@@ -12,6 +12,7 @@ from src.api.company.v1.repositories import (
     CompanyRepository,
     MemberRepository,
     PositionRepository,
+    StructAdmRepository
 )
 
 
@@ -55,6 +56,7 @@ class UnitOfWork(AbstractUnitOfWork):
         self.company = CompanyRepository(self.session)
         self.member = MemberRepository(self.session)
         self.position = PositionRepository(self.session)
+        self.struct_adm = StructAdmRepository(self.session)
 
         return self
 

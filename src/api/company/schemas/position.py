@@ -18,3 +18,8 @@ class UpdatePositionRequestSchema(BaseModel):
 
 class UpdatePositionResponseSchema(AddPositionResponseSchema):
     message: str = 'Должность обновлена!'
+
+
+class AddStructReqeustSchema(BaseModel):
+    name: str
+    parent_id: UUID4 = None

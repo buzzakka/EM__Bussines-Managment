@@ -15,7 +15,10 @@ from src.api.auth.models import (
 )
 from src.api.company.models import (
     CompanyModel,
-    MemberModel
+    MemberModel,
+    StructAdmModel,
+    PositionModel,
+    UserPositionModel,
 )
 
 # this is the Alembic Config object, which provides
