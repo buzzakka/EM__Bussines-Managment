@@ -19,6 +19,9 @@ from src.api.company.models import (
     StructAdmModel,
     PositionModel,
     UserPositionModel,
+    TaskModel,
+    TaskObserversModel,
+    TaskPerformersModel,
 )
 
 # this is the Alembic Config object, which provides

@@ -17,3 +17,10 @@ class AccountModel(Base):
     credential = relationship(
         'CredentialModel', back_populates='account', uselist=False
     )
+    
+    observed_tasks: Mapped[list['TaskModel']] = relationship(
+        secondary='task_observers', back_populates='observers'
+    )
+    performed_tasks: Mapped[list['TaskModel']] = relationship(
+        secondary='task_performers', back_populates='performers'
+    )

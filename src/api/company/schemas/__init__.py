@@ -18,3 +18,7 @@ from src.api.company.schemas.position import (
     UpdateStructRequestSchema,
     UpdateStructResponseSchema,
 )
+
+from src.api.company.schemas.task import (
+    AddTaskRequestSchema,
+)

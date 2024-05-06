@@ -1,9 +1,11 @@
+from datetime import datetime
 from fastapi import APIRouter, Depends, Request
 from pydantic import Field, EmailStr, UUID4
 
+from src.api.auth.models.user import UserModel
 from src.core.utils import UnitOfWork
 
-from src.api.company.v1.services import MemberService, PositionService
+from src.api.company.v1.services import MemberService, PositionService, TaskService
 from src.api.company.schemas import (
     AddMemberRequestSchema,
     AddMemberResponseSchema,
@@ -17,8 +19,10 @@ from src.api.company.schemas import (
     AddStructReqeustSchema,
     UpdateStructRequestSchema,
     DeleteStructRequestSchema,
-    UpdateStructResponseSchema
+    UpdateStructResponseSchema,
+    AddTaskRequestSchema
 )
+from src.api.company.models import TaskModel
 
 
 router: APIRouter = APIRouter(
@@ -28,7 +32,7 @@ router: APIRouter = APIRouter(
 
 
 @router.post(
-    '/add-member',
+    '/member',
     tags=['protected', 'for_admins'],
     response_model=AddMemberResponseSchema
 )
@@ -49,12 +53,13 @@ async def add_new_member(
     return response
 
 
-@router.patch('/update-users-email', tags=['protected', 'for_admins'])
+@router.patch('/member/email', tags=['protected', 'for_admins'])
 async def update_users_email(
     request: Request,
     data: UpdateUsersEmailByAdminRequestSchema,
     uow: UnitOfWork = Depends(UnitOfWork),
 ):
+    """Изменение email работника админом."""
     payload: dict = request.state.payload
     company_id: int = payload['company_id']
     response: UpdateUsersEmailByAdminResponseSchema = await MemberService.update_users_email_by_admin(
@@ -66,12 +71,13 @@ async def update_users_email(
     return response
 
 
-@router.patch('/update-users-name', tags=['protected', 'for_admins'])
+@router.patch('/member/name', tags=['protected', 'for_admins'])
 async def update_users_email(
     request: Request,
     data: UpdateUsersNameByAdminRequeestSchema,
     uow: UnitOfWork = Depends(UnitOfWork),
 ):
+    """Изменение имени работника админом."""
     payload: dict = request.state.payload
     company_id: int = payload['company_id']
     response: UpdateUsersEmailByAdminResponseSchema = await MemberService.update_users_name(
@@ -85,7 +91,7 @@ async def update_users_email(
 
 
 @router.post(
-    '/create-position',
+    '/position',
     tags=['protected', 'for_admins'],
     response_model=AddPositionResponseSchema
 )
@@ -94,6 +100,7 @@ async def create_position(
     data: AddPositionRequestSchema,
     uow: UnitOfWork = Depends(UnitOfWork),
 ):
+    """Создание новой позиции."""
     payload: str = request.state.payload
     company_id: int = payload['company_id']
     response: AddPositionResponseSchema = await PositionService.add_new_position(
@@ -106,7 +113,7 @@ async def create_position(
 
 
 @router.patch(
-    '/update-position',
+    '/position',
     tags=['protected', 'for_admins'],
     response_model=UpdatePositionResponseSchema
 )
@@ -115,6 +122,7 @@ async def update_position(
     data: UpdatePositionRequestSchema,
     uow: UnitOfWork = Depends(UnitOfWork),
 ):
+    """Изменение существующей позиции."""
     payload: str = request.state.payload
     company_id: int = payload['company_id']
     response: AddPositionResponseSchema = await PositionService.update_position(
@@ -137,6 +145,7 @@ async def create_struct(
     data: AddStructReqeustSchema,
     uow: UnitOfWork = Depends(UnitOfWork),
 ):
+    """Создание нового подразделения."""
     payload: str = request.state.payload
     company_id: int = payload['company_id']
     await PositionService.add_struct(
@@ -156,6 +165,7 @@ async def delete_struct(
     data: DeleteStructRequestSchema,
     uow: UnitOfWork = Depends(UnitOfWork),
 ):
+    """Удаления подразделения и всех его подразделений."""
     payload: str = request.state.payload
     company_id: int = payload['company_id']
     await PositionService.delete_struct(uow, struct_id=data.struct_id, company_id=company_id)
@@ -170,6 +180,7 @@ async def update_struct(
     data: UpdateStructRequestSchema,
     uow: UnitOfWork = Depends(UnitOfWork)
 ):
+    """Изменение подразделения."""
     payload: str = request.state.payload
     company_id: int = payload['company_id']
     response = await PositionService.update_struct(
@@ -178,4 +189,19 @@ async def update_struct(
         company_id=company_id,
         new_name=data.new_name
     )
+    return response
+
+
+@router.post(
+    '/task',
+    tags=['protected', 'for_admins'],
+)
+async def add_task(
+    request: Request,
+    data: AddTaskRequestSchema,
+    uow: UnitOfWork = Depends(UnitOfWork),
+):
+    payload: str = request.state.payload
+    account_id: str = payload['account_id']
+    response = await TaskService.add_new_task(uow=uow, author_id=account_id, **data.model_dump(exclude_none=True))
     return response
