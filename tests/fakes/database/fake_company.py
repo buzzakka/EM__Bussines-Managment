@@ -6,7 +6,7 @@ from tests.fakes.schemas import (
 )
 from tests.fakes.database.fake_auth import FAKE_ACCOUNTS
 from src.api.auth.models import InviteTypes
-from src.api.auth.utils import hash_password
+from api.auth.utils.secret import hash_password
 
 
 FAKE_COMPANYS = [

@@ -1,4 +1,4 @@
-from src.core import exceptions
+from src.api.auth.utils import exceptions
 from src.core.utils import BaseService, UnitOfWork
 from src.celery_app.tasks import send_invite_link
 

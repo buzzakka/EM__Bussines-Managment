@@ -9,20 +9,19 @@ from src.api.auth.schemas import (
     SignUpCompleteResponseSchema,
     SignUpRequestSchema,
     SignUpResponseSchema,
-    CheckAccountResponseSchema,
     SignUpCompleteEmployeeResponseSchema,
 )
 from src.api.auth.v1.schemas import (
     CheckAccountResponseSchema,
+    SignUpResponseSchema,
 )
-from src.api.auth.v1.utils.exception_responses import (
-    account_doesnt_exists_response,
+from src.api.auth.utils.bad_responses import (
+    account_exists_response,
 )
 from src.api.auth.schemas.mixins import EmailSchema
 
 from src.api.auth.models.invite import InviteTypes
-from src.core import exceptions
-from src.api.auth import utils
+from src.api.auth.utils import exceptions, secret, bad_responses
 
 
 class RegisterService(BaseService):
@@ -36,7 +35,7 @@ class RegisterService(BaseService):
             is_account_exists: bool = await uow.account.get_by_query_one_or_none(email=email)
 
             if is_account_exists:
-                return account_doesnt_exists_response(email=email)
+                return account_exists_response(email=email)
 
             invite_obj: InviteModel = await cls._create_invite_token(
                 uow=uow,
@@ -54,19 +53,24 @@ class RegisterService(BaseService):
     async def sign_up_company(
         cls,
         uow: UnitOfWork,
-        sign_up_data: SignUpRequestSchema
+        **kwargs
     ) -> SignUpResponseSchema:
         async with uow:
-            email: str = sign_up_data.account
-            token: str = sign_up_data.invite_token
+            email: str = kwargs['email']
+            token: str = kwargs['token']
 
             is_account_exists: bool = await cls._is_account_exists(uow=uow, email=email)
             if is_account_exists:
-                raise exceptions.account_already_registered()
+                return account_exists_response(email=email)
 
-            await cls._confirm_invite_token(uow=uow, email=email, invite_token=token)
+            try:
+                await cls._confirm_invite_token(uow=uow, email=email, invite_token=token)
+            except exceptions.IvalidInviteToken:
+                return bad_responses.incorrect_email_or_ivite_token()
+            except exceptions.AccountAlreadyConfirmed:
+                return bad_responses.account_confirmed_already(email=email)
 
-            return SignUpResponseSchema(email=sign_up_data.account)
+            return SignUpResponseSchema(payload=EmailSchema(email=email))
 
     @classmethod
     async def register_company(
@@ -148,7 +152,7 @@ class RegisterService(BaseService):
 
             await uow.secret.change_password(
                 account_id=account_obj.id,
-                new_password=utils.hash_password(password)
+                new_password=secret.hash_password(password)
             )
             return SignUpCompleteEmployeeResponseSchema(
                 account_id=account_obj.id,
@@ -179,10 +183,10 @@ class RegisterService(BaseService):
         )
 
         if invite_obj is None:
-            raise exceptions.incorrect_account_or_invite_token()
+            raise exceptions.IvalidInviteToken()
 
         if invite_obj.is_confirmed:
-            raise exceptions.invite_token_already_confirmed()
+            raise exceptions.AccountAlreadyConfirmed()
 
         invite_obj.is_confirmed = True
 
@@ -225,6 +229,6 @@ class RegisterService(BaseService):
         secret: dict = {
             'user_id': user_obj.id,
             'account_id': account_obj.id,
-            'password_hash': utils.hash_password(password)
+            'password_hash': secret.hash_password(password)
         }
         await uow.secret.add_one(**secret)

@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from src.core import exceptions
+from src.api.auth.utils import exceptions
 from src.core.utils import BaseService, UnitOfWork
 
 from src.api.auth.models import AccountModel

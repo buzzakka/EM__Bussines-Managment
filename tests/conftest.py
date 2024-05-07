@@ -53,9 +53,9 @@ async def setup_db(async_engine):
     async with async_engine.begin() as db_conn:
         await db_conn.run_sync(Base.metadata.drop_all)
         await db_conn.run_sync(Base.metadata.create_all)
-    yield
-    async with async_engine.begin() as db_conn:
-        await db_conn.run_sync(Base.metadata.drop_all)
+    # yield
+    # async with async_engine.begin() as db_conn:
+    #     await db_conn.run_sync(Base.metadata.drop_all)
 
 
 @pytest.fixture(scope="function")

@@ -1,5 +1,19 @@
 from fastapi import HTTPException, status
 
+from src.api.auth.utils.bad_responses import (
+    account_exists_response
+)
+
+class UserAlreadyRegistred(Exception):
+    pass
+
+
+class AccountAlreadyConfirmed(Exception):
+    pass
+
+
+class IvalidInviteToken(Exception):
+    pass
 
 def account_already_registered(email: str) -> HTTPException:
     return HTTPException(

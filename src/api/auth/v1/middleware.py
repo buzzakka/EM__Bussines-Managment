@@ -3,9 +3,9 @@ from fastapi.responses import JSONResponse
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from starlette.middleware.base import BaseHTTPMiddleware
 
-from src.core import exceptions
+from src.api.auth.utils import exceptions
 from src.core.utils import UnitOfWork
-from src.api.auth import utils
+from src.api.auth.utils import secret
 from src.api.auth.models import CredentialModel
 from src.api.auth.v1.services import CredentialService
 
@@ -55,7 +55,7 @@ class AuthMiddleware(BaseHTTPMiddleware):
         if cred_obj is None or not cred_obj.account.is_active:
             raise exceptions.incorrect_jwt_token()
 
-        return utils.decode_jwt(token)
+        return secret.decode_jwt(token)
 
     def _check_is_admin(self, payload: dict):
         if not payload['is_admin']:

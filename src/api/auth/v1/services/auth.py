@@ -1,4 +1,4 @@
-from src.core import exceptions
+from src.api.auth.utils import exceptions, secret
 from src.core.utils import UnitOfWork, BaseService
 
 from src.api.auth.models import CredentialModel, SecretModel
@@ -6,7 +6,6 @@ from src.api.auth.schemas import (
     UserLoginSchema,
     TokenSchema,
 )
-from src.api.auth import utils
 
 
 class AuthService(BaseService):
@@ -33,7 +32,7 @@ class AuthService(BaseService):
         if account_info is None or not account_info.is_active:
             raise exceptions.incorrect_email_or_password()
 
-        is_correct_password: bool = utils.validate_password(
+        is_correct_password: bool = secret.validate_password(
             password, account_info.password_hash)
 
         if not is_correct_password:
@@ -46,13 +45,13 @@ class AuthService(BaseService):
         if db_payload is None:
             raise exceptions.incorrect_email_or_password()
 
-        payload: dict = utils.make_payload(
+        payload: dict = secret.make_payload(
             account_id=str(db_payload.account_id),
             company_id=str(db_payload.company_id),
             is_admin=db_payload.is_admin
         )
 
-        token: str = utils.encode_jwt(payload=payload)
+        token: str = secret.encode_jwt(payload=payload)
 
         credential_obj: CredentialModel = await uow.credential.get_by_query_one_or_none(
             account_id=payload['account_id']

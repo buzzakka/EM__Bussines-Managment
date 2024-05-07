@@ -2,11 +2,11 @@ from fastapi import Depends
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from jwt import InvalidTokenError
 
-from core import exceptions
+from api.auth.v1.utils import exceptions
 from src.core.utils import UnitOfWork
 
 from src.api.auth.models import CredentialModel
-from src.api.auth import utils
+from api.auth.utils import secret
 
 
 http_bearer: HTTPBearer = HTTPBearer()
@@ -17,7 +17,7 @@ async def get_auth_data(
 ):
     try:
         token: str = credentials.credentials
-        payload: dict = utils.decode_jwt(token=token)
+        payload: dict = secret.decode_jwt(token=token)
     except InvalidTokenError as e:
         raise exceptions.incorrect_jwt_token()
 

@@ -1,6 +1,6 @@
 from sqlalchemy import Result
 from src.core.utils import UnitOfWork, BaseService
-from src.core import exceptions
+from src.api.auth.utils import exceptions
 
 from src.api.company.schemas import (
     AddPositionResponseSchema,

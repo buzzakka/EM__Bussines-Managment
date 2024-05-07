@@ -7,7 +7,7 @@ from tests.fakes.schemas import (
     UserSchema
 )
 from src.api.auth.models import InviteTypes
-from src.api.auth.utils import hash_password
+from api.auth.utils.secret import hash_password
 
 
 FAKE_INVITES = [
@@ -31,6 +31,13 @@ FAKE_INVITES = [
         token='222222',
         invite_type=InviteTypes.ACCOUNT,
         is_confirmed=True
+    ),
+    InviteSchema(
+        id=uuid4(),
+        email='user4@example.com',
+        token='222222',
+        invite_type=InviteTypes.ACCOUNT,
+        is_confirmed=False
     )
 ]
 
