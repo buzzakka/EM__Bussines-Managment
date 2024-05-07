@@ -2,19 +2,13 @@ from fastapi import APIRouter, Depends, Request
 from pydantic import EmailStr
 
 from src.core.utils import UnitOfWork
-
+from src.core.schemas import BaseResponseModel
 from src.api.auth.v1.services import RegisterService, AuthService
-# from src.api.auth.schemas import (
-#     TokenSchema,
-#     SignUpCompleteRequestSchema,
-#     SignUpRequestSchema,
-#     SignUpResponseSchema,
-#     UserLoginSchema,
-#     SignUpCompleteResponseSchema,
-#     CheckAccountResponseSchema,
-#     SignUpCompleteEmploymeeRequestSchema,
-#     SignUpCompleteEmployeeResponseSchema,
-# )
+from src.api.auth.schemas import (
+    UserLoginResponseSchema,
+    UserLoginRequestSchema,
+    TokenSchema
+)
 from src.api.auth.v1.schemas import (
     CheckAccountResponseSchema,
     SignUpRequestSchema,
@@ -114,23 +108,28 @@ async def sign_up_complete_employmee(
     return response
 
 
-# @router.post('/login', response_model=TokenSchema)
-# async def login(
-#     user: UserLoginSchema,
-#     uow: UnitOfWork = Depends(UnitOfWork)
-# ):
-#     login_response: TokenSchema = await AuthService.login(
-#         uow=uow,
-#         user=user
-#     )
-#     return login_response
+@router.post('/login', response_model=UserLoginResponseSchema)
+async def login(
+    data: UserLoginRequestSchema,
+    uow: UnitOfWork = Depends(UnitOfWork)
+):
+    login_response: TokenSchema = await AuthService.login(
+        uow=uow,
+        email=data.email,
+        password=data.password
+    )
+    return login_response
 
 
-# @router.post('/logout', tags=['protected'])
-# async def logout(
-#     request: Request,
-#     uow: UnitOfWork = Depends(UnitOfWork),
-# ):
-#     account_id: int = request.state.payload['account_id']
-#     await AuthService.logout(uow=uow, account_id=account_id)
-#     return
+@router.post(
+    path='/logout',
+    tags=['protected'],
+    response_model=BaseResponseModel
+)
+async def logout(
+    request: Request,
+    uow: UnitOfWork = Depends(UnitOfWork),
+):
+    account_id: int = request.state.payload['account_id']
+    await AuthService.logout(uow=uow, account_id=account_id)
+    return BaseResponseModel()

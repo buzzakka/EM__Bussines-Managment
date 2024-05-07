@@ -91,6 +91,8 @@ FAKE_SECRETS = [
         account_id=FAKE_ACCOUNTS[0].id,
         password_hash=hash_password('password')
     ),
+    # SecretSchema(
+    #     id=uuid4(),
+
+    # )
 ]
-
-

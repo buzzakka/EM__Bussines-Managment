@@ -1,10 +1,10 @@
-from src.api.auth.utils import exceptions, secret
+from src.api.auth.utils import exceptions, secret, bad_responses
 from src.core.utils import UnitOfWork, BaseService
 
 from src.api.auth.models import CredentialModel, SecretModel
 from src.api.auth.schemas import (
-    UserLoginSchema,
-    TokenSchema,
+    UserLoginResponseSchema,
+    TokenSchema
 )
 
 
@@ -13,12 +13,15 @@ class AuthService(BaseService):
     repository: str = 'account'
 
     @classmethod
-    async def login(cls, uow: UnitOfWork, user: UserLoginSchema) -> TokenSchema:
+    async def login(cls, uow: UnitOfWork, email: str, password: str) -> UserLoginResponseSchema:
         async with uow:
-            await cls._check_account(uow=uow, email=user.email, password=user.password)
+            try:
+                await cls._check_account(uow=uow, email=email, password=password)
+                token: str = await cls._create_and_return_jwt(uow=uow, email=email)
+            except exceptions.InvalidEmailOrPassword:
+                return bad_responses.invalid_email_or_password()
 
-            token: str = await cls._create_and_return_jwt(uow=uow, email=user.email)
-            return TokenSchema(access_token=token)
+            return UserLoginResponseSchema(payload=TokenSchema(access_token=token))
 
     @classmethod
     async def logout(cls, uow: UnitOfWork, account_id: int):
@@ -30,20 +33,20 @@ class AuthService(BaseService):
         account_info: SecretModel = await uow.secret.get_account_info_and_password(email=email)
 
         if account_info is None or not account_info.is_active:
-            raise exceptions.incorrect_email_or_password()
+            raise exceptions.InvalidEmailOrPassword
 
         is_correct_password: bool = secret.validate_password(
             password, account_info.password_hash)
 
         if not is_correct_password:
-            raise exceptions.incorrect_email_or_password()
+            raise exceptions.InvalidEmailOrPassword
 
     @classmethod
     async def _create_and_return_jwt(cls, uow: UnitOfWork, email: str):
         db_payload = await uow.credential.get_payload(email=email)
 
         if db_payload is None:
-            raise exceptions.incorrect_email_or_password()
+            raise exceptions.InvalidEmailOrPassword
 
         payload: dict = secret.make_payload(
             account_id=str(db_payload.account_id),

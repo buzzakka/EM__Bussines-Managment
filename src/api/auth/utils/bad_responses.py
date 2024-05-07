@@ -33,3 +33,11 @@ def incorrect_email_or_ivite_token():
         error=True,
         message=f'Неверный адрес электронной почты или токен.'
     )
+
+
+def invalid_email_or_password():
+    return BaseResponseModel(
+        status_code=status.HTTP_400_BAD_REQUEST,
+        error=True,
+        message=f'Неверный адрес электронной почты или пароль.'
+    )
