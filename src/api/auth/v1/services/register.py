@@ -12,6 +12,14 @@ from src.api.auth.schemas import (
     CheckAccountResponseSchema,
     SignUpCompleteEmployeeResponseSchema,
 )
+from src.api.auth.v1.schemas import (
+    CheckAccountResponseSchema,
+)
+from src.api.auth.v1.utils.exception_responses import (
+    account_doesnt_exists_response,
+)
+from src.api.auth.schemas.mixins import EmailSchema
+
 from src.api.auth.models.invite import InviteTypes
 from src.core import exceptions
 from src.api.auth import utils
@@ -28,7 +36,7 @@ class RegisterService(BaseService):
             is_account_exists: bool = await uow.account.get_by_query_one_or_none(email=email)
 
             if is_account_exists:
-                raise exceptions.account_already_registered()
+                return account_doesnt_exists_response(email=email)
 
             invite_obj: InviteModel = await cls._create_invite_token(
                 uow=uow,
@@ -37,9 +45,10 @@ class RegisterService(BaseService):
             )
 
             send_invite_token.delay(
-                to_email=email, invite_token=invite_obj.token)
+                to_email=email, invite_token=invite_obj.token
+            )
 
-            return CheckAccountResponseSchema(email=email)
+            return CheckAccountResponseSchema(payload=EmailSchema(email=email))
 
     @classmethod
     async def sign_up_company(

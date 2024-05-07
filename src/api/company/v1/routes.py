@@ -20,7 +20,7 @@ from src.api.company.schemas import (
     UpdateStructRequestSchema,
     DeleteStructRequestSchema,
     UpdateStructResponseSchema,
-    AddTaskRequestSchema
+    AddTaskRequestSchema,
 )
 from src.api.company.models import TaskModel
 

@@ -22,23 +22,29 @@ from src.api.company.models import (
 from src.core.config import settings
 
 
-@pytest.fixture(scope='session', autouse=True)
+@pytest.fixture(scope='module', autouse=True)
 async def fill_db(make_db, async_session_maker) -> None:
     assert settings.MODE == 'TEST'
 
     fake_data: list = [
         (FAKE_INVITES, InviteModel),
-        (FAKE_ACCOUNTS, AccountModel),
-        (FAKE_COMPANIES, CompanyModel),
-        (FAKE_MEMBER, MemberModel),
-        (FAKE_SECRETS, SecretModel),
-        (FAKE_USERS, UserModel),
+        # (FAKE_ACCOUNTS, AccountModel),
+        # (FAKE_COMPANIES, CompanyModel),
+        # (FAKE_MEMBER, MemberModel),
+        # (FAKE_SECRETS, SecretModel),
+        # (FAKE_USERS, UserModel),
     ]
-
+    
     async with async_session_maker() as session:
-        for elem in fake_data:
-            fake, model = elem
-            for row in fake:
-                obj = model(**row.model_dump())
-                session.add(obj)
+        for elem in FAKE_INVITES:
+            obj = InviteModel(**elem.model_dump())
+            session.add(obj)
         await session.commit()
+
+    # async with async_session_maker() as session:
+    #     for elem in fake_data:
+    #         fake, model = elem
+    #         for row in fake:
+    #             obj = model(**row.model_dump())
+    #             session.add(obj)
+    #     await session.commit()

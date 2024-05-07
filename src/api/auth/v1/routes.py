@@ -15,6 +15,9 @@ from src.api.auth.schemas import (
     SignUpCompleteEmploymeeRequestSchema,
     SignUpCompleteEmployeeResponseSchema,
 )
+from src.api.auth.v1.schemas import (
+    CheckAccountResponseSchema,
+)
 
 router: APIRouter = APIRouter(
     prefix='/v1/auth',

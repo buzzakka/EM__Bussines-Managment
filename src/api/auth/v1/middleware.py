@@ -12,12 +12,13 @@ from src.api.auth.v1.services import CredentialService
 
 class AuthMiddleware(BaseHTTPMiddleware):
     def __init__(
-        self, 
-        router: APIRouter, 
+        self,
+        router: APIRouter,
         protected_tag: str = 'protected',
         for_admin_tag: str = 'for_admins',
-        *args, 
-        **kwargs):
+        *args,
+        **kwargs
+    ):
         self.protected_paths: list[str] = [
             route.path for route in router.routes if protected_tag in route.__dict__['tags']
         ]
@@ -32,7 +33,7 @@ class AuthMiddleware(BaseHTTPMiddleware):
             try:
                 payload: dict = await self._get_payload(request)
                 request.state.payload = payload
-                
+
                 if path in self.only_for_admins:
                     self._check_is_admin(payload=payload)
             except HTTPException as e:
@@ -55,8 +56,7 @@ class AuthMiddleware(BaseHTTPMiddleware):
             raise exceptions.incorrect_jwt_token()
 
         return utils.decode_jwt(token)
-    
+
     def _check_is_admin(self, payload: dict):
         if not payload['is_admin']:
             raise exceptions.page_not_found()
-        
