@@ -38,6 +38,20 @@ FAKE_INVITES = [
         token='222222',
         invite_type=InviteTypes.ACCOUNT,
         is_confirmed=False
+    ),
+    InviteSchema(
+        id=uuid4(),
+        email='employee@example.com',
+        token='333333',
+        invite_type=InviteTypes.EMPLOYMENT,
+        is_confirmed=False
+    ),
+    InviteSchema(
+        id=uuid4(),
+        email='employee_2@example.com',
+        token='444444',
+        invite_type=InviteTypes.EMPLOYMENT,
+        is_confirmed=True
     )
 ]
 
@@ -47,6 +61,11 @@ FAKE_ACCOUNTS = [
         id=uuid4(),
         email='user2@example.com',
         is_active=True
+    ),
+    AccountSchema(
+        id=uuid4(),
+        email='employee_2@example.com',
+        is_active=False,
     )
 ]
 
@@ -56,6 +75,11 @@ FAKE_USERS = [
         id=uuid4(),
         first_name='Виталий',
         last_name='Артас'
+    ),
+    UserSchema(
+        id=uuid4(),
+        first_name='Работник',
+        last_name='Юниттестовый'
     )
 ]
 
@@ -66,7 +90,7 @@ FAKE_SECRETS = [
         user_id=FAKE_USERS[0].id,
         account_id=FAKE_ACCOUNTS[0].id,
         password_hash=hash_password('password')
-    )
+    ),
 ]
 
 

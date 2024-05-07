@@ -1,6 +1,4 @@
-from fastapi import status
 from pydantic import BaseModel, EmailStr
-from typing import Optional
 
 from src.core.schemas import BaseResponseModel
 
@@ -33,3 +31,15 @@ class AccountRegisterRequestSchema(AccountRegisterPayload):
 
 class AccountRegisterResponseSchema(BaseResponseModel):
     payload: AccountRegisterPayload | None = None
+
+
+class EmployeConfirmResponseSchema(BaseResponseModel):
+    payload: EmailSchema | None = None
+
+
+class EmployeeSignUpCompleteRequestSchema(EmailSchema):
+    password: str
+
+
+class EmployeeSignUpCompleteResponseSchema(BaseResponseModel):
+    payload: EmailSchema | None = None

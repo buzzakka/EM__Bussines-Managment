@@ -3,19 +3,15 @@ from random import randint
 from src.core.utils import UnitOfWork, BaseService
 from src.celery_app.tasks import send_invite_token
 
-from src.api.auth.models import InviteModel, UserModel, AccountModel, SecretModel
+from src.api.auth.models import InviteModel, UserModel, AccountModel
 from src.api.company.models import CompanyModel
-from src.api.auth.schemas import (
-    SignUpCompleteResponseSchema,
-    SignUpRequestSchema,
-    SignUpResponseSchema,
-    SignUpCompleteEmployeeResponseSchema,
-)
 from src.api.auth.v1.schemas import (
     CheckAccountResponseSchema,
     SignUpResponseSchema,
     AccountRegisterPayload,
     AccountRegisterResponseSchema,
+    EmployeConfirmResponseSchema,
+    EmployeeSignUpCompleteResponseSchema,
 )
 from src.api.auth.utils.bad_responses import (
     account_exists_response,
@@ -79,7 +75,7 @@ class RegisterService(BaseService):
         cls,
         uow: UnitOfWork,
         account: str, password: str, first_name: str, last_name: str, company_name: str,
-    ) -> SignUpCompleteResponseSchema:
+    ) -> AccountRegisterResponseSchema:
         async with uow:
             try:
                 await cls._get_confirmed_invite_obj_or_raise(uow=uow, email=account, invite_type=InviteTypes.ACCOUNT)
@@ -128,14 +124,16 @@ class RegisterService(BaseService):
                 invite_type=InviteTypes.EMPLOYMENT,
             )
             if invite_obj is None:
-                raise exceptions.page_not_found()
+                return bad_responses.incorrect_email_or_ivite_token()
 
             if invite_obj.is_confirmed:
-                raise exceptions.invite_token_already_confirmed()
+                return bad_responses.account_confirmed_already(email=email)
 
             invite_obj.is_confirmed = True
 
-            return SignUpResponseSchema(email=invite_obj.email)
+            return EmployeConfirmResponseSchema(
+                payload=EmailSchema(email=email)
+            )
 
     @classmethod
     async def register_employee(
@@ -143,17 +141,20 @@ class RegisterService(BaseService):
         uow: UnitOfWork,
         email: str,
         password: str
-    ):
+    ) -> EmployeeSignUpCompleteResponseSchema:
         async with uow:
             account_obj: AccountModel = await uow.account.get_by_query_one_or_none(email=email)
-            if not account_obj or account_obj.is_active:
-                raise exceptions.account_already_registered()
+            if account_obj is None:
+                return bad_responses.account_not_confirmed(email=email)
+            if account_obj.is_active:
+                return bad_responses.account_exists_response(email=email)
 
-            invite_obj: InviteModel = await cls._get_confirmed_invite_obj_or_raise(
-                uow=uow, email=email, invite_type=InviteTypes.EMPLOYMENT
-            )
-            if not invite_obj.is_confirmed:
-                raise exceptions.account_is_not_confirmed()
+            try:
+                await cls._get_confirmed_invite_obj_or_raise(
+                    uow=uow, email=email, invite_type=InviteTypes.EMPLOYMENT
+                )
+            except exceptions.AccountNotConfirmed:
+                return bad_responses.account_not_confirmed(email=email)
 
             account_obj.is_active = True
 
@@ -161,9 +162,8 @@ class RegisterService(BaseService):
                 account_id=account_obj.id,
                 new_password=secret.hash_password(password)
             )
-            return SignUpCompleteEmployeeResponseSchema(
-                account_id=account_obj.id,
-                email=email
+            return EmployeeSignUpCompleteResponseSchema(
+                payload=EmailSchema(email=email)
             )
 
     @staticmethod
@@ -190,10 +190,10 @@ class RegisterService(BaseService):
         )
 
         if invite_obj is None:
-            raise exceptions.IvalidInviteToken()
+            raise exceptions.IvalidInviteToken
 
         if invite_obj.is_confirmed:
-            raise exceptions.AccountAlreadyConfirmed()
+            raise exceptions.AccountAlreadyConfirmed
 
         invite_obj.is_confirmed = True
 

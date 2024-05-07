@@ -21,6 +21,9 @@ from src.api.auth.v1.schemas import (
     SignUpResponseSchema,
     AccountRegisterRequestSchema,
     AccountRegisterResponseSchema,
+    EmployeConfirmResponseSchema,
+    EmployeeSignUpCompleteRequestSchema,
+    EmployeeSignUpCompleteResponseSchema,
 )
 
 router: APIRouter = APIRouter(
@@ -79,33 +82,36 @@ async def sign_up_complete(
     return sign_up_complete_response
 
 
-# @router.get('/sign-up-employee')
-# async def check_account_with_token(
-#     email: str,
-#     invite_token: str,
-#     uow: UnitOfWork = Depends(UnitOfWork)
-# ):
-#     response: dict = await RegisterService.sign_up_employee(
-#         uow=uow,
-#         email=email,
-#         invite_token=invite_token,
-#     )
-#     return response
+@router.get(
+    path='/sign-up-employee',
+    response_model=EmployeConfirmResponseSchema
+)
+async def check_account_with_token(
+    email: EmailStr,
+    invite_token: str,
+    uow: UnitOfWork = Depends(UnitOfWork)
+):
+    response: dict = await RegisterService.sign_up_employee(
+        uow=uow,
+        email=email,
+        invite_token=invite_token,
+    )
+    return response
 
 
-# @router.post(
-#     path='/sign-up-employee',
-#     response_model=SignUpCompleteEmployeeResponseSchema
-# )
-# async def sign_up_complete_employmee(
-#     user_data: SignUpCompleteEmploymeeRequestSchema,
-#     uow: UnitOfWork = Depends(UnitOfWork),
-# ):
-#     response: dict = await RegisterService.register_employee(
-#         uow=uow,
-#         **user_data.model_dump()
-#     )
-#     return response
+@router.post(
+    path='/sign-up-employee',
+    response_model=EmployeeSignUpCompleteResponseSchema
+)
+async def sign_up_complete_employmee(
+    user_data: EmployeeSignUpCompleteRequestSchema,
+    uow: UnitOfWork = Depends(UnitOfWork),
+):
+    response: dict = await RegisterService.register_employee(
+        uow=uow,
+        **user_data.model_dump()
+    )
+    return response
 
 
 # @router.post('/login', response_model=TokenSchema)

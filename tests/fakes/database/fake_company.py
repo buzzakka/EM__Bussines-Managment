@@ -23,5 +23,11 @@ FAKE_MEMBERS = [
         account_id=FAKE_ACCOUNTS[0].id,
         company_id=FAKE_COMPANYS[0].id,
         is_admin=True
+    ),
+    MemberSchema(
+        id=uuid4(),
+        account_id=FAKE_ACCOUNTS[1].id,
+        company_id=FAKE_COMPANYS[0].id,
+        is_admin=False
     )
 ]

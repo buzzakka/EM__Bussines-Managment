@@ -31,5 +31,5 @@ def incorrect_email_or_ivite_token():
     return BaseResponseModel(
         status_code=status.HTTP_400_BAD_REQUEST,
         error=True,
-        message=f'Неверный account или invite token.'
+        message=f'Неверный адрес электронной почты или токен.'
     )

@@ -6,13 +6,15 @@ from tests.fakes.parameters.auth import (
     TEST_ENDPOINT_CHECK_ACCOUNT,
     TEST_ENDPOINT_SIGN_UP_COMPANY,
     TEST_ENDPOINT_SIGN_UP_COMPLETE_COMPANY,
+    TEST_ENDPOINT_CONFIRM_EMPLOYEE_ACCOUTN,
+    TEST_ENDPOINT_SIGN_UP_COMPLETE_EMPLOYEE,
 )
 
 
 class TestAuthRouterV1:
     
     @pytest.mark.parametrize(
-        "email, expected_result, expected_status, expectation",
+        'email, expected_result, expected_status, expectation',
         TEST_ENDPOINT_CHECK_ACCOUNT
     )
     def test_check_account(
@@ -29,7 +31,7 @@ class TestAuthRouterV1:
 
 
     @pytest.mark.parametrize(
-        "data, expected_result, expected_status, expectation",
+        'data, expected_result, expected_status, expectation',
         TEST_ENDPOINT_SIGN_UP_COMPANY
     )
     def test_sign_up_company(
@@ -45,8 +47,9 @@ class TestAuthRouterV1:
             assert response.status_code == expected_status
             assert response.json() == expected_result
 
+
     @pytest.mark.parametrize(
-        "data, expected_result, expected_status, expectation",
+        'data, expected_result, expected_status, expectation',
         TEST_ENDPOINT_SIGN_UP_COMPLETE_COMPANY
     )
     def test_sign_up_complete_account(
@@ -58,6 +61,42 @@ class TestAuthRouterV1:
             response: Response = client.post(
                 '/api/v1/auth/sign-up-complete/',
                 json=data
+            )
+            assert response.status_code == expected_status
+            assert response.json() == expected_result
+
+
+    @pytest.mark.parametrize(
+        'data, expected_result, expected_status, expectation',
+        TEST_ENDPOINT_SIGN_UP_COMPLETE_EMPLOYEE
+    )
+    def test_sign_up_complete_employee(
+        self,
+        client: TestClient,
+        data, expected_result, expected_status, expectation,
+    ):
+        with expectation:
+            response: Response = client.post(
+                '/api/v1/auth/sign-up-employee/',
+                json=data
+            )
+            assert response.status_code == expected_status
+            assert response.json() == expected_result
+
+
+    @pytest.mark.parametrize(
+        'email, token, expected_result, expected_status, expectation',
+        TEST_ENDPOINT_CONFIRM_EMPLOYEE_ACCOUTN
+    )
+    def test_sign_up_employee(
+        self,
+        client: TestClient,
+        email, token, expected_result, expected_status, expectation
+    ):
+        with expectation:
+            response: Response = client.get(
+                '/api/v1/auth/sign-up-employee/',
+                params={'email': email, 'invite_token': token}
             )
             assert response.status_code == expected_status
             assert response.json() == expected_result

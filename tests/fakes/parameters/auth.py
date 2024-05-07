@@ -11,6 +11,11 @@ from src.api.auth.v1.schemas import (
     AccountRegisterPayload,
     AccountRegisterRequestSchema,
     AccountRegisterResponseSchema,
+    
+    EmployeConfirmResponseSchema,
+    
+    EmployeeSignUpCompleteRequestSchema,
+    EmployeeSignUpCompleteResponseSchema,
 )
 
 
@@ -74,7 +79,7 @@ TEST_ENDPOINT_SIGN_UP_COMPANY: list[tuple[any]] = [
         SignUpResponseSchema(
             status_code=status.HTTP_400_BAD_REQUEST,
             error=True,
-            message='Неверный account или invite token.'
+            message='Неверный адрес электронной почты или токен.'
         ).model_dump(),
         status.HTTP_200_OK,
         does_not_raise(),
@@ -88,7 +93,7 @@ TEST_ENDPOINT_SIGN_UP_COMPANY: list[tuple[any]] = [
         SignUpResponseSchema(
             status_code=status.HTTP_400_BAD_REQUEST,
             error=True,
-            message='Неверный account или invite token.'
+            message='Неверный адрес электронной почты или токен.'
         ).model_dump(),
         status.HTTP_200_OK,
         does_not_raise(),
@@ -181,4 +186,112 @@ TEST_ENDPOINT_SIGN_UP_COMPLETE_COMPANY: list[tuple[any]] = [
         does_not_raise(),
     ),
 
+]
+
+TEST_ENDPOINT_CONFIRM_EMPLOYEE_ACCOUTN: list[tuple[any]] = [
+    # Попытка подтверждения с неправильным токеном
+    (
+        'employee@example.com',
+        'token',
+        EmployeConfirmResponseSchema(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            error=True,
+            message='Неверный адрес электронной почты или токен.'
+        ).model_dump(),
+        status.HTTP_200_OK,
+        does_not_raise(),
+    ),
+    
+    # Попытка подтверждения с несуществующей почты
+    (
+        'error@error.com',
+        'token',
+        EmployeConfirmResponseSchema(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            error=True,
+            message='Неверный адрес электронной почты или токен.'
+        ).model_dump(),
+        status.HTTP_200_OK,
+        does_not_raise(),
+    ),
+    
+    # Успешная попытка подтверждения
+    (
+        'employee@example.com',
+        '333333',
+        EmployeConfirmResponseSchema(
+            payload=EmailSchema(email='employee@example.com')
+        ).model_dump(),
+        status.HTTP_200_OK,
+        does_not_raise(),
+    ),
+    
+    # Попытка подтверждения подтвержденного пользователя
+    (
+        'employee@example.com',
+        '333333',
+        EmployeConfirmResponseSchema(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            error=True,
+            message='Аккаунт employee@example.com уже подтвержден.'
+        ).model_dump(),
+        status.HTTP_200_OK,
+        does_not_raise(),
+    ),
+]
+
+TEST_ENDPOINT_SIGN_UP_COMPLETE_EMPLOYEE: list[tuple[any]] = [
+    # Регистрация пользователя
+    (
+        EmployeeSignUpCompleteRequestSchema(
+            email='employee_2@example.com', password='password'
+        ).model_dump(),
+        EmployeeSignUpCompleteResponseSchema(
+            payload=EmailSchema(email='employee_2@example.com')
+        ).model_dump(),
+        status.HTTP_200_OK,
+        does_not_raise(),
+    ),
+    
+    # Повторная попытка регистрации пользователя
+    (
+        EmployeeSignUpCompleteRequestSchema(
+            email='employee_2@example.com', password='password'
+        ).model_dump(),
+        EmployeeSignUpCompleteResponseSchema(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            error=True,
+            message='Пользователь employee_2@example.com уже зарегистрирован.'
+        ).model_dump(),
+        status.HTTP_200_OK,
+        does_not_raise(),
+    ),
+    
+    # Попытка регистрации несуществующего пользователя
+    (
+        EmployeeSignUpCompleteRequestSchema(
+            email='error@example.com', password='password'
+        ).model_dump(),
+        EmployeeSignUpCompleteResponseSchema(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            error=True,
+            message='Аккаунт error@example.com не подтвержден.'
+        ).model_dump(),
+        status.HTTP_200_OK,
+        does_not_raise(),
+    ),
+    
+    # Попытка регистрации неподтвержденного пользователя
+    (
+        EmployeeSignUpCompleteRequestSchema(
+            email='employee@example.com', password='password'
+        ).model_dump(),
+        EmployeeSignUpCompleteResponseSchema(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            error=True,
+            message='Аккаунт employee@example.com не подтвержден.'
+        ).model_dump(),
+        status.HTTP_200_OK,
+        does_not_raise(),
+    ),
 ]
