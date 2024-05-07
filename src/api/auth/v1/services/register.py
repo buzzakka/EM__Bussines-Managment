@@ -14,6 +14,8 @@ from src.api.auth.schemas import (
 from src.api.auth.v1.schemas import (
     CheckAccountResponseSchema,
     SignUpResponseSchema,
+    AccountRegisterPayload,
+    AccountRegisterResponseSchema,
 )
 from src.api.auth.utils.bad_responses import (
     account_exists_response,
@@ -79,9 +81,13 @@ class RegisterService(BaseService):
         account: str, password: str, first_name: str, last_name: str, company_name: str,
     ) -> SignUpCompleteResponseSchema:
         async with uow:
-            await cls._get_confirmed_invite_obj_or_raise(uow=uow, email=account, invite_type=InviteTypes.ACCOUNT)
-
-            await cls._check_if_account_exists_or_raise(uow=uow, email=account)
+            try:
+                await cls._get_confirmed_invite_obj_or_raise(uow=uow, email=account, invite_type=InviteTypes.ACCOUNT)
+                await cls._check_if_account_exists_or_raise(uow=uow, email=account)
+            except exceptions.AccountNotConfirmed:
+                return bad_responses.account_not_confirmed(email=account)
+            except exceptions.AccountAlreadyRegistred:
+                return bad_responses.account_exists_response(email=account)
 
             user_obj: UserModel = await uow.user.add_one_and_get_obj(
                 first_name=first_name,
@@ -99,12 +105,13 @@ class RegisterService(BaseService):
 
             await uow.member.add_one(account_id=account_obj.id, company_id=company_obj.id, is_admin=True)
 
-            return SignUpCompleteResponseSchema(
-                user_id=user_obj.id,
-                email=account_obj.email,
-                first_name=user_obj.first_name,
-                last_name=user_obj.last_name,
-                company_name=company_obj.name
+            return AccountRegisterResponseSchema(
+                payload=AccountRegisterPayload(
+                    account=account,
+                    first_name=first_name,
+                    last_name=last_name,
+                    company_name=company_name
+                )
             )
 
     @classmethod
@@ -208,7 +215,7 @@ class RegisterService(BaseService):
         _invite_obj: InviteModel = await uow.invite.get_by_query_one_or_none(**invite_info)
 
         if _invite_obj is None or not _invite_obj.is_confirmed:
-            raise exceptions.account_is_not_confirmed()
+            raise exceptions.AccountNotConfirmed
 
         return _invite_obj
 
@@ -217,7 +224,7 @@ class RegisterService(BaseService):
         is_account_exists: bool = await uow.account.get_by_query_one_or_none(email=email) is not None
 
         if is_account_exists:
-            raise exceptions.account_already_registered()
+            raise exceptions.AccountAlreadyRegistred
 
     @staticmethod
     async def _add_secret_obj(
@@ -226,9 +233,9 @@ class RegisterService(BaseService):
         account_obj: AccountModel,
         password: str,
     ) -> None:
-        secret: dict = {
+        secret_obj: dict = {
             'user_id': user_obj.id,
             'account_id': account_obj.id,
             'password_hash': secret.hash_password(password)
         }
-        await uow.secret.add_one(**secret)
+        await uow.secret.add_one(**secret_obj)

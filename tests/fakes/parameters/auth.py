@@ -7,6 +7,10 @@ from src.api.auth.v1.schemas import (
     
     SignUpRequestSchema,
     SignUpResponseSchema,
+    
+    AccountRegisterPayload,
+    AccountRegisterRequestSchema,
+    AccountRegisterResponseSchema,
 )
 
 
@@ -120,5 +124,61 @@ TEST_ENDPOINT_SIGN_UP_COMPANY: list[tuple[any]] = [
 ]
 
 TEST_ENDPOINT_SIGN_UP_COMPLETE_COMPANY: list[tuple[any]] = [
+    # Регистрация нового пользователя
+    (
+        AccountRegisterRequestSchema(
+            account='user4@example.com',
+            first_name='Alan',
+            last_name='Wake',
+            company_name='Remedy',
+            password='password'
+        ).model_dump(),
+        AccountRegisterResponseSchema(
+            payload=AccountRegisterPayload(
+                account='user4@example.com',
+                first_name='Alan',
+                last_name='Wake',
+                company_name='Remedy',
+            )
+        ).model_dump(),
+        status.HTTP_200_OK,
+        does_not_raise(),
+    ),
     
+    # Регистрация пользователя с неподтвержденным email
+    (
+        AccountRegisterRequestSchema(
+            account='user@example.com',
+            first_name='Alan',
+            last_name='Wake',
+            company_name='Remedy',
+            password='password'
+        ).model_dump(),
+        AccountRegisterResponseSchema(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            error=True,
+            message='Аккаунт user@example.com не подтвержден.'
+        ).model_dump(),
+        status.HTTP_200_OK,
+        does_not_raise(),
+    ),
+
+    # Регистрация зарегестрированного
+    (
+        AccountRegisterRequestSchema(
+            account='user4@example.com',
+            first_name='Alan',
+            last_name='Wake',
+            company_name='Remedy',
+            password='password'
+        ).model_dump(),
+        AccountRegisterResponseSchema(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            error=True,
+            message='Пользователь user4@example.com уже зарегистрирован.'
+        ).model_dump(),
+        status.HTTP_200_OK,
+        does_not_raise(),
+    ),
+
 ]

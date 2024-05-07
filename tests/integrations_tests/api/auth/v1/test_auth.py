@@ -5,6 +5,7 @@ import pytest
 from tests.fakes.parameters.auth import (
     TEST_ENDPOINT_CHECK_ACCOUNT,
     TEST_ENDPOINT_SIGN_UP_COMPANY,
+    TEST_ENDPOINT_SIGN_UP_COMPLETE_COMPANY,
 )
 
 
@@ -39,6 +40,23 @@ class TestAuthRouterV1:
         with expectation:
             response: Response = client.post(
                 '/api/v1/auth/sign-up',
+                json=data
+            )
+            assert response.status_code == expected_status
+            assert response.json() == expected_result
+
+    @pytest.mark.parametrize(
+        "data, expected_result, expected_status, expectation",
+        TEST_ENDPOINT_SIGN_UP_COMPLETE_COMPANY
+    )
+    def test_sign_up_complete_account(
+        self,
+        client: TestClient,
+        data, expected_result, expected_status, expectation
+    ):
+        with expectation:
+            response: Response = client.post(
+                '/api/v1/auth/sign-up-complete/',
                 json=data
             )
             assert response.status_code == expected_status

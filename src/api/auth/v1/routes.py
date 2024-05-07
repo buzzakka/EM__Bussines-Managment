@@ -18,7 +18,9 @@ from src.api.auth.v1.services import RegisterService, AuthService
 from src.api.auth.v1.schemas import (
     CheckAccountResponseSchema,
     SignUpRequestSchema,
-    SignUpResponseSchema
+    SignUpResponseSchema,
+    AccountRegisterRequestSchema,
+    AccountRegisterResponseSchema,
 )
 
 router: APIRouter = APIRouter(
@@ -61,20 +63,20 @@ async def sign_up(
     return sign_up_response
 
 
-# @router.post(
-#     path='/sign-up-complete',
-#     response_model=SignUpCompleteResponseSchema
-# )
-# async def sign_up_complete(
-#     user_data: SignUpCompleteRequestSchema,
-#     uow: UnitOfWork = Depends(UnitOfWork),
-# ):
-#     """Регистрация компании."""
-#     sign_up_complete_response: dict = await RegisterService.register_company(
-#         uow=uow,
-#         **user_data.model_dump()
-#     )
-#     return sign_up_complete_response
+@router.post(
+    path='/sign-up-complete',
+    response_model=AccountRegisterResponseSchema
+)
+async def sign_up_complete(
+    user_data: AccountRegisterRequestSchema,
+    uow: UnitOfWork = Depends(UnitOfWork),
+):
+    """Регистрация компании."""
+    sign_up_complete_response: dict = await RegisterService.register_company(
+        uow=uow,
+        **user_data.model_dump()
+    )
+    return sign_up_complete_response
 
 
 # @router.get('/sign-up-employee')

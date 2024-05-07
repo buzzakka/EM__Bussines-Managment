@@ -4,11 +4,15 @@ from src.api.auth.utils.bad_responses import (
     account_exists_response
 )
 
-class UserAlreadyRegistred(Exception):
+class AccountAlreadyRegistred(Exception):
     pass
 
 
 class AccountAlreadyConfirmed(Exception):
+    pass
+
+
+class AccountNotConfirmed(Exception):
     pass
 
 

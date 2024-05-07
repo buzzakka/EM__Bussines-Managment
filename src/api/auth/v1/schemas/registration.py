@@ -18,3 +18,18 @@ class SignUpRequestSchema(BaseModel):
 
 class SignUpResponseSchema(BaseResponseModel):
     payload: EmailSchema | None = None
+
+
+class AccountRegisterPayload(BaseModel):
+    account: EmailStr
+    first_name: str
+    last_name: str
+    company_name: str
+
+
+class AccountRegisterRequestSchema(AccountRegisterPayload):
+    password: str
+
+
+class AccountRegisterResponseSchema(BaseResponseModel):
+    payload: AccountRegisterPayload | None = None
