@@ -7,7 +7,7 @@ from fastapi import Response
 async def get_account_jwt(setup_db, client: TestClient) -> str:
     response: Response = client.post(
         url='/api/v1/auth/login/',
-        json={'email': 'user2@example.com', 'password': 'password'}
+        json={'email': 'user_2@example.com', 'password': 'password'}
     )
     payload: dict = response.json()['payload']
     token_type: str = payload['token_type']
