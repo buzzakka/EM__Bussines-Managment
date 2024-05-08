@@ -11,12 +11,6 @@ from tests.fakes.parameters.auth import (
     TEST_ENDPOINT_INVALID_TOKEN,
 )
 
-from src.api.auth.schemas import (
-    TokenSchema,
-    UserLoginRequestSchema,
-    UserLoginResponseSchema
-)
-
 
 class TestAuthRouterV1:
 

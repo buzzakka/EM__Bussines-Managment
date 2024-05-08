@@ -10,6 +10,14 @@ from src.api.company.schemas import (
     UpdateUsersEmailByAdminResponseSchema,
     UpdateUsersNameByAdminResponseSchema
 )
+from src.api.company.v1.schemas import (
+    AddMemberRequestSchema,
+    AddMemberResponseSchema,
+    UpdateUsersEmailByAdminResponseSchema,
+    UpdateUsersEmailByAdminRequestSchema,
+)
+from src.api.auth.utils import bad_responses as auth_bad_responses
+from src.api.company.utils import bad_responses as company_bad_responses
 
 
 class MemberService(BaseService):
@@ -19,9 +27,12 @@ class MemberService(BaseService):
         cls,
         uow: UnitOfWork,
         email: str, first_name: str, last_name: str, company_id: int
-    ):
+    ) -> AddMemberResponseSchema:
         async with uow:
-            await RegisterService._check_if_account_exists_or_raise(uow=uow, email=email)
+            try:
+                await RegisterService._check_if_account_exists_or_raise(uow=uow, email=email)
+            except exceptions.AccountAlreadyRegistred:
+                return auth_bad_responses.account_exists_response(email=email)
 
             user_obj: UserModel = await uow.user.add_one_and_get_obj(
                 first_name=first_name,
@@ -55,7 +66,7 @@ class MemberService(BaseService):
             cls._send_invite_link(email=email, invite_token=invite_obj.token)
 
             return AddMemberResponseSchema(
-                user=AddMemberRequestSchema(
+                payload=AddMemberRequestSchema(
                     email=email, first_name=first_name, last_name=last_name
                 )
             )
@@ -73,14 +84,18 @@ class MemberService(BaseService):
             )
 
             if account_obj is None:
-                raise exceptions.incorrect_account_id()
+                return company_bad_responses.invalid_account_id(account_id)
 
             if await uow.account.get_by_query_one_or_none(email=new_email) is not None:
-                raise exceptions.account_already_registered(email=new_email)
+                return auth_bad_responses.account_exists_response(email=new_email)
 
             account_obj.email = new_email
 
-            return UpdateUsersEmailByAdminResponseSchema(new_email=new_email)
+            return UpdateUsersEmailByAdminResponseSchema(
+                payload=UpdateUsersEmailByAdminRequestSchema(
+                    account_id=account_id, new_email=new_email
+                )
+            )
 
     @classmethod
     async def update_users_name(
@@ -95,12 +110,11 @@ class MemberService(BaseService):
             )
             if user_obj is None:
                 raise exceptions.incorrect_account_id()
-            
+
             user_obj.first_name = first_name
             user_obj.last_name = last_name
-            
+
             return UpdateUsersNameByAdminResponseSchema(account_id=account_id)
-        
 
     @staticmethod
     def _send_invite_link(email: str, invite_token: str) -> None:
