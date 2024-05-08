@@ -14,10 +14,19 @@ class AddMemberResponseSchema(BaseResponseModel):
 
 
 class UpdateUsersEmailByAdminRequestSchema(BaseModel):
-    account_id: str
+    account_id: UUID4
     new_email: EmailStr
 
 
 class UpdateUsersEmailByAdminResponseSchema(BaseResponseModel):
     payload: UpdateUsersEmailByAdminRequestSchema | None = None
 
+
+class UpdateUsersNameByAdminRequestSchema(BaseModel):
+    account_id: UUID4
+    first_name: str
+    last_name: str
+
+
+class UpdateUsersNameByAdminResponseSchema(BaseResponseModel):
+    payload: UpdateUsersNameByAdminRequestSchema | None = None

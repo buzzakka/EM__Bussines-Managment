@@ -2,30 +2,21 @@ from fastapi import APIRouter, Depends, Request
 
 from src.core.utils import UnitOfWork
 
-from src.api.company.v1.services import MemberService, PositionService, TaskService
-from src.api.company.schemas import (
-    AddMemberRequestSchema,
-    AddMemberResponseSchema,
-    UpdateUsersEmailByAdminResponseSchema,
-    UpdateUsersEmailByAdminRequestSchema,
-    UpdateUsersNameByAdminRequeestSchema,
-    AddPositionRequestSchema,
-    AddPositionResponseSchema,
-    UpdatePositionRequestSchema,
-    UpdatePositionResponseSchema,
-    AddStructReqeustSchema,
-    UpdateStructRequestSchema,
-    DeleteStructRequestSchema,
-    UpdateStructResponseSchema,
-    AddTaskRequestSchema,
-)
+from src.api.company.v1.services import MemberService, TaskService, PositionService
+
 from src.api.company.v1.schemas import (
     AddMemberRequestSchema,
     AddMemberResponseSchema,
+
     UpdateUsersEmailByAdminRequestSchema,
     UpdateUsersEmailByAdminResponseSchema,
+
+    UpdateUsersNameByAdminRequestSchema,
+    UpdateUsersNameByAdminResponseSchema,
+    
+    AddPositionRequestSchema,
+    AddPositionResponseSchema,
 )
-from src.api.company.models import TaskModel
 
 
 router: APIRouter = APIRouter(
@@ -54,7 +45,11 @@ async def add_new_member(
     return response
 
 
-@router.patch('/member/email', tags=['protected', 'for_admins'])
+@router.patch(
+    '/member/email',
+    tags=['protected', 'for_admins'],
+    response_model=UpdateUsersEmailByAdminResponseSchema
+)
 async def update_users_email(
     request: Request,
     data: UpdateUsersEmailByAdminRequestSchema,
@@ -72,45 +67,49 @@ async def update_users_email(
     return response
 
 
-# @router.patch('/member/name', tags=['protected', 'for_admins'])
-# async def update_users_email(
-#     request: Request,
-#     data: UpdateUsersNameByAdminRequeestSchema,
-#     uow: UnitOfWork = Depends(UnitOfWork),
-# ):
-#     """Изменение имени работника админом."""
-#     payload: dict = request.state.payload
-#     company_id: int = payload['company_id']
-#     response: UpdateUsersEmailByAdminResponseSchema = await MemberService.update_users_name(
-#         uow=uow,
-#         company_id=company_id,
-#         account_id=data.account_id,
-#         first_name=data.first_name,
-#         last_name=data.last_name
-#     )
-#     return response
+@router.patch(
+    '/member/name',
+    tags=['protected', 'for_admins'],
+    response_model=UpdateUsersNameByAdminResponseSchema
+)
+async def update_users_name(
+    request: Request,
+    data: UpdateUsersNameByAdminRequestSchema,
+    uow: UnitOfWork = Depends(UnitOfWork),
+):
+    """Изменение имени работника админом."""
+    payload: dict = request.state.payload
+    company_id: int = payload['company_id']
+    response: UpdateUsersNameByAdminResponseSchema = await MemberService.update_users_name(
+        uow=uow,
+        company_id=company_id,
+        account_id=data.account_id,
+        first_name=data.first_name,
+        last_name=data.last_name
+    )
+    return response
 
 
-# @router.post(
-#     '/position',
-#     tags=['protected', 'for_admins'],
-#     response_model=AddPositionResponseSchema
-# )
-# async def create_position(
-#     request: Request,
-#     data: AddPositionRequestSchema,
-#     uow: UnitOfWork = Depends(UnitOfWork),
-# ):
-#     """Создание новой позиции."""
-#     payload: str = request.state.payload
-#     company_id: int = payload['company_id']
-#     response: AddPositionResponseSchema = await PositionService.add_new_position(
-#         uow=uow,
-#         title=data.title,
-#         company_id=company_id,
-#         description=data.description,
-#     )
-#     return response
+@router.post(
+    '/position',
+    tags=['protected', 'for_admins'],
+    response_model=AddPositionResponseSchema
+)
+async def create_position(
+    request: Request,
+    data: AddPositionRequestSchema,
+    uow: UnitOfWork = Depends(UnitOfWork),
+):
+    """Создание новой позиции."""
+    payload: str = request.state.payload
+    company_id: int = payload['company_id']
+    response: AddPositionResponseSchema = await PositionService.add_new_position(
+        uow=uow,
+        title=data.title,
+        company_id=company_id,
+        description=data.description,
+    )
+    return response
 
 
 # @router.patch(

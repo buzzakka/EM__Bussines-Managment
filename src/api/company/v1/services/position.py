@@ -3,11 +3,13 @@ from src.core.utils import UnitOfWork, BaseService
 from src.api.auth.utils import exceptions
 
 from src.api.company.schemas import (
-    AddPositionResponseSchema,
-    AddPositionRequestSchema,
     UpdatePositionResponseSchema,
     UpdateStructRequestSchema,
     UpdateStructResponseSchema,
+)
+from src.api.company.v1.schemas import (
+    AddPositionPayloadSchema,
+    AddPositionResponseSchema,
 )
 from src.api.company.models import PositionModel, StructAdmModel
 
@@ -20,16 +22,16 @@ class PositionService(BaseService):
         cls,
         uow: UnitOfWork,
         title: str, company_id: str, description: str = None
-    ):
+    ) -> AddPositionResponseSchema:
         async with uow:
-            await uow.position.add_one_and_get_obj(
+            position_obj: PositionModel = await uow.position.add_one_and_get_obj(
                 title=title,
                 description=description,
                 company_id=company_id,
             )
             return AddPositionResponseSchema(
-                position=AddPositionRequestSchema(
-                    title=title, description=description, company_id=company_id
+                payload=AddPositionPayloadSchema(
+                    title=title, description=description, position_id=position_obj.id
                 )
             )
 

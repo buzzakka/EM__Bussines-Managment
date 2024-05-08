@@ -6,7 +6,7 @@ from tests.fakes.parameters.auth import (
     TEST_ENDPOINT_CHECK_ACCOUNT,
     TEST_ENDPOINT_SIGN_UP_COMPANY,
     TEST_ENDPOINT_SIGN_UP_COMPLETE_COMPANY,
-    TEST_ENDPOINT_CONFIRM_EMPLOYEE_ACCOUTN,
+    TEST_ENDPOINT_CONFIRM_EMPLOYEE_ACCOUNT,
     TEST_ENDPOINT_SIGN_UP_COMPLETE_EMPLOYEE,
     TEST_ENDPOINT_INVALID_TOKEN,
 )
@@ -83,7 +83,7 @@ class TestAuthRouterV1:
 
     @pytest.mark.parametrize(
         'email, token, expected_result, expected_status, expectation',
-        TEST_ENDPOINT_CONFIRM_EMPLOYEE_ACCOUTN
+        TEST_ENDPOINT_CONFIRM_EMPLOYEE_ACCOUNT
     )
     def test_sign_up_employee(
         self,
@@ -118,7 +118,7 @@ class TestAuthRouterV1:
     def test_login_and_logout(self, client: TestClient):
         response: Response = client.post(
             '/api/v1/auth/login/',
-            json={'email': 'user2@example.com', 'password': 'password'}
+            json={'email': 'user_2@example.com', 'password': 'password'}
         )
         payload: dict = response.json()['payload']
         access_token: str = payload['access_token']

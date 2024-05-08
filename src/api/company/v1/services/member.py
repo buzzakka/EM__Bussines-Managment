@@ -4,17 +4,13 @@ from src.celery_app.tasks import send_invite_link
 
 from src.api.auth.v1.services import RegisterService
 from src.api.auth.models import UserModel, AccountModel, InviteTypes, InviteModel
-from src.api.company.schemas import (
-    AddMemberResponseSchema,
-    AddMemberRequestSchema,
-    UpdateUsersEmailByAdminResponseSchema,
-    UpdateUsersNameByAdminResponseSchema
-)
 from src.api.company.v1.schemas import (
     AddMemberRequestSchema,
     AddMemberResponseSchema,
     UpdateUsersEmailByAdminResponseSchema,
     UpdateUsersEmailByAdminRequestSchema,
+    UpdateUsersNameByAdminRequestSchema,
+    UpdateUsersNameByAdminResponseSchema,
 )
 from src.api.auth.utils import bad_responses as auth_bad_responses
 from src.api.company.utils import bad_responses as company_bad_responses
@@ -109,12 +105,16 @@ class MemberService(BaseService):
                 account_id=account_id,
             )
             if user_obj is None:
-                raise exceptions.incorrect_account_id()
+                return company_bad_responses.invalid_account_id(account_id=account_id)
 
             user_obj.first_name = first_name
             user_obj.last_name = last_name
 
-            return UpdateUsersNameByAdminResponseSchema(account_id=account_id)
+            return UpdateUsersNameByAdminResponseSchema(
+                payload=UpdateUsersNameByAdminRequestSchema(
+                    account_id=account_id, first_name=first_name, last_name=last_name
+                )
+            )
 
     @staticmethod
     def _send_invite_link(email: str, invite_token: str) -> None:

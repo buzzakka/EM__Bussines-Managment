@@ -27,38 +27,38 @@ from src.api.auth.schemas import (
 TEST_ENDPOINT_CHECK_ACCOUNT: list[tuple[any]] = [
     # Проверка аккаунта нового пользователя
     (
-        'user@example.com',
+        'fake_user_1@example.com',
         CheckAccountResponseSchema(payload=EmailSchema(
-            email='user@example.com')).model_dump(),
+            email='fake_user_1@example.com')).model_dump(),
         status.HTTP_200_OK,
         does_not_raise(),
     ),
 
     # Проверка аккаунта у пользователя, который уже проверял его
     (
-        'user1@example.com',
+        'fake_user_1@example.com',
         CheckAccountResponseSchema(payload=EmailSchema(
-            email='user1@example.com')).model_dump(),
+            email='fake_user_1@example.com')).model_dump(),
         status.HTTP_200_OK,
         does_not_raise(),
     ),
 
     # Проверка аккаунта у пользователя, который уже подтвердил его
     (
-        'user3@example.com',
+        'user_3@example.com',
         CheckAccountResponseSchema(payload=EmailSchema(
-            email='user3@example.com')).model_dump(),
+            email='user_3@example.com')).model_dump(),
         status.HTTP_200_OK,
         does_not_raise(),
     ),
 
     # Проверка аккаунта у зарегестрированного пользователя
     (
-        'user2@example.com',
+        'user_1@example.com',
         CheckAccountResponseSchema(
             status_code=status.HTTP_400_BAD_REQUEST,
             error=True,
-            message='Пользователь user2@example.com уже зарегистрирован.'
+            message='Пользователь user_1@example.com уже зарегистрирован.'
         ).model_dump(),
         status.HTTP_200_OK,
         does_not_raise(),
@@ -69,11 +69,11 @@ TEST_ENDPOINT_SIGN_UP_COMPANY: list[tuple[any]] = [
     # Подтверждение корректного инвайт токена
     (
         SignUpRequestSchema(
-            account='user4@example.com',
-            invite_token='222222'
+            account='user_4@example.com',
+            invite_token='444444'
         ).model_dump(),
         SignUpResponseSchema(
-            payload=EmailSchema(email='user4@example.com')
+            payload=EmailSchema(email='user_4@example.com')
         ).model_dump(),
         status.HTTP_200_OK,
         does_not_raise(),
@@ -82,7 +82,7 @@ TEST_ENDPOINT_SIGN_UP_COMPANY: list[tuple[any]] = [
     # Подтверждение некорректного инвайт токена
     (
         SignUpRequestSchema(
-            account='user@example.com', invite_token='qwerty'
+            account='fake_user_1@example.com', invite_token='qwerty'
         ).model_dump(),
         SignUpResponseSchema(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -110,12 +110,12 @@ TEST_ENDPOINT_SIGN_UP_COMPANY: list[tuple[any]] = [
     # Подтверждение уже подтвержденного аккаунта
     (
         SignUpRequestSchema(
-            account='user4@example.com', invite_token='222222'
+            account='user_3_2@example.com', invite_token='333333'
         ).model_dump(),
         SignUpResponseSchema(
             status_code=status.HTTP_400_BAD_REQUEST,
             error=True,
-            message='Аккаунт user4@example.com уже подтвержден.'
+            message='Аккаунт user_3_2@example.com уже подтвержден.'
         ).model_dump(),
         status.HTTP_200_OK,
         does_not_raise(),
@@ -124,12 +124,12 @@ TEST_ENDPOINT_SIGN_UP_COMPANY: list[tuple[any]] = [
     # Подтверждение уже зарегестрированного аккаунта
     (
         SignUpRequestSchema(
-            account='user2@example.com', invite_token='222222'
+            account='user_1@example.com', invite_token='111111'
         ).model_dump(),
         SignUpResponseSchema(
             status_code=status.HTTP_400_BAD_REQUEST,
             error=True,
-            message='Пользователь user2@example.com уже зарегистрирован.'
+            message='Пользователь user_1@example.com уже зарегистрирован.'
         ).model_dump(),
         status.HTTP_200_OK,
         does_not_raise(),
@@ -140,7 +140,7 @@ TEST_ENDPOINT_SIGN_UP_COMPLETE_COMPANY: list[tuple[any]] = [
     # Регистрация нового пользователя
     (
         AccountRegisterRequestSchema(
-            account='user4@example.com',
+            account='user_3@example.com',
             first_name='Alan',
             last_name='Wake',
             company_name='Remedy',
@@ -148,7 +148,7 @@ TEST_ENDPOINT_SIGN_UP_COMPLETE_COMPANY: list[tuple[any]] = [
         ).model_dump(),
         AccountRegisterResponseSchema(
             payload=AccountRegisterPayload(
-                account='user4@example.com',
+                account='user_3@example.com',
                 first_name='Alan',
                 last_name='Wake',
                 company_name='Remedy',
@@ -161,7 +161,7 @@ TEST_ENDPOINT_SIGN_UP_COMPLETE_COMPANY: list[tuple[any]] = [
     # Регистрация пользователя с неподтвержденным email
     (
         AccountRegisterRequestSchema(
-            account='user@example.com',
+            account='fake_user@example.com',
             first_name='Alan',
             last_name='Wake',
             company_name='Remedy',
@@ -170,7 +170,7 @@ TEST_ENDPOINT_SIGN_UP_COMPLETE_COMPANY: list[tuple[any]] = [
         AccountRegisterResponseSchema(
             status_code=status.HTTP_400_BAD_REQUEST,
             error=True,
-            message='Аккаунт user@example.com не подтвержден.'
+            message='Аккаунт fake_user@example.com не подтвержден.'
         ).model_dump(),
         status.HTTP_200_OK,
         does_not_raise(),
@@ -179,7 +179,7 @@ TEST_ENDPOINT_SIGN_UP_COMPLETE_COMPANY: list[tuple[any]] = [
     # Регистрация зарегестрированного
     (
         AccountRegisterRequestSchema(
-            account='user4@example.com',
+            account='user_2@example.com',
             first_name='Alan',
             last_name='Wake',
             company_name='Remedy',
@@ -188,7 +188,7 @@ TEST_ENDPOINT_SIGN_UP_COMPLETE_COMPANY: list[tuple[any]] = [
         AccountRegisterResponseSchema(
             status_code=status.HTTP_400_BAD_REQUEST,
             error=True,
-            message='Пользователь user4@example.com уже зарегистрирован.'
+            message='Пользователь user_2@example.com уже зарегистрирован.'
         ).model_dump(),
         status.HTTP_200_OK,
         does_not_raise(),
@@ -196,10 +196,10 @@ TEST_ENDPOINT_SIGN_UP_COMPLETE_COMPANY: list[tuple[any]] = [
 
 ]
 
-TEST_ENDPOINT_CONFIRM_EMPLOYEE_ACCOUTN: list[tuple[any]] = [
+TEST_ENDPOINT_CONFIRM_EMPLOYEE_ACCOUNT: list[tuple[any]] = [
     # Попытка подтверждения с неправильным токеном
     (
-        'employee@example.com',
+        'employee_2@example.com',
         'token',
         EmployeConfirmResponseSchema(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -225,10 +225,10 @@ TEST_ENDPOINT_CONFIRM_EMPLOYEE_ACCOUTN: list[tuple[any]] = [
 
     # Успешная попытка подтверждения
     (
-        'employee@example.com',
-        '333333',
+        'employee_2@example.com',
+        '222222',
         EmployeConfirmResponseSchema(
-            payload=EmailSchema(email='employee@example.com')
+            payload=EmailSchema(email='employee_2@example.com')
         ).model_dump(),
         status.HTTP_200_OK,
         does_not_raise(),
@@ -236,12 +236,12 @@ TEST_ENDPOINT_CONFIRM_EMPLOYEE_ACCOUTN: list[tuple[any]] = [
 
     # Попытка подтверждения подтвержденного пользователя
     (
-        'employee@example.com',
-        '333333',
+        'employee_1@example.com',
+        '111111',
         EmployeConfirmResponseSchema(
             status_code=status.HTTP_400_BAD_REQUEST,
             error=True,
-            message='Аккаунт employee@example.com уже подтвержден.'
+            message='Аккаунт employee_1@example.com уже подтвержден.'
         ).model_dump(),
         status.HTTP_200_OK,
         does_not_raise(),
@@ -252,10 +252,10 @@ TEST_ENDPOINT_SIGN_UP_COMPLETE_EMPLOYEE: list[tuple[any]] = [
     # Регистрация пользователя
     (
         EmployeeSignUpCompleteRequestSchema(
-            email='employee_2@example.com', password='password'
+            email='employee_1@example.com', password='password'
         ).model_dump(),
         EmployeeSignUpCompleteResponseSchema(
-            payload=EmailSchema(email='employee_2@example.com')
+            payload=EmailSchema(email='employee_1@example.com')
         ).model_dump(),
         status.HTTP_200_OK,
         does_not_raise(),
@@ -264,12 +264,12 @@ TEST_ENDPOINT_SIGN_UP_COMPLETE_EMPLOYEE: list[tuple[any]] = [
     # Повторная попытка регистрации пользователя
     (
         EmployeeSignUpCompleteRequestSchema(
-            email='employee_2@example.com', password='password'
+            email='employee_1@example.com', password='password'
         ).model_dump(),
         EmployeeSignUpCompleteResponseSchema(
             status_code=status.HTTP_400_BAD_REQUEST,
             error=True,
-            message='Пользователь employee_2@example.com уже зарегистрирован.'
+            message='Пользователь employee_1@example.com уже зарегистрирован.'
         ).model_dump(),
         status.HTTP_200_OK,
         does_not_raise(),
@@ -292,12 +292,12 @@ TEST_ENDPOINT_SIGN_UP_COMPLETE_EMPLOYEE: list[tuple[any]] = [
     # Попытка регистрации неподтвержденного пользователя
     (
         EmployeeSignUpCompleteRequestSchema(
-            email='employee@example.com', password='password'
+            email='employee_2@example.com', password='password'
         ).model_dump(),
         EmployeeSignUpCompleteResponseSchema(
             status_code=status.HTTP_400_BAD_REQUEST,
             error=True,
-            message='Аккаунт employee@example.com не подтвержден.'
+            message='Аккаунт employee_2@example.com не подтвержден.'
         ).model_dump(),
         status.HTTP_200_OK,
         does_not_raise(),
