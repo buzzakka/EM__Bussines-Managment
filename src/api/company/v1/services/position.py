@@ -16,8 +16,12 @@ from src.api.company.v1.schemas import (
     UpdatePositionRequestSchema,
     UpdatePositionResponseSchema,
 
-    PositionDeletePayloadSchema,
-    PositionDeleteResponseSchema,
+    DeletePositionPayloadSchema,
+    DeletePositionResponseSchema,
+
+    AddStructRequestSchema,
+    AddStructResponseSchema,
+    AddStructPayloadSchema,
 )
 from src.api.company.models import PositionModel, StructAdmModel
 from src.api.company.utils import bad_responses
@@ -85,7 +89,7 @@ class PositionService(BaseService):
         uow: UnitOfWork,
         company_id: str,
         position_id: UUID4
-    ) -> PositionDeleteResponseSchema:
+    ) -> DeletePositionResponseSchema:
         async with uow:
             position_obj: PositionModel = await uow.position.get_by_query_one_or_none(
                 company_id=company_id,
@@ -97,8 +101,8 @@ class PositionService(BaseService):
 
             await uow.position.delete_by_query(company_id=company_id, id=position_id)
         
-        return PositionDeleteResponseSchema(
-            payload=PositionDeletePayloadSchema(
+        return DeletePositionResponseSchema(
+            payload=DeletePositionPayloadSchema(
                 position_id=position_id,
                 title=position_obj.title
             )
@@ -108,25 +112,30 @@ class PositionService(BaseService):
     async def add_struct(
         cls,
         uow: UnitOfWork,
-        company_id: str, name: str, parent_id: int | None = None
-    ):
+        data: AddStructRequestSchema, company_id: UUID4
+    ) -> AddStructResponseSchema:
         async with uow:
-            if parent_id is not None:
+            if data.parent_id is not None:
                 parent_obj: StructAdmModel = await uow.struct_adm.get_by_query_one_or_none(
-                    company_id=company_id, id=parent_id
+                    company_id=company_id, id=data.parent_id
                 )
                 if parent_obj is None:
-                    raise exceptions.incorrect_param('parent_id')
+                    return bad_responses.invalid_struct_id(data.parrent_id)
             else:
                 parent_obj = None
 
             struct_obj: StructAdmModel = await uow.struct_adm.add_new_struct(
                 company_id=company_id,
-                name=name,
+                name=data.name,
                 parent_obj=parent_obj
             )
 
-        return struct_obj
+        return AddStructResponseSchema(
+            payload=AddStructPayloadSchema(
+                struct_id=struct_obj.id,
+                name=struct_obj.name
+            )
+        )
 
     @classmethod
     async def delete_struct(

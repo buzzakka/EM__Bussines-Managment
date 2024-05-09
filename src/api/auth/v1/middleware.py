@@ -3,7 +3,7 @@ from fastapi.responses import JSONResponse
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from starlette.middleware.base import BaseHTTPMiddleware
 
-from src.api.auth.utils import exceptions
+from src.core.schemas import BaseResponseModel
 from src.core.utils import UnitOfWork
 from src.api.auth.utils import secret
 from src.api.auth.models import CredentialModel
@@ -37,7 +37,10 @@ class AuthMiddleware(BaseHTTPMiddleware):
                 if path in self.only_for_admins:
                     self._check_is_admin(payload=payload)
             except HTTPException as e:
-                return JSONResponse(status_code=status.HTTP_401_UNAUTHORIZED, content=e.detail)
+                response: str = BaseResponseModel(
+                    status_code=e.status_code, error=True, message=e.detail
+                ).model_dump()
+                return JSONResponse(content=response)
 
         response = await call_next(request)
         return response
@@ -53,10 +56,16 @@ class AuthMiddleware(BaseHTTPMiddleware):
         )
 
         if cred_obj is None or not cred_obj.account.is_active:
-            raise exceptions.incorrect_jwt_token()
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail='Not authenticated'
+            )
 
         return secret.decode_jwt(token)
 
     def _check_is_admin(self, payload: dict):
         if not payload['is_admin']:
-            raise exceptions.page_not_found()
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail='Not found'
+            )

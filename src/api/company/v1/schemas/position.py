@@ -25,10 +25,24 @@ class UpdatePositionResponseSchema(BaseResponseModel):
     payload: UpdatePositionRequestSchema | None = None
 
 
-class PositionDeletePayloadSchema(BaseModel):
+class DeletePositionPayloadSchema(BaseModel):
     position_id: UUID4
     title: str
 
 
-class PositionDeleteResponseSchema(BaseResponseModel):
-    payload: PositionDeletePayloadSchema | None = None
+class DeletePositionResponseSchema(BaseResponseModel):
+    payload: DeletePositionPayloadSchema | None = None
+
+
+class AddStructRequestSchema(BaseModel):
+    name: str
+    parent_id: UUID4 | None = None
+
+
+class AddStructPayloadSchema(BaseModel):
+    struct_id: UUID4
+    name: str
+
+
+class AddStructResponseSchema(BaseResponseModel):
+    payload: AddStructPayloadSchema | None = None

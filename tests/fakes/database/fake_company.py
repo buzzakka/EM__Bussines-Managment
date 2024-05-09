@@ -61,6 +61,11 @@ FAKE_POSITIONS = [
     ),
     PositionSchema(
         id=uuid4(),
+        title='position for update',
+        company_id=FAKE_COMPANYS[1].id
+    ),
+    PositionSchema(
+        id=uuid4(),
         title='position for delete',
         company_id=FAKE_COMPANYS[1].id
     ),

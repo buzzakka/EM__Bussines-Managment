@@ -19,7 +19,10 @@ from src.api.company.v1.schemas import (
     AddPositionResponseSchema, 
     UpdatePositionRequestSchema,
     UpdatePositionResponseSchema,
-    PositionDeleteResponseSchema,
+    DeletePositionResponseSchema,
+
+    AddStructRequestSchema,
+    AddStructResponseSchema,
 )
 
 
@@ -142,20 +145,40 @@ async def update_position(
 @router.delete(
     '/position',
     tags=['protected', 'for_admins'],
-    response_model=PositionDeleteResponseSchema
+    response_model=DeletePositionResponseSchema
 )
 async def update_position(
     request: Request,
-    # data: PositionDeleteRequestSchema,
     position_id: UUID4,
     uow: UnitOfWork = Depends(UnitOfWork),
 ):
     payload: str = request.state.payload
     company_id: str = payload['company_id']
-    response: PositionDeleteRequestSchema = await PositionService.delete_position(
+    response: DeletePositionResponseSchema = await PositionService.delete_position(
         uow=uow, position_id=position_id, company_id=company_id
     )
     return response
+
+
+@router.post(
+    '/struct',
+    tags=['protected', 'for_admins'],
+    response_model=AddStructResponseSchema
+)
+async def add_struct(
+    request: Request,
+    data: AddStructRequestSchema,
+    uow: UnitOfWork = Depends(UnitOfWork),
+):
+    payload: str = request.state.payload
+    company_id: str = payload['company_id']
+    response: AddStructResponseSchema = await PositionService.add_struct(
+        uow=uow,
+        company_id=company_id,
+        data=data
+    )
+    return response
+
 
 # @router.delete(
 #     '/struct',
