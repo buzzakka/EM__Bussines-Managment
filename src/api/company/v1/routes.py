@@ -16,6 +16,9 @@ from src.api.company.v1.schemas import (
     
     AddPositionRequestSchema,
     AddPositionResponseSchema,
+    
+    UpdatePositionRequestSchema,
+    UpdatePositionResponseSchema
 )
 
 
@@ -112,27 +115,27 @@ async def create_position(
     return response
 
 
-# @router.patch(
-#     '/position',
-#     tags=['protected', 'for_admins'],
-#     response_model=UpdatePositionResponseSchema
-# )
-# async def update_position(
-#     request: Request,
-#     data: UpdatePositionRequestSchema,
-#     uow: UnitOfWork = Depends(UnitOfWork),
-# ):
-#     """Изменение существующей позиции."""
-#     payload: str = request.state.payload
-#     company_id: int = payload['company_id']
-#     response: AddPositionResponseSchema = await PositionService.update_position(
-#         uow=uow,
-#         position_id=data.position_id,
-#         company_id=company_id,
-#         new_title=data.new_position.title,
-#         new_description=data.new_position.description,
-#     )
-#     return response
+@router.patch(
+    '/position',
+    tags=['protected', 'for_admins'],
+    response_model=UpdatePositionResponseSchema
+)
+async def update_position(
+    request: Request,
+    data: UpdatePositionRequestSchema,
+    uow: UnitOfWork = Depends(UnitOfWork),
+):
+    """Изменение существующей позиции."""
+    payload: str = request.state.payload
+    company_id: int = payload['company_id']
+    response: AddPositionResponseSchema = await PositionService.update_position(
+        uow=uow,
+        position_id=data.position_id,
+        company_id=company_id,
+        new_title=data.new_position.title,
+        new_description=data.new_position.description,
+    )
+    return response
 
 
 

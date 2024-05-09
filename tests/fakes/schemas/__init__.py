@@ -4,5 +4,6 @@ from tests.fakes.schemas.model import (
     SecretSchema,
     UserSchema,
     CompanySchema,
-    MemberSchema
+    MemberSchema,
+    PositionSchema
 )

@@ -15,8 +15,12 @@ from src.api.company.v1.schemas import (
     AddPositionPayloadSchema,
     AddPositionRequestSchema,
     AddPositionResponseSchema,
+    
+    UpdatePositionRequestSchema,
+    UpdatePositionResponseSchema,
 )
 from tests.fakes.database.fake_auth import FAKE_ACCOUNTS
+from tests.fakes.database.fake_company import FAKE_POSITIONS
 
 
 TEST_ENDPOINT_ADD_NEW_MEMBER: list[tuple[any]] = [
@@ -155,4 +159,46 @@ TEST_ENDPOINT_ADD_POSITION: list[tuple[any]] = [
         status.HTTP_200_OK,
         does_not_raise(),
     ),
+]
+
+TEST_ENDPOINT_UPDATE_POSITION: list[tuple[any]] = [
+    # Изменение позиции своей компании
+    (
+        UpdatePositionRequestSchema(
+            position_id=FAKE_POSITIONS[1].id,
+            new_position=AddPositionRequestSchema(
+                title='renamed position',
+                description='New description'
+            )
+        ).model_dump_json(),
+        UpdatePositionResponseSchema(
+            payload=UpdatePositionRequestSchema(
+                position_id=FAKE_POSITIONS[1].id,
+                new_position=AddPositionRequestSchema(
+                    title='renamed position',
+                    description='New description'
+                )
+            ),
+        ).model_dump_json(),
+        status.HTTP_200_OK,
+        does_not_raise(),
+    ),
+
+    # Изменение позиции другой компании
+    (
+        UpdatePositionRequestSchema(
+            position_id=FAKE_POSITIONS[0].id,
+            new_position=AddPositionRequestSchema(
+                title='renamed position',
+                description='New description'
+            )
+        ).model_dump_json(),
+        UpdatePositionResponseSchema(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            error=True,
+            message=f'Неверный position_id {FAKE_POSITIONS[0].id}.'
+        ).model_dump_json(),
+        status.HTTP_200_OK,
+        does_not_raise(),
+    )
 ]

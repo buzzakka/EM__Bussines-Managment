@@ -3,6 +3,7 @@ from uuid import uuid4
 from tests.fakes.schemas import (
     CompanySchema,
     MemberSchema,
+    PositionSchema,
 )
 from tests.fakes.database.fake_auth import FAKE_ACCOUNTS
 
@@ -43,5 +44,19 @@ FAKE_MEMBERS = [
         account_id=FAKE_ACCOUNTS[3].id,
         company_id=FAKE_COMPANYS[1].id,
         is_admin=False
+    ),
+]
+
+
+FAKE_POSITIONS = [
+    PositionSchema(
+        id=uuid4(),
+        title='test_1',
+        company_id=FAKE_COMPANYS[0].id
+    ),
+    PositionSchema(
+        id=uuid4(),
+        title='test_2',
+        company_id=FAKE_COMPANYS[1].id
     ),
 ]

@@ -8,6 +8,7 @@ from tests.fakes.database import (
     FAKE_SECRETS,
     FAKE_MEMBERS,
     FAKE_COMPANYS,
+    FAKE_POSITIONS,
 )
 
 from src.api.auth.models import (
@@ -19,6 +20,7 @@ from src.api.auth.models import (
 from src.api.company.models import (
     MemberModel,
     CompanyModel,
+    PositionModel,
 )
 
 
@@ -31,6 +33,7 @@ async def fill_db(setup_db, async_session_maker) -> None:
         (FAKE_SECRETS, SecretModel),
         (FAKE_MEMBERS, MemberModel),
         (FAKE_COMPANYS, CompanyModel),
+        (FAKE_POSITIONS, PositionModel),
     ]
 
     async with async_session_maker() as s:

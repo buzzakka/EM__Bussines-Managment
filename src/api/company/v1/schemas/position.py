@@ -14,3 +14,12 @@ class AddPositionPayloadSchema(AddPositionRequestSchema):
 
 class AddPositionResponseSchema(BaseResponseModel):
     payload: AddPositionPayloadSchema
+
+
+class UpdatePositionRequestSchema(BaseModel):
+    position_id: UUID4
+    new_position: AddPositionRequestSchema
+
+
+class UpdatePositionResponseSchema(BaseResponseModel):
+    payload: UpdatePositionRequestSchema | None = None

@@ -7,6 +7,7 @@ from tests.fakes.parameters.company import (
     TEST_ENDPOINT_UPDATE_USERS_EMAIL,
     TEST_ENDPOINT_UPDATE_USERS_NAME,
     TEST_ENDPOINT_ADD_POSITION,
+    TEST_ENDPOINT_UPDATE_POSITION,
 )
 import json
 
@@ -91,3 +92,23 @@ class TestCompanyRouterV1:
             payload: dict = response.json()['payload']
             assert payload['title'] == expected_result.payload.title
             assert payload['description'] == expected_result.payload.description
+
+
+    @pytest.mark.parametrize(
+        'data, expected_result, expected_status, expectation',
+        TEST_ENDPOINT_UPDATE_POSITION
+    )
+    def test_update_position(
+        self,
+        client: TestClient,
+        get_account_jwt,
+        data, expected_result, expected_status, expectation,
+    ):
+        with expectation:
+            response: Response = client.patch(
+                '/api/v1/company/position/',
+                data=data,
+                headers={'Authorization': get_account_jwt}
+            )
+            assert response.status_code == expected_status
+            assert response.json() == json.loads(expected_result)

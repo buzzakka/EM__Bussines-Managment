@@ -9,9 +9,14 @@ from src.api.company.schemas import (
 )
 from src.api.company.v1.schemas import (
     AddPositionPayloadSchema,
+    AddPositionRequestSchema,
     AddPositionResponseSchema,
+    
+    UpdatePositionRequestSchema,
+    UpdatePositionResponseSchema,
 )
 from src.api.company.models import PositionModel, StructAdmModel
+from src.api.company.utils import bad_responses
 
 
 class PositionService(BaseService):
@@ -40,7 +45,7 @@ class PositionService(BaseService):
         cls,
         uow: UnitOfWork,
         position_id: str, company_id: str, new_title: str, new_description: str = None
-    ):
+    ) -> UpdatePositionResponseSchema:
         async with uow:
             filters: dict = {
                 'id': position_id,
@@ -57,12 +62,15 @@ class PositionService(BaseService):
             )
 
             if position_obj is None:
-                raise exceptions.incorrect_position_id()
+                return bad_responses.invalid_position_id(position_id=position_id)
 
             new_pos: UpdatePositionResponseSchema = UpdatePositionResponseSchema(
-                position=AddPositionRequestSchema(
-                    title=new_title,
-                    description=new_description
+                payload=UpdatePositionRequestSchema(
+                    position_id=position_id,
+                    new_position=AddPositionRequestSchema(
+                        title=new_title,
+                        description=new_description
+                    )
                 )
             )
             return new_pos

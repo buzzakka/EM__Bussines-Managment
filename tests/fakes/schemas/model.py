@@ -39,3 +39,9 @@ class  MemberSchema(BaseModel):
     account_id: UUID4
     company_id: UUID4
     is_admin: bool
+
+
+class PositionSchema(BaseModel):
+    id: UUID4
+    title: str
+    company_id: UUID4
