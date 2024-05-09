@@ -22,6 +22,7 @@ from src.api.company.models import (
     TaskModel,
     TaskObserversModel,
     TaskPerformersModel,
+    StructAdmPositionsModel,
 )
 
 # this is the Alembic Config object, which provides
