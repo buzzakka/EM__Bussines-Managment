@@ -23,3 +23,12 @@ class UpdatePositionRequestSchema(BaseModel):
 
 class UpdatePositionResponseSchema(BaseResponseModel):
     payload: UpdatePositionRequestSchema | None = None
+
+
+class PositionDeletePayloadSchema(BaseModel):
+    position_id: UUID4
+    title: str
+
+
+class PositionDeleteResponseSchema(BaseResponseModel):
+    payload: PositionDeletePayloadSchema | None = None

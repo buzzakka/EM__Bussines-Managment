@@ -11,13 +11,16 @@ from src.api.company.v1.schemas import (
 
     UpdateUsersNameByAdminRequestSchema,
     UpdateUsersNameByAdminResponseSchema,
-    
+
     AddPositionPayloadSchema,
     AddPositionRequestSchema,
     AddPositionResponseSchema,
-    
+
     UpdatePositionRequestSchema,
     UpdatePositionResponseSchema,
+
+    PositionDeletePayloadSchema,
+    PositionDeleteResponseSchema,
 )
 from tests.fakes.database.fake_auth import FAKE_ACCOUNTS
 from tests.fakes.database.fake_company import FAKE_POSITIONS
@@ -69,7 +72,7 @@ TEST_ENDPOINT_UPDATE_USERS_EMAIL: list[tuple[any]] = [
         status.HTTP_200_OK,
         does_not_raise(),
     ),
-    
+
     (
         UpdateUsersEmailByAdminRequestSchema(
             account_id=FAKE_ACCOUNTS[3].id,
@@ -136,7 +139,8 @@ TEST_ENDPOINT_UPDATE_USERS_NAME: list[tuple[any]] = [
 
 TEST_ENDPOINT_ADD_POSITION: list[tuple[any]] = [
     (
-        AddPositionRequestSchema(title='Position', description='Test').model_dump_json(),
+        AddPositionRequestSchema(
+            title='Position', description='Test').model_dump_json(),
         AddPositionResponseSchema(
             payload=AddPositionPayloadSchema(
                 title='Position',
@@ -148,7 +152,8 @@ TEST_ENDPOINT_ADD_POSITION: list[tuple[any]] = [
         does_not_raise(),
     ),
     (
-        AddPositionRequestSchema(title='Position', description='Test').model_dump_json(),
+        AddPositionRequestSchema(
+            title='Position', description='Test').model_dump_json(),
         AddPositionResponseSchema(
             payload=AddPositionPayloadSchema(
                 title='Position',
@@ -201,4 +206,32 @@ TEST_ENDPOINT_UPDATE_POSITION: list[tuple[any]] = [
         status.HTTP_200_OK,
         does_not_raise(),
     )
+]
+
+TEST_ENDPOINT_DELETE_POSITION: list[tuple[any]] = [
+    # Удаление своей категории
+    (
+        {'position_id': FAKE_POSITIONS[2].id},
+        PositionDeleteResponseSchema(
+            payload=PositionDeletePayloadSchema(
+                position_id=FAKE_POSITIONS[2].id, title=FAKE_POSITIONS[2].title
+            )
+        ).model_dump_json(),
+
+        status.HTTP_200_OK,
+        does_not_raise(),
+    ),
+
+    # Удаление чужой категории
+    (
+        {'position_id': FAKE_POSITIONS[0].id},
+        PositionDeleteResponseSchema(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            error=True,
+            message=f'Неверный position_id {FAKE_POSITIONS[0].id}.'
+        ).model_dump_json(),
+
+        status.HTTP_200_OK,
+        does_not_raise(),
+    ),
 ]

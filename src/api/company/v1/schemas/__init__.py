@@ -15,4 +15,7 @@ from src.api.company.v1.schemas.position import (
 
     UpdatePositionRequestSchema,
     UpdatePositionResponseSchema,
+
+    PositionDeletePayloadSchema,
+    PositionDeleteResponseSchema,
 )

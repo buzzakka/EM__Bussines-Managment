@@ -8,6 +8,7 @@ from tests.fakes.parameters.company import (
     TEST_ENDPOINT_UPDATE_USERS_NAME,
     TEST_ENDPOINT_ADD_POSITION,
     TEST_ENDPOINT_UPDATE_POSITION,
+    TEST_ENDPOINT_DELETE_POSITION,
 )
 import json
 
@@ -108,6 +109,26 @@ class TestCompanyRouterV1:
             response: Response = client.patch(
                 '/api/v1/company/position/',
                 data=data,
+                headers={'Authorization': get_account_jwt}
+            )
+            assert response.status_code == expected_status
+            assert response.json() == json.loads(expected_result)
+
+
+    @pytest.mark.parametrize(
+        'data, expected_result, expected_status, expectation',
+        TEST_ENDPOINT_DELETE_POSITION
+    )
+    def test_delete_position(
+        self,
+        client: TestClient,
+        get_account_jwt,
+        data, expected_result, expected_status, expectation,
+    ):
+        with expectation:
+            response: Response = client.delete(
+                '/api/v1/company/position/',
+                params=data,
                 headers={'Authorization': get_account_jwt}
             )
             assert response.status_code == expected_status

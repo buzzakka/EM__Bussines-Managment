@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends, Request
+from pydantic import UUID4
 
 from src.core.utils import UnitOfWork
 
@@ -15,10 +16,10 @@ from src.api.company.v1.schemas import (
     UpdateUsersNameByAdminResponseSchema,
     
     AddPositionRequestSchema,
-    AddPositionResponseSchema,
-    
+    AddPositionResponseSchema, 
     UpdatePositionRequestSchema,
-    UpdatePositionResponseSchema
+    UpdatePositionResponseSchema,
+    PositionDeleteResponseSchema,
 )
 
 
@@ -60,7 +61,7 @@ async def update_users_email(
 ):
     """Изменение email работника админом."""
     payload: dict = request.state.payload
-    company_id: int = payload['company_id']
+    company_id: str = payload['company_id']
     response: UpdateUsersEmailByAdminResponseSchema = await MemberService.update_users_email_by_admin(
         uow=uow,
         account_id=data.account_id,
@@ -82,7 +83,7 @@ async def update_users_name(
 ):
     """Изменение имени работника админом."""
     payload: dict = request.state.payload
-    company_id: int = payload['company_id']
+    company_id: str = payload['company_id']
     response: UpdateUsersNameByAdminResponseSchema = await MemberService.update_users_name(
         uow=uow,
         company_id=company_id,
@@ -105,7 +106,7 @@ async def create_position(
 ):
     """Создание новой позиции."""
     payload: str = request.state.payload
-    company_id: int = payload['company_id']
+    company_id: str = payload['company_id']
     response: AddPositionResponseSchema = await PositionService.add_new_position(
         uow=uow,
         title=data.title,
@@ -127,7 +128,7 @@ async def update_position(
 ):
     """Изменение существующей позиции."""
     payload: str = request.state.payload
-    company_id: int = payload['company_id']
+    company_id: str = payload['company_id']
     response: AddPositionResponseSchema = await PositionService.update_position(
         uow=uow,
         position_id=data.position_id,
@@ -138,26 +139,23 @@ async def update_position(
     return response
 
 
-
-# @router.post(
-#     '/struct',
-#     tags=['protected', 'for_admins'],
-# )
-# async def create_struct(
-#     request: Request,
-#     data: AddStructReqeustSchema,
-#     uow: UnitOfWork = Depends(UnitOfWork),
-# ):
-#     """Создание нового подразделения."""
-#     payload: str = request.state.payload
-#     company_id: int = payload['company_id']
-#     await PositionService.add_struct(
-#         uow=uow,
-#         company_id=company_id,
-#         **data.model_dump()
-#     )
-#     return
-
+@router.delete(
+    '/position',
+    tags=['protected', 'for_admins'],
+    response_model=PositionDeleteResponseSchema
+)
+async def update_position(
+    request: Request,
+    # data: PositionDeleteRequestSchema,
+    position_id: UUID4,
+    uow: UnitOfWork = Depends(UnitOfWork),
+):
+    payload: str = request.state.payload
+    company_id: str = payload['company_id']
+    response: PositionDeleteRequestSchema = await PositionService.delete_position(
+        uow=uow, position_id=position_id, company_id=company_id
+    )
+    return response
 
 # @router.delete(
 #     '/struct',
@@ -170,7 +168,7 @@ async def update_position(
 # ):
 #     """Удаления подразделения и всех его подразделений."""
 #     payload: str = request.state.payload
-#     company_id: int = payload['company_id']
+#     company_id: str = payload['company_id']
 #     await PositionService.delete_struct(uow, struct_id=data.struct_id, company_id=company_id)
 
 
@@ -185,7 +183,7 @@ async def update_position(
 # ):
 #     """Изменение подразделения."""
 #     payload: str = request.state.payload
-#     company_id: int = payload['company_id']
+#     company_id: str = payload['company_id']
 #     response = await PositionService.update_struct(
 #         uow=uow,
 #         id=data.struct_id,

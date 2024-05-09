@@ -51,12 +51,17 @@ FAKE_MEMBERS = [
 FAKE_POSITIONS = [
     PositionSchema(
         id=uuid4(),
-        title='test_1',
+        title='company_1 position',
         company_id=FAKE_COMPANYS[0].id
     ),
     PositionSchema(
         id=uuid4(),
-        title='test_2',
+        title='company_2 position',
+        company_id=FAKE_COMPANYS[1].id
+    ),
+    PositionSchema(
+        id=uuid4(),
+        title='position for delete',
         company_id=FAKE_COMPANYS[1].id
     ),
 ]

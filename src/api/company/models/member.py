@@ -9,9 +9,13 @@ class MemberModel(Base):
     __tablename__ = 'member'
 
     id: Mapped[uuid_pk_T]
-    account_id: Mapped[UUID] = mapped_column(UUID(as_uuid=True), ForeignKey('account.id'))
-    company_id: Mapped[UUID] = mapped_column(UUID(as_uuid=True), ForeignKey('company.id'))
+    account_id: Mapped[UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey('account.id', ondelete='CASCADE')
+    )
+    company_id: Mapped[UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey('company.id', ondelete='CASCADE')
+    )
     is_admin: Mapped[bool] = mapped_column(default=False)
 
-    account: Mapped['AccountModel'] = relationship()
-    company: Mapped['CompanyModel'] = relationship()
+    account: Mapped['AccountModel'] = relationship(uselist=False)
+    company: Mapped['CompanyModel'] = relationship(uselist=False)

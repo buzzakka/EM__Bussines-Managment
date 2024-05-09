@@ -13,7 +13,7 @@ class UserPositionModel(Base):
     __tablename__ = 'user_position'
 
     id: Mapped[uuid_pk_T]
-    user_id: Mapped[UUID] = mapped_column(UUID(as_uuid=True), ForeignKey('user.id'))
+    account_id: Mapped[UUID] = mapped_column(UUID(as_uuid=True), ForeignKey('account.id'))
     possition_id: Mapped[UUID] = mapped_column(UUID(as_uuid=True), ForeignKey('position.id'))
 
     created_at: Mapped[created_at_T]

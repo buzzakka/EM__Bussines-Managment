@@ -12,13 +12,16 @@ class StructAdmModel(Base):
     __tablename__ = 'struct_adm'
 
     id: Mapped[uuid_pk_T]
-    company_id: Mapped[UUID] = mapped_column(UUID(as_uuid=True), ForeignKey('company.id'))
+    company_id: Mapped[UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey('company.id', ondelete='CASCADE')
+    )
     name: Mapped[str]
     path = Column(LtreeType, nullable=False)
 
     created_at: Mapped[created_at_T]
     updated_at: Mapped[updated_at_T]
 
+    company: Mapped['CompanyModel'] = relationship(uselist=False)
     parent = relationship(
         'StructAdmModel',
         primaryjoin=(remote(path) == foreign(func.subpath(path, 0, -1))),

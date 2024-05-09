@@ -1,3 +1,4 @@
+from pydantic import UUID4
 from sqlalchemy import Result
 from src.core.utils import UnitOfWork, BaseService
 from src.api.auth.utils import exceptions
@@ -14,6 +15,9 @@ from src.api.company.v1.schemas import (
     
     UpdatePositionRequestSchema,
     UpdatePositionResponseSchema,
+
+    PositionDeletePayloadSchema,
+    PositionDeleteResponseSchema,
 )
 from src.api.company.models import PositionModel, StructAdmModel
 from src.api.company.utils import bad_responses
@@ -74,6 +78,31 @@ class PositionService(BaseService):
                 )
             )
             return new_pos
+    
+    @classmethod
+    async def delete_position(
+        cls,
+        uow: UnitOfWork,
+        company_id: str,
+        position_id: UUID4
+    ) -> PositionDeleteResponseSchema:
+        async with uow:
+            position_obj: PositionModel = await uow.position.get_by_query_one_or_none(
+                company_id=company_id,
+                id=position_id
+            )
+            
+            if position_obj is None:
+                return bad_responses.invalid_position_id(position_id=position_id)
+
+            await uow.position.delete_by_query(company_id=company_id, id=position_id)
+        
+        return PositionDeleteResponseSchema(
+            payload=PositionDeletePayloadSchema(
+                position_id=position_id,
+                title=position_obj.title
+            )
+        )
 
     @classmethod
     async def add_struct(
