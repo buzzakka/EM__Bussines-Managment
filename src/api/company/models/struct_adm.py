@@ -1,4 +1,4 @@
-from sqlalchemy import ForeignKey, Column, Index, func
+from sqlalchemy import ForeignKey, Column, Index, func, UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship, remote, foreign
 from sqlalchemy_utils import LtreeType, Ltree
 
@@ -12,7 +12,7 @@ class StructAdmModel(Base):
     __tablename__ = 'struct_adm'
 
     id: Mapped[uuid_pk_T]
-    company_id: Mapped[str] = mapped_column(ForeignKey('company.id'))
+    company_id: Mapped[UUID] = mapped_column(UUID(as_uuid=True), ForeignKey('company.id'))
     name: Mapped[str]
     path = Column(LtreeType, nullable=False)
 

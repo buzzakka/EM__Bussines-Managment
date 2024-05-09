@@ -1,4 +1,4 @@
-from sqlalchemy import ForeignKey
+from sqlalchemy import ForeignKey, UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from src.core.models.base import Base
@@ -9,8 +9,8 @@ class MemberModel(Base):
     __tablename__ = 'member'
 
     id: Mapped[uuid_pk_T]
-    account_id: Mapped[int] = mapped_column(ForeignKey('account.id'))
-    company_id: Mapped[int] = mapped_column(ForeignKey('company.id'))
+    account_id: Mapped[UUID] = mapped_column(UUID(as_uuid=True), ForeignKey('account.id'))
+    company_id: Mapped[UUID] = mapped_column(UUID(as_uuid=True), ForeignKey('company.id'))
     is_admin: Mapped[bool] = mapped_column(default=False)
 
     account: Mapped['AccountModel'] = relationship()
