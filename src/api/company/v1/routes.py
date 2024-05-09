@@ -23,6 +23,9 @@ from src.api.company.v1.schemas import (
 
     AddStructRequestSchema,
     AddStructResponseSchema,
+    UpdateStructRequestSchema,
+    UpdateStructResponseSchema,
+    DeleteStructResponseSchema,
 )
 
 
@@ -180,40 +183,44 @@ async def add_struct(
     return response
 
 
-# @router.delete(
-#     '/struct',
-#     tags=['protected', 'for_admins'],
-# )
-# async def delete_struct(
-#     request: Request,
-#     data: DeleteStructRequestSchema,
-#     uow: UnitOfWork = Depends(UnitOfWork),
-# ):
-#     """Удаления подразделения и всех его подразделений."""
-#     payload: str = request.state.payload
-#     company_id: str = payload['company_id']
-#     await PositionService.delete_struct(uow, struct_id=data.struct_id, company_id=company_id)
+@router.patch(
+    '/struct',
+    tags=['protected', 'for_admins'],
+    response_model=UpdateStructResponseSchema
+)
+async def update_struct(
+    request: Request,
+    data: UpdateStructRequestSchema,
+    uow: UnitOfWork = Depends(UnitOfWork)
+):
+    """Изменение подразделения."""
+    payload: str = request.state.payload
+    company_id: str = payload['company_id']
+    response: UpdateStructResponseSchema = await PositionService.update_struct(
+        uow=uow,
+        data=data,
+        company_id=company_id,
+    )
+    return response
 
 
-# @router.patch(
-#     '/struct',
-#     tags=['protected', 'for_admins']
-# )
-# async def update_struct(
-#     request: Request,
-#     data: UpdateStructRequestSchema,
-#     uow: UnitOfWork = Depends(UnitOfWork)
-# ):
-#     """Изменение подразделения."""
-#     payload: str = request.state.payload
-#     company_id: str = payload['company_id']
-#     response = await PositionService.update_struct(
-#         uow=uow,
-#         id=data.struct_id,
-#         company_id=company_id,
-#         new_name=data.new_name
-#     )
-#     return response
+@router.delete(
+    '/struct',
+    tags=['protected', 'for_admins'],
+    response_model=DeleteStructResponseSchema
+)
+async def delete_struct(
+    request: Request,
+    struct_id: UUID4,
+    uow: UnitOfWork = Depends(UnitOfWork),
+):
+    """Удаление подразделения и всех его подразделений."""
+    payload: str = request.state.payload
+    company_id: str = payload['company_id']
+    response: DeleteStructResponseSchema = await PositionService.delete_struct(
+        uow=uow, struct_id=struct_id, company_id=company_id
+    )
+    return response
 
 
 # @router.post(

@@ -46,3 +46,15 @@ class AddStructPayloadSchema(BaseModel):
 
 class AddStructResponseSchema(BaseResponseModel):
     payload: AddStructPayloadSchema | None = None
+
+
+class UpdateStructRequestSchema(BaseModel):
+    struct_id: UUID4
+    name: str
+
+
+class UpdateStructResponseSchema(BaseResponseModel):
+    payload: UpdateStructRequestSchema | None = None
+
+
+class DeleteStructResponseSchema(UpdateStructResponseSchema): ...

@@ -22,4 +22,7 @@ from src.api.company.v1.schemas.position import (
     AddStructPayloadSchema,
     AddStructRequestSchema,
     AddStructResponseSchema,
+    UpdateStructRequestSchema,
+    UpdateStructResponseSchema,
+    DeleteStructResponseSchema,
 )

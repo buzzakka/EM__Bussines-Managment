@@ -3,11 +3,11 @@ from sqlalchemy import Result
 from src.core.utils import UnitOfWork, BaseService
 from src.api.auth.utils import exceptions
 
-from src.api.company.schemas import (
-    UpdatePositionResponseSchema,
-    UpdateStructRequestSchema,
-    UpdateStructResponseSchema,
-)
+# from src.api.company.schemas import (
+#     UpdatePositionResponseSchema,
+#     UpdateStructRequestSchema,
+#     UpdateStructResponseSchema,
+# )
 from src.api.company.v1.schemas import (
     AddPositionPayloadSchema,
     AddPositionRequestSchema,
@@ -19,9 +19,12 @@ from src.api.company.v1.schemas import (
     DeletePositionPayloadSchema,
     DeletePositionResponseSchema,
 
+    AddStructPayloadSchema,
     AddStructRequestSchema,
     AddStructResponseSchema,
-    AddStructPayloadSchema,
+    UpdateStructRequestSchema,
+    UpdateStructResponseSchema,
+    DeleteStructResponseSchema,
 )
 from src.api.company.models import PositionModel, StructAdmModel
 from src.api.company.utils import bad_responses
@@ -138,35 +141,40 @@ class PositionService(BaseService):
         )
 
     @classmethod
+    async def update_struct(
+        cls,
+        uow: UnitOfWork,
+        data: UpdateStructRequestSchema, company_id: str
+    ) -> UpdateStructResponseSchema:
+        async with uow:
+            struct_obj: StructAdmModel = await uow.struct_adm.update_one_by_filters(
+                filters={'id': data.struct_id, 'company_id': company_id},
+                values={'name': data.name}
+            )
+            
+            if struct_obj is None:
+                return bad_responses.invalid_struct_id(struct_id=data.struct_id)
+            
+            return UpdateStructResponseSchema(
+                payload=data
+            )
+
+    @classmethod
     async def delete_struct(
         cls,
         uow: UnitOfWork,
         struct_id: str, company_id: str
-    ):
+    ) -> DeleteStructResponseSchema:
         async with uow:
             struct_obj: StructAdmModel = await uow.struct_adm.get_by_query_one_or_none(
                 id=struct_id, company_id=company_id
             )
             if struct_obj is None:
-                raise exceptions.incorrect_param('struct_id')
+                return bad_responses.invalid_struct_id(struct_id=struct_id)
 
             await uow.struct_adm.delete_struct_and_descendants(struct_obj)
-
-    @classmethod
-    async def update_struct(
-        cls,
-        uow: UnitOfWork,
-        id: str, company_id: str, new_name: str
-    ):
-        async with uow:
-            struct_obj: StructAdmModel = await uow.struct_adm.update_one_by_filters(
-                filters={'id': id, 'company_id': company_id},
-                values={'name': new_name}
-            )
-            
-            if struct_obj is None:
-                raise exceptions.incorrect_param('struct_id')
-            
-            return UpdateStructResponseSchema(
-                new_item=UpdateStructRequestSchema(struct_id=id, new_name=new_name),
+            return DeleteStructResponseSchema(
+                payload=UpdateStructRequestSchema(
+                    struct_id=struct_id, name=struct_obj.name
+                )
             )
