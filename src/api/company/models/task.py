@@ -1,7 +1,6 @@
-import datetime
-import enum
+import datetime, enum
 from typing import Optional
-from sqlalchemy import Column, ForeignKey, DateTime, UUID, Enum, Table
+from sqlalchemy import ForeignKey, UUID, Enum
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from src.core.models.base import Base

@@ -14,9 +14,9 @@ from src.api.company.v1.schemas import (
 
     UpdateUsersNameByAdminRequestSchema,
     UpdateUsersNameByAdminResponseSchema,
-    
+
     AddPositionRequestSchema,
-    AddPositionResponseSchema, 
+    AddPositionResponseSchema,
     UpdatePositionRequestSchema,
     UpdatePositionResponseSchema,
     DeletePositionResponseSchema,
@@ -31,7 +31,10 @@ from src.api.company.v1.schemas import (
     AddStructPositionResponseSchema,
     UpdateStructPositionRequestSchema,
     UpdateStructPositionResponseSchema,
-    DeleteStructPositionResponseSchema
+    DeleteStructPositionResponseSchema,
+
+    AddTaskRequestSchema,
+    AddTaskResponseSchema,
 )
 
 
@@ -282,16 +285,21 @@ async def delete_struct_position(
     )
     return response
 
-# @router.post(
-#     '/task',
-#     tags=['protected', 'for_admins'],
-# )
-# async def add_task(
-#     request: Request,
-#     data: AddTaskRequestSchema,
-#     uow: UnitOfWork = Depends(UnitOfWork),
-# ):
-#     payload: str = request.state.payload
-#     account_id: str = payload['account_id']
-#     response = await TaskService.add_new_task(uow=uow, author_id=account_id, **data.model_dump(exclude_none=True))
-#     return response
+
+@router.post(
+    '/task',
+    tags=['protected', 'for_admins'],
+    response_model=AddTaskResponseSchema
+)
+async def add_task(
+    request: Request,
+    data: AddTaskRequestSchema,
+    uow: UnitOfWork = Depends(UnitOfWork),
+):
+    payload: str = request.state.payload
+    account_id: str = payload['account_id']
+    company_id: str = payload['company_id']
+    response: AddTaskResponseSchema = await TaskService.add_new_task(
+        uow=uow, author_id=account_id, company_id=company_id, data=data
+    )
+    return response

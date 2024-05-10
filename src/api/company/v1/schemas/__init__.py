@@ -34,3 +34,8 @@ from src.api.company.v1.schemas.position import (
     DeleteStructPositionPayloadSchema,
     DeleteStructPositionResponseSchema
 )
+from src.api.company.v1.schemas.task import (
+    AddTaskPayloadSchema,
+    AddTaskRequestSchema,
+    AddTaskResponseSchema,
+)
