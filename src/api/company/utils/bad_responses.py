@@ -23,3 +23,10 @@ def invalid_struct_id(struct_id: str):
         error=True,
         message=f'Неверный id структуры: {struct_id}'
     )
+
+def invalid_member_id(member_id: str):
+    return BaseResponseModel(
+        status_code=status.HTTP_400_BAD_REQUEST,
+        error=True,
+        message=f'Неверный member_id: {member_id}'
+    )

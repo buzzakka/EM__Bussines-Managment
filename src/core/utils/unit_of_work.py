@@ -13,7 +13,8 @@ from src.api.company.v1.repositories import (
     MemberRepository,
     PositionRepository,
     StructAdmRepository,
-    TaskRepository
+    StructAdmPositionRepository,
+    TaskRepository,
 )
 
 
@@ -58,6 +59,8 @@ class UnitOfWork(AbstractUnitOfWork):
         self.member = MemberRepository(self.session)
         self.position = PositionRepository(self.session)
         self.struct_adm = StructAdmRepository(self.session)
+        self.struct_adm_pos = StructAdmPositionRepository(self.session)
+
         self.task = TaskRepository(self.session)
 
         return self

@@ -25,4 +25,8 @@ from src.api.company.v1.schemas.position import (
     UpdateStructRequestSchema,
     UpdateStructResponseSchema,
     DeleteStructResponseSchema,
+
+    AddStructPositionPayloadSchema,
+    AddStructPositionRequestSchema,
+    AddStructPositionResponseSchema
 )

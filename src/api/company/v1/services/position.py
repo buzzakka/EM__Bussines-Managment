@@ -1,13 +1,8 @@
 from pydantic import UUID4
 from sqlalchemy import Result
-from src.core.utils import UnitOfWork, BaseService
-from src.api.auth.utils import exceptions
 
-# from src.api.company.schemas import (
-#     UpdatePositionResponseSchema,
-#     UpdateStructRequestSchema,
-#     UpdateStructResponseSchema,
-# )
+from src.core.utils import UnitOfWork, BaseService
+
 from src.api.company.v1.schemas import (
     AddPositionPayloadSchema,
     AddPositionRequestSchema,
@@ -25,8 +20,17 @@ from src.api.company.v1.schemas import (
     UpdateStructRequestSchema,
     UpdateStructResponseSchema,
     DeleteStructResponseSchema,
+
+    AddStructPositionPayloadSchema,
+    AddStructPositionRequestSchema,
+    AddStructPositionResponseSchema,
 )
-from src.api.company.models import PositionModel, StructAdmModel
+from src.api.company.models import (
+    PositionModel,
+    StructAdmModel,
+    StructAdmPositionsModel,
+    MemberModel
+)
 from src.api.company.utils import bad_responses
 
 
@@ -144,7 +148,7 @@ class PositionService(BaseService):
     async def update_struct(
         cls,
         uow: UnitOfWork,
-        data: UpdateStructRequestSchema, company_id: str
+        data: UpdateStructRequestSchema, company_id: UUID4
     ) -> UpdateStructResponseSchema:
         async with uow:
             struct_obj: StructAdmModel = await uow.struct_adm.update_one_by_filters(
@@ -163,7 +167,7 @@ class PositionService(BaseService):
     async def delete_struct(
         cls,
         uow: UnitOfWork,
-        struct_id: str, company_id: str
+        struct_id: str, company_id: UUID4
     ) -> DeleteStructResponseSchema:
         async with uow:
             struct_obj: StructAdmModel = await uow.struct_adm.get_by_query_one_or_none(
@@ -176,5 +180,48 @@ class PositionService(BaseService):
             return DeleteStructResponseSchema(
                 payload=UpdateStructRequestSchema(
                     struct_id=struct_id, name=struct_obj.name
+                )
+            )
+
+    @classmethod
+    async def add_position_to_struct(
+        cls,
+        uow: UnitOfWork,
+        data: AddStructPositionRequestSchema, company_id: UUID4
+    ) ->AddStructPositionResponseSchema:
+        async with uow:
+            # Проверка, что существует структура в компании
+            struct_obj: StructAdmModel = await uow.struct_adm.get_by_query_one_or_none(
+                id=data.struct_id, company_id=company_id
+            )
+            if struct_obj is None:
+                return bad_responses.invalid_struct_id(struct_id=data.struct_id)
+
+            # Проверка, что существует позиция в компании
+            position_obj: PositionModel = await uow.position.get_by_query_one_or_none(
+                id=data.position_id, company_id=company_id
+            )
+            if position_obj is None:
+                return bad_responses.invalid_position_id(position_id=data.position_id)
+
+            # Проверка, что существует пользователь в компании
+            if data.member_id is not None:
+                member_obj: MemberModel = await uow.member.get_by_query_one_or_none(
+                    id=data.member_id, company_id=company_id
+                )
+                if member_obj is None:
+                    return bad_responses.invalid_member_id(member_id=data.member_id)
+
+            struct_pos_obj: StructAdmPositionsModel =await uow.struct_adm_pos.add_one_and_get_obj(
+                struct_id=data.struct_id,
+                position_id=data.position_id,
+                member_id=data.member_id,
+                is_director=data.is_director
+            )
+
+            return AddStructPositionResponseSchema(
+                payload=AddStructPositionPayloadSchema(
+                    struct_position_id=struct_pos_obj.id,
+                    **data.model_dump()
                 )
             )

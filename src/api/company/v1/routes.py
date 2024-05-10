@@ -26,6 +26,9 @@ from src.api.company.v1.schemas import (
     UpdateStructRequestSchema,
     UpdateStructResponseSchema,
     DeleteStructResponseSchema,
+
+    AddStructPositionRequestSchema,
+    AddStructPositionResponseSchema,
 )
 
 
@@ -219,6 +222,24 @@ async def delete_struct(
     company_id: str = payload['company_id']
     response: DeleteStructResponseSchema = await PositionService.delete_struct(
         uow=uow, struct_id=struct_id, company_id=company_id
+    )
+    return response
+
+
+@router.post(
+    '/struct/position/',
+    tags=['protected', 'for_admins'],
+    response_model=AddStructPositionResponseSchema
+)
+async def add_position_to_struct(
+    request: Request,
+    data: AddStructPositionRequestSchema,
+    uow: UnitOfWork = Depends(UnitOfWork),
+):
+    payload: str = request.state.payload
+    company_id: str = payload['company_id']
+    response: AddStructPositionResponseSchema = await PositionService.add_position_to_struct(
+        uow=uow, data=data, company_id=company_id
     )
     return response
 
