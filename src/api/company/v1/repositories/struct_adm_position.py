@@ -1,18 +1,17 @@
 from sqlalchemy import Result, select, UUID
 
 from src.core.utils import SqlAlchemyRepository
-from src.api.company.models import StructAdmPositionsModel, PositionModel, MemberModel, StructAdmModel
+from src.api.company.models import StructAdmPositionsModel, StructAdmModel
 
 
 class StructAdmPositionRepository(SqlAlchemyRepository):
     model = StructAdmPositionsModel
 
-    async def check_struct(self, company_id: UUID, **kwargs):
+    async def check_struct_pos_by_company_id(self, struct_pos_id: UUID, company_id: UUID):
         query = (
-            select(PositionModel, MemberModel, StructAdmModel)
-            .join(MemberModel, MemberModel.company_id == PositionModel.company_id)
-            .join(StructAdmModel, StructAdmModel.company_id == PositionModel.company_id)
-            .filter_by(PositionModel.company_id==company_id, **kwargs)
+            select(self.model)
+            .join(StructAdmModel, self.model.struct_id == StructAdmModel.id)
+            .filter(self.model.id == struct_pos_id, StructAdmModel.company_id == company_id)
         )
-        res: Result = await self.session.execute(query)
-        return res.first()
+        obj: Result = await self.session.execute(query)
+        return obj.scalar_one_or_none()

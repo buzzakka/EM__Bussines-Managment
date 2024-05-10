@@ -29,6 +29,9 @@ from src.api.company.v1.schemas import (
 
     AddStructPositionRequestSchema,
     AddStructPositionResponseSchema,
+    UpdateStructPositionRequestSchema,
+    UpdateStructPositionResponseSchema,
+    DeleteStructPositionResponseSchema
 )
 
 
@@ -229,7 +232,7 @@ async def delete_struct(
 @router.post(
     '/struct/position/',
     tags=['protected', 'for_admins'],
-    response_model=AddStructPositionResponseSchema
+    response_model=UpdateStructPositionResponseSchema
 )
 async def add_position_to_struct(
     request: Request,
@@ -238,11 +241,46 @@ async def add_position_to_struct(
 ):
     payload: str = request.state.payload
     company_id: str = payload['company_id']
-    response: AddStructPositionResponseSchema = await PositionService.add_position_to_struct(
+    response: UpdateStructPositionResponseSchema = await PositionService.add_position_to_struct(
         uow=uow, data=data, company_id=company_id
     )
     return response
 
+
+@router.patch(
+    '/struct/position/',
+    tags=['protected', 'for_admins'],
+    response_model=UpdateStructPositionResponseSchema
+)
+async def add_position_to_struct(
+    request: Request,
+    data: UpdateStructPositionRequestSchema,
+    uow: UnitOfWork = Depends(UnitOfWork),
+):
+    payload: str = request.state.payload
+    company_id: str = payload['company_id']
+    response: AddStructPositionResponseSchema = await PositionService.update_struct_position(
+        uow=uow, data=data, company_id=company_id
+    )
+    return response
+
+
+@router.delete(
+    '/struct/position/',
+    tags=['protected', 'for_admins'],
+    response_model=DeleteStructPositionResponseSchema
+)
+async def delete_struct_position(
+    request: Request,
+    struct_position_id: UUID4,
+    uow: UnitOfWork = Depends(UnitOfWork),
+):
+    payload: str = request.state.payload
+    company_id: str = payload['company_id']
+    response: DeleteStructPositionResponseSchema = await PositionService.delete_struct_position(
+        uow=uow, struct_position_id=struct_position_id, company_id=company_id
+    )
+    return response
 
 # @router.post(
 #     '/task',

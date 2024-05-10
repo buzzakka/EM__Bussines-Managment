@@ -57,7 +57,8 @@ class UpdateStructResponseSchema(BaseResponseModel):
     payload: UpdateStructRequestSchema | None = None
 
 
-class DeleteStructResponseSchema(UpdateStructResponseSchema): ...
+class DeleteStructResponseSchema(UpdateStructResponseSchema):
+    ...
 
 
 class AddStructPositionRequestSchema(BaseModel):
@@ -73,3 +74,23 @@ class AddStructPositionPayloadSchema(AddStructPositionRequestSchema):
 
 class AddStructPositionResponseSchema(BaseResponseModel):
     payload: AddStructPositionPayloadSchema | None = None
+
+
+class UpdateStructPositionRequestSchema(AddStructPositionRequestSchema):
+    struct_position_id: UUID4
+    struct_id: UUID4 | None = None
+    position_id: UUID4 | None = None
+    member_id: UUID4 | None = None
+    is_director: bool | None = None
+
+
+class UpdateStructPositionResponseSchema(BaseResponseModel):
+    payload: UpdateStructPositionRequestSchema | None = None
+
+
+class DeleteStructPositionPayloadSchema(BaseModel):
+    struct_position_id: UUID4
+
+
+class DeleteStructPositionResponseSchema(BaseResponseModel):
+    payload: DeleteStructPositionPayloadSchema | None = None
