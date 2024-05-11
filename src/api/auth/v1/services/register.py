@@ -13,9 +13,6 @@ from src.api.auth.v1.schemas import (
     EmployeConfirmResponseSchema,
     EmployeeSignUpCompleteResponseSchema,
 )
-from src.api.auth.utils.bad_responses import (
-    account_exists_response,
-)
 from src.api.auth.schemas.mixins import EmailSchema
 
 from src.api.auth.models.invite import InviteTypes
@@ -33,7 +30,7 @@ class RegisterService(BaseService):
             is_account_exists: bool = await uow.account.get_by_query_one_or_none(email=email)
 
             if is_account_exists:
-                return account_exists_response(email=email)
+                return bad_responses.account_exists_response(email=email)
 
             invite_obj: InviteModel = await cls._create_invite_token(
                 uow=uow,
@@ -59,7 +56,7 @@ class RegisterService(BaseService):
 
             is_account_exists: bool = await cls._is_account_exists(uow=uow, email=email)
             if is_account_exists:
-                return account_exists_response(email=email)
+                return bad_responses.account_exists_response(email=email)
 
             try:
                 await cls._confirm_invite_token(uow=uow, email=email, invite_token=token)

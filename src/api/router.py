@@ -1,7 +1,6 @@
 from fastapi import APIRouter
 
-# from src.api.auth.v1.routes import router as v1_auth_router
-from src.api.company.v1.routes import router as v1_company_router
+from src.api.company.v1.routers import router as v1_company_router
 from src.api.auth.v1.routers import router as v1_auth_router
 
 

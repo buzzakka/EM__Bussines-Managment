@@ -9,7 +9,9 @@ class SecretModel(Base):
     __tablename__ = 'secret'
 
     id: Mapped[uuid_pk_T]
-    user_id: Mapped[UUID] = mapped_column(UUID(as_uuid=True), ForeignKey('user.id'), unique=True)
+    user_id: Mapped[UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey('user.id'), unique=True
+    )
     account_id: Mapped[UUID] = mapped_column(
         UUID(as_uuid=True), ForeignKey('account.id'), unique=True
     )

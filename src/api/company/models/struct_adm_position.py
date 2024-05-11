@@ -1,6 +1,5 @@
-from sqlalchemy import ForeignKey, Column, Index, func, UUID
-from sqlalchemy.orm import Mapped, mapped_column, relationship, remote, foreign
-from sqlalchemy_utils import LtreeType, Ltree
+from sqlalchemy import ForeignKey, UUID
+from sqlalchemy.orm import Mapped, mapped_column
 
 from src.core.models import Base
 from src.core.models.mixins.custom_types import uuid_pk_T, created_at_T, updated_at_T

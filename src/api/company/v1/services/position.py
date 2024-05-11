@@ -1,5 +1,4 @@
 from pydantic import UUID4
-from sqlalchemy import Result
 
 from src.core.utils import UnitOfWork, BaseService
 

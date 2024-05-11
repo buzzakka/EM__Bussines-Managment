@@ -7,7 +7,7 @@ from src.api.company.models import StructAdmPositionsModel, StructAdmModel
 class StructAdmPositionRepository(SqlAlchemyRepository):
     model = StructAdmPositionsModel
 
-    async def check_struct_pos_by_company_id(self, struct_pos_id: UUID, company_id: UUID):
+    async def check_struct_pos_by_company_id(self, struct_pos_id: UUID, company_id: UUID) -> StructAdmPositionsModel:
         query = (
             select(self.model)
             .join(StructAdmModel, self.model.struct_id == StructAdmModel.id)

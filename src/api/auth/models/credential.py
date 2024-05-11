@@ -9,7 +9,9 @@ class CredentialModel(Base):
     __tablename__ = 'credential'
 
     id: Mapped[uuid_pk_T]
-    account_id: Mapped[UUID] = mapped_column(UUID(as_uuid=True), ForeignKey('account.id'), unique=True)
+    account_id: Mapped[UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey('account.id'), unique=True
+    )
     created_at: Mapped[created_at_T]
     api_key: Mapped[str]
 

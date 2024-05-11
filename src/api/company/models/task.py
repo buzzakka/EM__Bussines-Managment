@@ -1,4 +1,5 @@
-import datetime, enum
+import datetime
+import enum
 from typing import Optional
 from sqlalchemy import ForeignKey, UUID, Enum
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -18,12 +19,17 @@ class TaskModel(Base):
 
     id: Mapped[uuid_pk_T]
     title: Mapped[str]
-    description: Mapped[Optional[str]] = mapped_column(nullable=None, default=None)
+    description: Mapped[Optional[str]] = mapped_column(
+        nullable=None, default=None
+    )
     author_id: Mapped[UUID] = mapped_column(ForeignKey('account.id'))
-    responsible_id: Mapped[UUID] = mapped_column(ForeignKey('account.id'), nullable=True, default=None)
+    responsible_id: Mapped[UUID] = mapped_column(
+        ForeignKey('account.id'), nullable=True, default=None
+    )
     deadline: Mapped[datetime.datetime]
     status: Mapped[Enum] = mapped_column(
-        Enum(TaskStatus), default=TaskStatus.OPEN)
+        Enum(TaskStatus), default=TaskStatus.OPEN
+    )
 
     observers: Mapped[list['AccountModel']] = relationship(
         secondary='task_observers', back_populates='observed_tasks'

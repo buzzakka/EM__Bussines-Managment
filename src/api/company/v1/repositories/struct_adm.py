@@ -10,7 +10,7 @@ class StructAdmRepository(SqlAlchemyRepository):
     async def add_new_struct(
         self,
         company_id: str, name: str, parent_obj: StructAdmModel | None = None,
-    ):
+    ) -> None:
         struct_obj: StructAdmModel = StructAdmModel(
             company_id=company_id,
             name=name,
@@ -20,7 +20,7 @@ class StructAdmRepository(SqlAlchemyRepository):
 
         return struct_obj
 
-    async def delete_struct_and_descendants(self, parent_obj: StructAdmModel):
+    async def delete_struct_and_descendants(self, parent_obj: StructAdmModel) -> None:
         query = select(self.model).filter(
             self.model.path.descendant_of(parent_obj.path))
 

@@ -74,7 +74,7 @@ class TaskService(BaseService):
                     error=False,
                     message='Один из введенных id неверный.'
                 )
-            
+
             try:
                 await cls._check_task_id(uow, data.task_id, company_id)
             except ValueError:
@@ -99,9 +99,8 @@ class TaskService(BaseService):
                 return bad_responses.bad_param('task_id', task_id)
 
             await uow.task.delete_by_query(id=task_id)
-            
+
             return BaseResponseModel()
-            
 
     @classmethod
     async def _check_ids(

@@ -16,7 +16,7 @@ class MemberRepository(SqlAlchemyRepository):
         )
         _obj = await self.session.execute(query)
         return _obj.unique().scalar_one_or_none()
-    
+
     async def get_user_by_company_id_and_account_id_or_none(self, company_id: str, account_id: str) -> UserModel:
         query = (
             select(UserModel)

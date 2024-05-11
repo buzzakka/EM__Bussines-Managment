@@ -65,7 +65,10 @@ class TaskRepository(SqlAlchemyRepository):
 
         if observers is not None:
             # Удаляем существующих наблюдателей
-            stmt = delete(TaskObserversModel).where(TaskObserversModel.task_id == task_id)
+            stmt = (
+                delete(TaskObserversModel)
+                .where(TaskObserversModel.task_id == task_id)
+            )
             await self.session.execute(stmt)
 
             # Добавляем новых наблюдателей
@@ -73,18 +76,20 @@ class TaskRepository(SqlAlchemyRepository):
             account_objs: Result = await self.session.execute(query)
             for account in account_objs.scalars().all():
                 task.observers.append(account)
-        
+
         if performers is not None:
             # Удаляем существующих наблюдателей
-            stmt = delete(TaskPerformersModel).where(TaskPerformersModel.task_id == task_id)
+            stmt = delete(TaskPerformersModel).where(
+                TaskPerformersModel.task_id == task_id)
             await self.session.execute(stmt)
 
             # Добавляем новых наблюдателей
-            query = select(AccountModel).filter(AccountModel.id.in_(performers))
+            query = select(AccountModel).filter(
+                AccountModel.id.in_(performers))
             account_objs: Result = await self.session.execute(query)
             for account in account_objs.scalars().all():
                 task.performers.append(account)
-        
+
         return task
 
     async def get_companys_members_by_ids(

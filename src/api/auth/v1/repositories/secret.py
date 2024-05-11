@@ -9,13 +9,17 @@ class SecretRepository(SqlAlchemyRepository):
 
     async def get_account_info_and_password(self, email: str):
         query = (
-            select(SecretModel.account_id, SecretModel.password_hash, AccountModel.is_active)
+            select(
+                SecretModel.account_id,
+                SecretModel.password_hash,
+                AccountModel.is_active
+            )
             .join(AccountModel)
             .filter(AccountModel.email == email)
         )
         res: Result = await self.session.execute(query)
         return res.first()
-    
+
     async def change_password(self, account_id: str, new_password: bytes):
         stmt = (
             update(self.model)

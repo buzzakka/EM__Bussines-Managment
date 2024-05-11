@@ -4,7 +4,7 @@ __all__ = [
     'SecretModel',
     'UserModel',
     'CredentialModel',
-    
+
     'InviteTypes',
 ]
 
