@@ -38,4 +38,6 @@ from src.api.company.v1.schemas.task import (
     AddTaskPayloadSchema,
     AddTaskRequestSchema,
     AddTaskResponseSchema,
+    UpdateTaskRequestSchema,
+    UpdateTaskResponseSchema,
 )

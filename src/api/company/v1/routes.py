@@ -35,6 +35,8 @@ from src.api.company.v1.schemas import (
 
     AddTaskRequestSchema,
     AddTaskResponseSchema,
+    UpdateTaskRequestSchema,
+    UpdateTaskResponseSchema,
 )
 
 
@@ -120,7 +122,7 @@ async def create_position(
     uow: UnitOfWork = Depends(UnitOfWork),
 ):
     """Создание новой позиции."""
-    payload: str = request.state.payload
+    payload: dict = request.state.payload
     company_id: str = payload['company_id']
     response: AddPositionResponseSchema = await PositionService.add_new_position(
         uow=uow,
@@ -142,7 +144,7 @@ async def update_position(
     uow: UnitOfWork = Depends(UnitOfWork),
 ):
     """Изменение существующей позиции."""
-    payload: str = request.state.payload
+    payload: dict = request.state.payload
     company_id: str = payload['company_id']
     response: AddPositionResponseSchema = await PositionService.update_position(
         uow=uow,
@@ -164,7 +166,7 @@ async def update_position(
     position_id: UUID4,
     uow: UnitOfWork = Depends(UnitOfWork),
 ):
-    payload: str = request.state.payload
+    payload: dict = request.state.payload
     company_id: str = payload['company_id']
     response: DeletePositionResponseSchema = await PositionService.delete_position(
         uow=uow, position_id=position_id, company_id=company_id
@@ -182,7 +184,7 @@ async def add_struct(
     data: AddStructRequestSchema,
     uow: UnitOfWork = Depends(UnitOfWork),
 ):
-    payload: str = request.state.payload
+    payload: dict = request.state.payload
     company_id: str = payload['company_id']
     response: AddStructResponseSchema = await PositionService.add_struct(
         uow=uow,
@@ -203,7 +205,7 @@ async def update_struct(
     uow: UnitOfWork = Depends(UnitOfWork)
 ):
     """Изменение подразделения."""
-    payload: str = request.state.payload
+    payload: dict = request.state.payload
     company_id: str = payload['company_id']
     response: UpdateStructResponseSchema = await PositionService.update_struct(
         uow=uow,
@@ -224,7 +226,7 @@ async def delete_struct(
     uow: UnitOfWork = Depends(UnitOfWork),
 ):
     """Удаление подразделения и всех его подразделений."""
-    payload: str = request.state.payload
+    payload: dict = request.state.payload
     company_id: str = payload['company_id']
     response: DeleteStructResponseSchema = await PositionService.delete_struct(
         uow=uow, struct_id=struct_id, company_id=company_id
@@ -242,7 +244,7 @@ async def add_position_to_struct(
     data: AddStructPositionRequestSchema,
     uow: UnitOfWork = Depends(UnitOfWork),
 ):
-    payload: str = request.state.payload
+    payload: dict = request.state.payload
     company_id: str = payload['company_id']
     response: UpdateStructPositionResponseSchema = await PositionService.add_position_to_struct(
         uow=uow, data=data, company_id=company_id
@@ -260,7 +262,7 @@ async def add_position_to_struct(
     data: UpdateStructPositionRequestSchema,
     uow: UnitOfWork = Depends(UnitOfWork),
 ):
-    payload: str = request.state.payload
+    payload: dict = request.state.payload
     company_id: str = payload['company_id']
     response: AddStructPositionResponseSchema = await PositionService.update_struct_position(
         uow=uow, data=data, company_id=company_id
@@ -278,7 +280,7 @@ async def delete_struct_position(
     struct_position_id: UUID4,
     uow: UnitOfWork = Depends(UnitOfWork),
 ):
-    payload: str = request.state.payload
+    payload: dict = request.state.payload
     company_id: str = payload['company_id']
     response: DeleteStructPositionResponseSchema = await PositionService.delete_struct_position(
         uow=uow, struct_position_id=struct_position_id, company_id=company_id
@@ -287,7 +289,7 @@ async def delete_struct_position(
 
 
 @router.post(
-    '/task',
+    '/tasks',
     tags=['protected', 'for_admins'],
     response_model=AddTaskResponseSchema
 )
@@ -296,10 +298,30 @@ async def add_task(
     data: AddTaskRequestSchema,
     uow: UnitOfWork = Depends(UnitOfWork),
 ):
-    payload: str = request.state.payload
+    payload: dict = request.state.payload
     account_id: str = payload['account_id']
     company_id: str = payload['company_id']
     response: AddTaskResponseSchema = await TaskService.add_new_task(
         uow=uow, author_id=account_id, company_id=company_id, data=data
     )
     return response
+
+
+@router.patch(
+    '/tasks/',
+    tags=['protected', 'for_admins'],
+    response_model=UpdateTaskResponseSchema
+)
+async def update_task(
+    request: Request,
+    data: UpdateTaskRequestSchema,
+    uow: UnitOfWork = Depends(UnitOfWork),
+):
+    payload: dict = request.state.payload
+    company_id: str = payload['company_id']
+    account_id: str = payload['account_id']
+    response: UpdateTaskResponseSchema = await TaskService.update_task(
+        uow=uow, author_id=account_id, company_id=company_id, data=data
+    )
+    return response
+    

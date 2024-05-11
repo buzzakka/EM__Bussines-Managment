@@ -8,14 +8,14 @@ from src.api.company.models.task import TaskStatus
 
 class AddTaskRequestSchema(BaseModel):
     title: str
-    description: str = None
+    description: str | None = None
     responsible_id: UUID4 | None = None
     deadline: datetime
     status: TaskStatus = TaskStatus.OPEN
-    
-    observers: list[UUID4] | None = None
-    performers: list[UUID4] | None = None
-    
+
+    observers: list[UUID4] = None
+    performers: list[UUID4] = None
+
     @field_validator('deadline')
     def deadline_validate(cls, v: Any):
         if v < datetime.now():
@@ -29,3 +29,14 @@ class AddTaskPayloadSchema(AddTaskRequestSchema):
 
 class AddTaskResponseSchema(BaseResponseModel):
     payload: AddTaskPayloadSchema | None = None
+
+
+class UpdateTaskRequestSchema(AddTaskRequestSchema):
+    task_id: UUID4
+    title: str = None
+    deadline: datetime = None
+    status: TaskStatus = None
+
+
+class UpdateTaskResponseSchema(BaseModel    ):
+    payload: UpdateTaskRequestSchema | None = None

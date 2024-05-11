@@ -1,14 +1,16 @@
 from fastapi import status
 from pydantic import UUID4
 
-from src.core.utils import BaseService, UnitOfWork
+from src.core.utils import BaseService, UnitOfWork, bad_responses
 from src.core.schemas import BaseResponseModel
 
 from src.api.company.models import TaskModel
 from src.api.company.v1.schemas import (
     AddTaskRequestSchema,
     AddTaskResponseSchema,
-    AddTaskPayloadSchema
+    AddTaskPayloadSchema,
+    UpdateTaskRequestSchema,
+    UpdateTaskResponseSchema,
 )
 
 
@@ -47,6 +49,42 @@ class TaskService(BaseService):
                     task_id=task.id,
                     **data.model_dump(),
                 )
+            )
+
+    @classmethod
+    async def update_task(
+        cls,
+        uow: UnitOfWork,
+        company_id: UUID4, author_id: UUID4,
+        data: UpdateTaskRequestSchema
+    ) -> UpdateTaskResponseSchema:
+        async with uow:
+            try:
+                await cls._check_ids(
+                    uow,
+                    company_id,
+                    author_id,
+                    data.responsible_id,
+                    data.observers,
+                    data.performers
+                )
+            except ValueError:
+                return BaseResponseModel(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    error=False,
+                    message='Один из введенных id неверный.'
+                )
+
+            task_obj: TaskModel | None = await uow.task.get_task(company_id=company_id, task_id=data.task_id)
+            if task_obj is None:
+                return bad_responses.bad_param('task_id', data.task_id)
+
+            task_obj: TaskModel = await uow.task.update_task(
+                **data.model_dump(exclude_unset=True)
+            )
+
+            return UpdateTaskResponseSchema(
+                payload=data.model_dump(exclude_none=True)
             )
 
     @classmethod

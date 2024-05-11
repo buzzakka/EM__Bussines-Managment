@@ -127,7 +127,13 @@ class TestAuthRouterV1:
         response: Response = client.post(
             '/api/v1/auth/logout/'
         )
-        assert response.status_code == status.HTTP_401_UNAUTHORIZED
+        assert response.status_code == status.HTTP_200_OK
+        assert response.json() == {
+            'error': True,
+            'message': 'Not authenticated',
+            'payload': None,
+            'status_code': status.HTTP_403_FORBIDDEN,
+        }
 
         response: Response = client.post(
             '/api/v1/auth/logout/',
