@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 
-from src.api.auth.v1.middleware import AuthMiddleware
+from src.api.auth.v1.utils.middleware import AuthMiddleware
 from src.api.router import router
 
 app: FastAPI = FastAPI()

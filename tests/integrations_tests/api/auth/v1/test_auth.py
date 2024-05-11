@@ -25,7 +25,7 @@ class TestAuthRouterV1:
     ):
         with expectation:
             response: Response = client.get(
-                f'/api/v1/auth/check_account/{email}',
+                f'/api/v1/register/check_account/{email}',
             )
             assert response.status_code == expected_status
             assert response.json() == expected_result
@@ -41,7 +41,7 @@ class TestAuthRouterV1:
     ):
         with expectation:
             response: Response = client.post(
-                '/api/v1/auth/sign-up',
+                '/api/v1/register/sign-up',
                 json=data
             )
             assert response.status_code == expected_status
@@ -58,7 +58,7 @@ class TestAuthRouterV1:
     ):
         with expectation:
             response: Response = client.post(
-                '/api/v1/auth/sign-up-complete/',
+                '/api/v1/register/sign-up-complete/',
                 json=data
             )
             assert response.status_code == expected_status
@@ -75,7 +75,7 @@ class TestAuthRouterV1:
     ):
         with expectation:
             response: Response = client.post(
-                '/api/v1/auth/sign-up-employee/',
+                '/api/v1/register/sign-up-employee/',
                 json=data
             )
             assert response.status_code == expected_status
@@ -92,7 +92,7 @@ class TestAuthRouterV1:
     ):
         with expectation:
             response: Response = client.get(
-                '/api/v1/auth/sign-up-employee/',
+                '/api/v1/register/sign-up-employee/',
                 params={'email': email, 'invite_token': token}
             )
             assert response.status_code == expected_status
