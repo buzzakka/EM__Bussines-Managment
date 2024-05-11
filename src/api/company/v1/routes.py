@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, Request
 from pydantic import UUID4
 
+from src.core.schemas import BaseResponseModel
 from src.core.utils import UnitOfWork
 
 from src.api.company.v1.services import MemberService, TaskService, PositionService
@@ -324,4 +325,21 @@ async def update_task(
         uow=uow, author_id=account_id, company_id=company_id, data=data
     )
     return response
-    
+
+
+@router.delete(
+    '/tasks/',
+    tags=['protected', 'for_admins'],
+    response_model=BaseResponseModel
+)
+async def delete_task(
+    request: Request,
+    task_id: UUID4,
+    uow: UnitOfWork = Depends(UnitOfWork),
+):
+    payload: dict = request.state.payload
+    company_id: str = payload['company_id']
+    response = await TaskService.delete_task(
+        uow=uow, company_id=company_id, task_id=task_id
+    )
+    return response

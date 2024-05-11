@@ -74,18 +74,34 @@ class TaskService(BaseService):
                     error=False,
                     message='Один из введенных id неверный.'
                 )
-
-            task_obj: TaskModel | None = await uow.task.get_task(company_id=company_id, task_id=data.task_id)
-            if task_obj is None:
+            
+            try:
+                await cls._check_task_id(uow, data.task_id, company_id)
+            except ValueError:
                 return bad_responses.bad_param('task_id', data.task_id)
 
-            task_obj: TaskModel = await uow.task.update_task(
-                **data.model_dump(exclude_unset=True)
-            )
+            await uow.task.update_task(**data.model_dump(exclude_unset=True))
 
             return UpdateTaskResponseSchema(
                 payload=data.model_dump(exclude_none=True)
             )
+
+    @classmethod
+    async def delete_task(
+        cls,
+        uow: UnitOfWork,
+        company_id: UUID4, task_id: UUID4
+    ):
+        async with uow:
+            try:
+                await cls._check_task_id(uow, task_id, company_id)
+            except ValueError:
+                return bad_responses.bad_param('task_id', task_id)
+
+            await uow.task.delete_by_query(id=task_id)
+            
+            return BaseResponseModel()
+            
 
     @classmethod
     async def _check_ids(
@@ -106,3 +122,13 @@ class TaskService(BaseService):
         members = await uow.task.get_companys_members_by_ids(ids=user_ids, company_id=company_id)
         if len(user_ids) != len(members):
             raise ValueError
+
+    @classmethod
+    async def _check_task_id(
+        cls,
+        uow: UnitOfWork,
+        task_id: UUID4, company_id: UUID4
+    ):
+        task_obj: TaskModel | None = await uow.task.get_task(company_id=company_id, task_id=task_id)
+        if task_obj is None:
+            raise ValueError('task_id', task_id)

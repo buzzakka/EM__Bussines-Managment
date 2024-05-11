@@ -38,5 +38,9 @@ class UpdateTaskRequestSchema(AddTaskRequestSchema):
     status: TaskStatus = None
 
 
-class UpdateTaskResponseSchema(BaseModel    ):
+class UpdateTaskResponseSchema(BaseModel):
     payload: UpdateTaskRequestSchema | None = None
+
+
+class DeleteTaskResponseSchema(UpdateTaskResponseSchema):
+    ...
