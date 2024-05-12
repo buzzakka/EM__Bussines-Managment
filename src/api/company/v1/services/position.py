@@ -1,31 +1,22 @@
 from pydantic import UUID4
 
-from src.core.utils import UnitOfWork, BaseService
+from src.core.utils import UnitOfWork, BaseService, bad_responses
 
 from src.api.company.v1.schemas import (
-    AddPositionPayloadSchema,
-    AddPositionRequestSchema,
     AddPositionResponseSchema,
-
-    UpdatePositionRequestSchema,
     UpdatePositionResponseSchema,
-
-    DeletePositionPayloadSchema,
     DeletePositionResponseSchema,
 
-    AddStructPayloadSchema,
     AddStructRequestSchema,
     AddStructResponseSchema,
     UpdateStructRequestSchema,
     UpdateStructResponseSchema,
     DeleteStructResponseSchema,
 
-    AddStructPositionPayloadSchema,
     AddStructPositionRequestSchema,
     AddStructPositionResponseSchema,
     UpdateStructPositionRequestSchema,
     UpdateStructPositionResponseSchema,
-    DeleteStructPositionPayloadSchema,
     DeleteStructPositionResponseSchema,
 )
 from src.api.company.models import (
@@ -35,28 +26,24 @@ from src.api.company.models import (
     MemberModel
 )
 
-from src.core.utils import bad_responses
-
 
 class PositionService(BaseService):
     repository = 'position'
 
     @classmethod
-    async def add_new_position(
+    async def add_position(
         cls,
         uow: UnitOfWork,
         title: str, company_id: str, description: str = None
     ) -> AddPositionResponseSchema:
         async with uow:
-            position_obj: PositionModel = await uow.position.add_one_and_get_obj(
+            position: PositionModel = await uow.position.add_one_and_get_obj(
                 title=title,
                 description=description,
                 company_id=company_id,
             )
             return AddPositionResponseSchema(
-                payload=AddPositionPayloadSchema(
-                    title=title, description=description, position_id=position_obj.id
-                )
+                payload=position.to_pydantic_schema()
             )
 
     @classmethod
@@ -83,16 +70,9 @@ class PositionService(BaseService):
             if position_obj is None:
                 raise bad_responses.bad_param('position_id')
 
-            new_pos: UpdatePositionResponseSchema = UpdatePositionResponseSchema(
-                payload=UpdatePositionRequestSchema(
-                    position_id=position_id,
-                    new_position=AddPositionRequestSchema(
-                        title=new_title,
-                        description=new_description
-                    )
-                )
+            return UpdatePositionResponseSchema(
+                payload=position_obj.to_pydantic_schema()
             )
-            return new_pos
 
     @classmethod
     async def delete_position(
@@ -113,10 +93,7 @@ class PositionService(BaseService):
             await uow.position.delete_by_query(company_id=company_id, id=position_id)
 
         return DeletePositionResponseSchema(
-            payload=DeletePositionPayloadSchema(
-                position_id=position_id,
-                title=position_obj.title
-            )
+            payload=position_obj.to_pydantic_schema()
         )
 
     @classmethod
@@ -143,10 +120,7 @@ class PositionService(BaseService):
             )
 
         return AddStructResponseSchema(
-            payload=AddStructPayloadSchema(
-                struct_id=struct_obj.id,
-                name=struct_obj.name
-            )
+            payload=struct_obj.to_pydantic_schema()
         )
 
     @classmethod
@@ -165,7 +139,7 @@ class PositionService(BaseService):
                 raise bad_responses.bad_param('struct_id')
 
             return UpdateStructResponseSchema(
-                payload=data
+                payload=struct_obj.to_pydantic_schema()
             )
 
     @classmethod
@@ -183,9 +157,7 @@ class PositionService(BaseService):
 
             await uow.struct_adm.delete_struct_and_descendants(struct_obj)
             return DeleteStructResponseSchema(
-                payload=UpdateStructRequestSchema(
-                    struct_id=struct_id, name=struct_obj.name
-                )
+                payload=struct_obj.to_pydantic_schema()
             )
 
     @classmethod
@@ -207,10 +179,7 @@ class PositionService(BaseService):
             )
 
             return AddStructPositionResponseSchema(
-                payload=AddStructPositionPayloadSchema(
-                    struct_position_id=struct_pos_obj.id,
-                    **data.model_dump()
-                )
+                payload=struct_pos_obj.to_pydantic_schema()
             )
 
     @classmethod
@@ -223,7 +192,7 @@ class PositionService(BaseService):
             new_values: dict = data.model_dump(exclude_none=True)
             struct_pos_id: UUID4 = new_values.pop('struct_position_id')
 
-            await cls._check_struct_position(
+            struct_pos_obj: StructAdmPositionsModel = await cls._check_struct_position(
                 uow=uow, struct_pos_id=struct_pos_id, company_id=company_id
             )
             await cls._check_struct(uow=uow, struct_id=data.struct_id, company_id=company_id)
@@ -233,7 +202,7 @@ class PositionService(BaseService):
             await uow.struct_adm_pos.update_one_by_id(_id=struct_pos_id, values=new_values)
 
             return UpdateStructPositionResponseSchema(
-                payload=data
+                payload=struct_pos_obj.to_pydantic_schema()
             )
 
     @classmethod
@@ -244,16 +213,14 @@ class PositionService(BaseService):
         company_id: UUID4
     ) -> DeleteStructPositionResponseSchema:
         async with uow:
-            await cls._check_struct_position(
+            struct_pos_obj: StructAdmPositionsModel = await cls._check_struct_position(
                 uow=uow, struct_pos_id=struct_position_id, company_id=company_id
             )
 
             await uow.struct_adm_pos.delete_by_query(id=struct_position_id)
 
             return DeleteStructPositionResponseSchema(
-                payload=DeleteStructPositionPayloadSchema(
-                    struct_position_id=struct_position_id
-                )
+                payload=struct_pos_obj.to_pydantic_schema()
             )
 
     @classmethod
@@ -266,6 +233,8 @@ class PositionService(BaseService):
         )
         if obj is None:
             raise bad_responses.bad_param('struct_position_id')
+
+        return obj
 
     @classmethod
     async def _check_struct(cls, uow: UnitOfWork, struct_id: UUID4, company_id: UUID4):
@@ -291,7 +260,6 @@ class PositionService(BaseService):
 
     @classmethod
     async def _check_member(cls, uow: UnitOfWork, member_id: UUID4 | None, company_id: UUID4):
-        # Проверка, что существует пользователь в компании
         if member_id is None:
             return
 

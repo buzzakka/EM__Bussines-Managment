@@ -2,18 +2,20 @@ from pydantic import BaseModel, UUID4
 
 from src.core.schemas import BaseResponseModel
 
+from src.api.company.schemas import PositionSchema
+
+
+class PositionResponseSchema(BaseResponseModel):
+    payload: PositionSchema | None = None
+
 
 class AddPositionRequestSchema(BaseModel):
     title: str
     description: str | None = None
 
 
-class AddPositionPayloadSchema(AddPositionRequestSchema):
-    position_id: UUID4
-
-
-class AddPositionResponseSchema(BaseResponseModel):
-    payload: AddPositionPayloadSchema
+class AddPositionResponseSchema(PositionResponseSchema):
+    ...
 
 
 class UpdatePositionRequestSchema(BaseModel):
@@ -21,76 +23,9 @@ class UpdatePositionRequestSchema(BaseModel):
     new_position: AddPositionRequestSchema
 
 
-class UpdatePositionResponseSchema(BaseResponseModel):
-    payload: UpdatePositionRequestSchema | None = None
-
-
-class DeletePositionPayloadSchema(BaseModel):
-    position_id: UUID4
-    title: str
-
-
-class DeletePositionResponseSchema(BaseResponseModel):
-    payload: DeletePositionPayloadSchema | None = None
-
-
-class AddStructRequestSchema(BaseModel):
-    name: str
-    parent_id: UUID4 | None = None
-
-
-class AddStructPayloadSchema(BaseModel):
-    struct_id: UUID4
-    name: str
-
-
-class AddStructResponseSchema(BaseResponseModel):
-    payload: AddStructPayloadSchema | None = None
-
-
-class UpdateStructRequestSchema(BaseModel):
-    struct_id: UUID4
-    name: str
-
-
-class UpdateStructResponseSchema(BaseResponseModel):
-    payload: UpdateStructRequestSchema | None = None
-
-
-class DeleteStructResponseSchema(UpdateStructResponseSchema):
+class UpdatePositionResponseSchema(PositionResponseSchema):
     ...
 
 
-class AddStructPositionRequestSchema(BaseModel):
-    struct_id: UUID4
-    position_id: UUID4
-    member_id: UUID4 | None = None
-    is_director: bool
-
-
-class AddStructPositionPayloadSchema(AddStructPositionRequestSchema):
-    struct_position_id: UUID4
-
-
-class AddStructPositionResponseSchema(BaseResponseModel):
-    payload: AddStructPositionPayloadSchema | None = None
-
-
-class UpdateStructPositionRequestSchema(AddStructPositionRequestSchema):
-    struct_position_id: UUID4
-    struct_id: UUID4 | None = None
-    position_id: UUID4 | None = None
-    member_id: UUID4 | None = None
-    is_director: bool | None = None
-
-
-class UpdateStructPositionResponseSchema(BaseResponseModel):
-    payload: UpdateStructPositionRequestSchema | None = None
-
-
-class DeleteStructPositionPayloadSchema(BaseModel):
-    struct_position_id: UUID4
-
-
-class DeleteStructPositionResponseSchema(BaseResponseModel):
-    payload: DeleteStructPositionPayloadSchema | None = None
+class DeletePositionResponseSchema(PositionResponseSchema):
+    ...

@@ -1,7 +1,13 @@
 from pydantic import UUID4, BaseModel, EmailStr
 
 from src.core.schemas import BaseResponseModel
+
 from src.api.auth.schemas.mixins import EmailSchema
+from src.api.company.schemas import MemberSchema
+
+
+class MemberResponseSchema(BaseResponseModel):
+    payload: MemberSchema | None = None
 
 
 class AddMemberRequestSchema(EmailSchema):
@@ -9,8 +15,8 @@ class AddMemberRequestSchema(EmailSchema):
     last_name: str
 
 
-class AddMemberResponseSchema(BaseResponseModel):
-    payload: AddMemberRequestSchema | None = None
+class AddMemberResponseSchema(MemberResponseSchema):
+    ...
 
 
 class UpdateUsersEmailByAdminRequestSchema(BaseModel):

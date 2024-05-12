@@ -1,18 +1,20 @@
-from src.core.utils import BaseService, UnitOfWork
 from src.celery_app.tasks import send_invite_link
 
-from src.api.auth.v1.services import RegisterService
+from src.core.utils import BaseService, UnitOfWork
+from src.core.utils import bad_responses as core_bade_responses
+
 from src.api.auth.models import UserModel, AccountModel, InviteTypes, InviteModel
+from src.api.auth.utils import bad_responses as auth_bad_responses
+from src.api.auth.v1.services import RegisterService
+
+from src.api.company.models import MemberModel
 from src.api.company.v1.schemas import (
-    AddMemberRequestSchema,
     AddMemberResponseSchema,
     UpdateUsersEmailByAdminResponseSchema,
     UpdateUsersEmailByAdminRequestSchema,
     UpdateUsersNameByAdminRequestSchema,
     UpdateUsersNameByAdminResponseSchema,
 )
-from src.api.auth.utils import bad_responses as auth_bad_responses
-from src.core.utils import bad_responses as core_bade_responses
 
 
 class MemberService(BaseService):
@@ -43,7 +45,7 @@ class MemberService(BaseService):
                 password='password'
             )
 
-            await uow.member.add_one(
+            member: MemberModel = await uow.member.add_one_and_get_obj(
                 account_id=account_obj.id,
                 company_id=company_id,
                 is_admin=False
@@ -58,9 +60,7 @@ class MemberService(BaseService):
             cls._send_invite_link(email=email, invite_token=invite_obj.token)
 
             return AddMemberResponseSchema(
-                payload=AddMemberRequestSchema(
-                    email=email, first_name=first_name, last_name=last_name
-                )
+                payload=member.to_pydantic_schema()
             )
 
     @classmethod

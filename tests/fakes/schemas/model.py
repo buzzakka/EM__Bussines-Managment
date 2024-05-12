@@ -44,4 +44,5 @@ class  MemberSchema(BaseModel):
 class PositionSchema(BaseModel):
     id: UUID4
     title: str
+    description: str | None = None
     company_id: UUID4

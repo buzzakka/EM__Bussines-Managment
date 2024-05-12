@@ -4,6 +4,7 @@ from datetime import datetime
 
 from src.core.schemas import BaseResponseModel
 from src.api.company.models.task import TaskStatus
+from src.api.company.schemas import TaskSchema
 
 
 class AddTaskRequestSchema(BaseModel):
@@ -11,7 +12,6 @@ class AddTaskRequestSchema(BaseModel):
     description: str | None = None
     responsible_id: UUID4 | None = None
     deadline: datetime
-    status: TaskStatus = TaskStatus.OPEN
 
     observers: list[UUID4] = None
     performers: list[UUID4] = None
@@ -23,12 +23,12 @@ class AddTaskRequestSchema(BaseModel):
         return v
 
 
-class AddTaskPayloadSchema(AddTaskRequestSchema):
-    task_id: UUID4
+class TaskResponseSchema(BaseResponseModel):
+    payload: TaskSchema
 
 
-class AddTaskResponseSchema(BaseResponseModel):
-    payload: AddTaskPayloadSchema | None = None
+class AddTaskResponseSchema(TaskResponseSchema):
+    ...
 
 
 class UpdateTaskRequestSchema(AddTaskRequestSchema):
@@ -38,9 +38,9 @@ class UpdateTaskRequestSchema(AddTaskRequestSchema):
     status: TaskStatus = None
 
 
-class UpdateTaskResponseSchema(BaseModel):
-    payload: UpdateTaskRequestSchema | None = None
+class UpdateTaskResponseSchema(TaskResponseSchema):
+    ...
 
 
-class DeleteTaskResponseSchema(UpdateTaskResponseSchema):
+class DeleteTaskResponseSchema(TaskResponseSchema):
     ...

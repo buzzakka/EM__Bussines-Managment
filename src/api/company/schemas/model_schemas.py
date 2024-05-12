@@ -17,8 +17,7 @@ class MemberSchema(BaseModel):
 class PositionSchema(BaseModel):
     id: UUID4
     title: str
-    description: str
-    company_id: UUID4
+    description: str | None
 
 
 class StructSchema(BaseModel):

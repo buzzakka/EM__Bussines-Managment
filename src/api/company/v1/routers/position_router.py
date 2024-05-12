@@ -33,7 +33,7 @@ async def create_position(
     """Создание новой позиции."""
 
     company_id: str = payload['company_id']
-    response: AddPositionResponseSchema = await PositionService.add_new_position(
+    response: AddPositionResponseSchema = await PositionService.add_position(
         uow=uow,
         title=data.title,
         company_id=company_id,

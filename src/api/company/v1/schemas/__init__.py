@@ -9,17 +9,15 @@ from src.api.company.v1.schemas.member import (
     UpdateUsersNameByAdminResponseSchema,
 )
 from src.api.company.v1.schemas.position import (
-    AddPositionPayloadSchema,
     AddPositionRequestSchema,
     AddPositionResponseSchema,
 
     UpdatePositionRequestSchema,
     UpdatePositionResponseSchema,
 
-    DeletePositionPayloadSchema,
-    DeletePositionResponseSchema,
-
-    AddStructPayloadSchema,
+    DeletePositionResponseSchema
+)
+from src.api.company.v1.schemas.struct import (
     AddStructRequestSchema,
     AddStructResponseSchema,
 
@@ -27,19 +25,17 @@ from src.api.company.v1.schemas.position import (
     UpdateStructResponseSchema,
 
     DeleteStructResponseSchema,
-
-    AddStructPositionPayloadSchema,
+)
+from src.api.company.v1.schemas.struct_pos import (
     AddStructPositionRequestSchema,
     AddStructPositionResponseSchema,
 
     UpdateStructPositionRequestSchema,
     UpdateStructPositionResponseSchema,
 
-    DeleteStructPositionPayloadSchema,
     DeleteStructPositionResponseSchema
 )
 from src.api.company.v1.schemas.task import (
-    AddTaskPayloadSchema,
     AddTaskRequestSchema,
     AddTaskResponseSchema,
 
