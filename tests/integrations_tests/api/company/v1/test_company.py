@@ -18,6 +18,8 @@ from tests.fakes.parameters.company import (
     TEST_ENDPOINT_DELETE_STRUCT,
 
     TEST_ENDPOINT_ADD_STRUCT_POSITION,
+    TEST_ENDPOINT_UPDATE_STRUCT_POSITION,
+    TEST_ENDPOINT_DELETE_STRUCT_POSITION,
 )
 import json
 
@@ -267,3 +269,42 @@ class TestCompanyRouterV1:
                 assert payload['is_director'] == expected_result['is_director']
             else:
                 assert response_data == json.loads(expected_result)
+
+    @pytest.mark.parametrize(
+        'data, expected_result, expected_status, expectation',
+        TEST_ENDPOINT_UPDATE_STRUCT_POSITION
+    )
+    def test_update_struct_position(
+        self,
+        client: TestClient,
+        get_account_jwt,
+        data, expected_result, expected_status, expectation,
+    ):
+        with expectation:
+            response: Response = client.patch(
+                '/api/v1/company/struct/position',
+                data=data,
+                headers={'Authorization': get_account_jwt}
+            )
+            assert response.status_code == expected_status
+            assert response.json() == json.loads(expected_result)
+
+    @pytest.mark.parametrize(
+        'data, expected_result, expected_status, expectation',
+        TEST_ENDPOINT_DELETE_STRUCT_POSITION
+    )
+    def test_delete_struct_position(
+        self,
+        client: TestClient,
+        get_account_jwt,
+        data, expected_result, expected_status, expectation,
+    ):
+        with expectation:
+            response: Response = client.delete(
+                '/api/v1/company/struct/position',
+                params=data,
+                headers={'Authorization': get_account_jwt}
+            )
+            assert response.status_code == expected_status
+            assert response.json() == json.loads(expected_result)
+

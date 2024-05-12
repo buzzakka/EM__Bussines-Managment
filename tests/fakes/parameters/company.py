@@ -15,14 +15,16 @@ from src.api.company.v1.schemas import (
     UpdatePositionRequestSchema,
     UpdatePositionResponseSchema,
     DeletePositionResponseSchema,
-    
+
     AddStructRequestSchema,
     UpdateStructRequestSchema,
     UpdateStructResponseSchema,
     DeleteStructResponseSchema,
 
     AddStructPositionRequestSchema,
-    AddStructPositionResponseSchema,
+    UpdateStructPositionRequestSchema,
+    UpdateStructPositionResponseSchema,
+    DeleteStructPositionResponseSchema
 )
 from src.api.company.schemas import (
     CompanySchema,
@@ -38,6 +40,7 @@ from tests.fakes.database.fake_company import (
     FAKE_POSITIONS,
     FAKE_COMPANYS,
     FAKE_STRUCT,
+    FAKE_STRUCT_POSITION,
 )
 
 
@@ -226,7 +229,7 @@ TEST_ENDPOINT_DELETE_POSITION: list[tuple[any]] = [
         status.HTTP_200_OK,
         does_not_raise(),
     ),
-    
+
     # Повторное удаление удаленной категории
     (
         {'position_id': FAKE_POSITIONS[3].id},
@@ -269,7 +272,7 @@ TEST_ENDPOINT_ADD_STRUCT: list[tuple[any]] = [
         status.HTTP_200_OK,
         does_not_raise(),
     ),
-    
+
     # Добавление новой структуры без родителя
     (
         AddStructRequestSchema(
@@ -283,7 +286,7 @@ TEST_ENDPOINT_ADD_STRUCT: list[tuple[any]] = [
         status.HTTP_200_OK,
         does_not_raise(),
     ),
-    
+
     # Добавление структуры с parent_id позиции другой компании
     (
         AddStructRequestSchema(
@@ -333,7 +336,7 @@ TEST_ENDPOINT_UPDATE_STRUCT: list[tuple[any]] = [
         status.HTTP_400_BAD_REQUEST,
         does_not_raise(),
     ),
-] 
+]
 
 TEST_ENDPOINT_DELETE_STRUCT: list[tuple[any]] = [
     # Удаление своей структуры
@@ -350,7 +353,7 @@ TEST_ENDPOINT_DELETE_STRUCT: list[tuple[any]] = [
         status.HTTP_200_OK,
         does_not_raise(),
     ),
-    
+
     # Повторное удаление своей структуры
     (
         {'struct_id': FAKE_STRUCT[3].id},
@@ -389,7 +392,7 @@ TEST_ENDPOINT_ADD_STRUCT_POSITION: list[tuple[any]] = [
         status.HTTP_200_OK,
         does_not_raise(),
     ),
-    
+
     # Создание позиции в чужой структуре
     (
         AddStructPositionRequestSchema(
@@ -406,7 +409,7 @@ TEST_ENDPOINT_ADD_STRUCT_POSITION: list[tuple[any]] = [
         status.HTTP_400_BAD_REQUEST,
         does_not_raise(),
     ),
-    
+
     # Создание позиции c чужой позицией
     (
         AddStructPositionRequestSchema(
@@ -423,7 +426,7 @@ TEST_ENDPOINT_ADD_STRUCT_POSITION: list[tuple[any]] = [
         status.HTTP_400_BAD_REQUEST,
         does_not_raise(),
     ),
-    
+
     # Создание позиции c чужим коллегой
     (
         AddStructPositionRequestSchema(
@@ -443,5 +446,139 @@ TEST_ENDPOINT_ADD_STRUCT_POSITION: list[tuple[any]] = [
 ]
 
 TEST_ENDPOINT_UPDATE_STRUCT_POSITION: list[tuple[any]] = [
+    # Изменение корректной позиции структуры
+    (
+        UpdateStructPositionRequestSchema(
+            struct_position_id=FAKE_STRUCT_POSITION[2].id,
+            struct_id=FAKE_STRUCT[2].id,
+            position_id=FAKE_POSITIONS[2].id,
+            member_id=FAKE_MEMBERS[3].id,
+            is_director=False
+        ).model_dump_json(),
+        UpdateStructPositionResponseSchema(
+            payload=StructPositionSchema(
+                id=FAKE_STRUCT_POSITION[2].id,
+                struct_id=FAKE_STRUCT[2].id,
+                position_id=FAKE_POSITIONS[2].id,
+                member_id=FAKE_MEMBERS[3].id,
+                is_director=False
+            )
+        ).model_dump_json(),
+        status.HTTP_200_OK,
+        does_not_raise(),
+    ),
+
+    # Неверный struct_position_id
+    (
+        UpdateStructPositionRequestSchema(
+            struct_position_id=FAKE_STRUCT_POSITION[1].id,
+            struct_id=FAKE_STRUCT[2].id,
+            position_id=FAKE_POSITIONS[2].id,
+            member_id=FAKE_MEMBERS[3].id,
+            is_director=False
+        ).model_dump_json(),
+        BaseResponseModel(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            error=True,
+            message='Неверный параметр: struct_position_id.'
+        ).model_dump_json(),
+        status.HTTP_400_BAD_REQUEST,
+        does_not_raise(),
+    ),
+
+    # Неверный struct_id
+    (
+        UpdateStructPositionRequestSchema(
+            struct_position_id=FAKE_STRUCT_POSITION[2].id,
+            struct_id=FAKE_STRUCT[0].id,
+            position_id=FAKE_POSITIONS[2].id,
+            member_id=FAKE_MEMBERS[3].id,
+            is_director=False
+        ).model_dump_json(),
+        BaseResponseModel(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            error=True,
+            message='Неверный параметр: struct_id.'
+        ).model_dump_json(),
+        status.HTTP_400_BAD_REQUEST,
+        does_not_raise(),
+    ),
+
+    # Неверный position_id
+    (
+        UpdateStructPositionRequestSchema(
+            struct_position_id=FAKE_STRUCT_POSITION[2].id,
+            struct_id=FAKE_STRUCT[1].id,
+            position_id=FAKE_POSITIONS[0].id,
+            member_id=FAKE_MEMBERS[3].id,
+            is_director=False
+        ).model_dump_json(),
+        BaseResponseModel(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            error=True,
+            message='Неверный параметр: position_id.'
+        ).model_dump_json(),
+        status.HTTP_400_BAD_REQUEST,
+        does_not_raise(),
+    ),
+
+    # Неверный member_id
+    (
+        UpdateStructPositionRequestSchema(
+            struct_position_id=FAKE_STRUCT_POSITION[2].id,
+            struct_id=FAKE_STRUCT[1].id,
+            position_id=FAKE_POSITIONS[2].id,
+            member_id=FAKE_MEMBERS[1].id,
+            is_director=False
+        ).model_dump_json(),
+        BaseResponseModel(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            error=True,
+            message='Неверный параметр: member_id.'
+        ).model_dump_json(),
+        status.HTTP_400_BAD_REQUEST,
+        does_not_raise(),
+    ),
+]
+
+TEST_ENDPOINT_DELETE_STRUCT_POSITION: list[tuple[any]] = [
+    # Удаление корректной позиции структуры
+    (
+        {'struct_position_id': FAKE_STRUCT_POSITION[2].id},
+        DeleteStructPositionResponseSchema(
+            payload=StructPositionSchema(
+                id=FAKE_STRUCT_POSITION[2].id,
+                struct_id=FAKE_STRUCT[2].id,
+                position_id=FAKE_POSITIONS[2].id,
+                member_id=FAKE_MEMBERS[3].id,
+                is_director=False
+            )
+        ).model_dump_json(),
+        status.HTTP_200_OK,
+        does_not_raise(),
+    ),
+
+    # Повторная попытка удаления
+    (
+        {'struct_position_id': FAKE_STRUCT_POSITION[2].id},
+        BaseResponseModel(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            error=True,
+            message='Неверный параметр: struct_position_id.'
+        ).model_dump_json(),
+        status.HTTP_400_BAD_REQUEST,
+        does_not_raise(),
+    ),
     
+    # Удаление чужой позиции структуры
+    (
+        {'struct_position_id': FAKE_STRUCT_POSITION[1].id},
+        BaseResponseModel(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            error=True,
+            message='Неверный параметр: struct_position_id.'
+        ).model_dump_json(),
+        status.HTTP_400_BAD_REQUEST,
+        does_not_raise(),
+    ),
 ]
