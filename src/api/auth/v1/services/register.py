@@ -1,4 +1,6 @@
+from fastapi import HTTPException, status
 from random import randint
+
 
 from src.core.utils import UnitOfWork, BaseService
 from src.celery_app.tasks import send_invite_token
@@ -16,7 +18,7 @@ from src.api.auth.v1.schemas import (
 from src.api.auth.schemas.mixins import EmailSchema
 
 from src.api.auth.models.invite import InviteTypes
-from src.api.auth.utils import exceptions, secret, bad_responses
+from src.api.auth.utils import secret, bad_responses
 
 
 class RegisterService(BaseService):
@@ -30,7 +32,7 @@ class RegisterService(BaseService):
             is_account_exists: bool = await uow.account.get_by_query_one_or_none(email=email)
 
             if is_account_exists:
-                return bad_responses.account_exists_response(email=email)
+                raise bad_responses.account_exists_response()
 
             invite_obj: InviteModel = await cls._create_invite_token(
                 uow=uow,
@@ -56,14 +58,10 @@ class RegisterService(BaseService):
 
             is_account_exists: bool = await cls._is_account_exists(uow=uow, email=email)
             if is_account_exists:
-                return bad_responses.account_exists_response(email=email)
+                raise bad_responses.account_exists_response()
 
-            try:
-                await cls._confirm_invite_token(uow=uow, email=email, invite_token=token)
-            except exceptions.IvalidInviteToken:
-                return bad_responses.incorrect_email_or_ivite_token()
-            except exceptions.AccountAlreadyConfirmed:
-                return bad_responses.account_confirmed_already(email=email)
+
+            await cls._confirm_invite_token(uow=uow, email=email, invite_token=token)
 
             return SignUpResponseSchema(payload=EmailSchema(email=email))
 
@@ -74,13 +72,8 @@ class RegisterService(BaseService):
         account: str, password: str, first_name: str, last_name: str, company_name: str,
     ) -> AccountRegisterResponseSchema:
         async with uow:
-            try:
-                await cls._get_confirmed_invite_obj_or_raise(uow=uow, email=account, invite_type=InviteTypes.ACCOUNT)
-                await cls._check_if_account_exists_or_raise(uow=uow, email=account)
-            except exceptions.AccountNotConfirmed:
-                return bad_responses.account_not_confirmed(email=account)
-            except exceptions.AccountAlreadyRegistred:
-                return bad_responses.account_exists_response(email=account)
+            await cls._get_confirmed_invite_obj_or_raise(uow=uow, email=account, invite_type=InviteTypes.ACCOUNT)
+            await cls._check_if_account_exists_or_raise(uow=uow, email=account)
 
             user_obj: UserModel = await uow.user.add_one_and_get_obj(
                 first_name=first_name,
@@ -121,10 +114,10 @@ class RegisterService(BaseService):
                 invite_type=InviteTypes.EMPLOYMENT,
             )
             if invite_obj is None:
-                return bad_responses.incorrect_email_or_ivite_token()
+                raise bad_responses.invalid_email_or_ivite_token()
 
             if invite_obj.is_confirmed:
-                return bad_responses.account_confirmed_already(email=email)
+                raise bad_responses.account_confirmed_already()
 
             invite_obj.is_confirmed = True
 
@@ -142,16 +135,13 @@ class RegisterService(BaseService):
         async with uow:
             account_obj: AccountModel = await uow.account.get_by_query_one_or_none(email=email)
             if account_obj is None:
-                return bad_responses.account_not_confirmed(email=email)
+                raise bad_responses.account_not_confirmed()
             if account_obj.is_active:
-                return bad_responses.account_exists_response(email=email)
+                raise bad_responses.account_exists_response()
 
-            try:
-                await cls._get_confirmed_invite_obj_or_raise(
-                    uow=uow, email=email, invite_type=InviteTypes.EMPLOYMENT
-                )
-            except exceptions.AccountNotConfirmed:
-                return bad_responses.account_not_confirmed(email=email)
+            await cls._get_confirmed_invite_obj_or_raise(
+                uow=uow, email=email, invite_type=InviteTypes.EMPLOYMENT
+            )
 
             account_obj.is_active = True
 
@@ -187,10 +177,10 @@ class RegisterService(BaseService):
         )
 
         if invite_obj is None:
-            raise exceptions.IvalidInviteToken
+            raise bad_responses.invalid_email_or_ivite_token()
 
         if invite_obj.is_confirmed:
-            raise exceptions.AccountAlreadyConfirmed
+            raise bad_responses.account_confirmed_already()
 
         invite_obj.is_confirmed = True
 
@@ -212,7 +202,7 @@ class RegisterService(BaseService):
         _invite_obj: InviteModel = await uow.invite.get_by_query_one_or_none(**invite_info)
 
         if _invite_obj is None or not _invite_obj.is_confirmed:
-            raise exceptions.AccountNotConfirmed
+            raise bad_responses.account_not_confirmed()
 
         return _invite_obj
 
@@ -221,7 +211,7 @@ class RegisterService(BaseService):
         is_account_exists: bool = await uow.account.get_by_query_one_or_none(email=email) is not None
 
         if is_account_exists:
-            raise exceptions.AccountAlreadyRegistred
+            raise bad_responses.account_exists_response()
 
     @staticmethod
     async def _add_secret_obj(

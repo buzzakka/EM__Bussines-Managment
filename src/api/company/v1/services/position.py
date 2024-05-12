@@ -34,8 +34,8 @@ from src.api.company.models import (
     StructAdmPositionsModel,
     MemberModel
 )
-from src.api.company.utils import bad_responses
-from src.core.utils import bad_responses as br
+
+from src.core.utils import bad_responses
 
 
 class PositionService(BaseService):
@@ -81,7 +81,7 @@ class PositionService(BaseService):
             )
 
             if position_obj is None:
-                return bad_responses.invalid_position_id(position_id=position_id)
+                raise bad_responses.bad_param('position_id')
 
             new_pos: UpdatePositionResponseSchema = UpdatePositionResponseSchema(
                 payload=UpdatePositionRequestSchema(
@@ -108,7 +108,7 @@ class PositionService(BaseService):
             )
 
             if position_obj is None:
-                return bad_responses.invalid_position_id(position_id=position_id)
+                raise bad_responses.bad_param('position_id')
 
             await uow.position.delete_by_query(company_id=company_id, id=position_id)
 
@@ -131,7 +131,8 @@ class PositionService(BaseService):
                     company_id=company_id, id=data.parent_id
                 )
                 if parent_obj is None:
-                    return bad_responses.invalid_struct_id(data.parrent_id)
+                    raise bad_responses.bad_param('struct_id')
+
             else:
                 parent_obj = None
 
@@ -161,7 +162,7 @@ class PositionService(BaseService):
             )
 
             if struct_obj is None:
-                return bad_responses.invalid_struct_id(struct_id=data.struct_id)
+                raise bad_responses.bad_param('struct_id')
 
             return UpdateStructResponseSchema(
                 payload=data
@@ -178,7 +179,7 @@ class PositionService(BaseService):
                 id=struct_id, company_id=company_id
             )
             if struct_obj is None:
-                return bad_responses.invalid_struct_id(struct_id=struct_id)
+                raise bad_responses.bad_param('struct_id')
 
             await uow.struct_adm.delete_struct_and_descendants(struct_obj)
             return DeleteStructResponseSchema(
@@ -194,12 +195,9 @@ class PositionService(BaseService):
         data: AddStructPositionRequestSchema, company_id: UUID4
     ) -> AddStructPositionResponseSchema:
         async with uow:
-            try:
-                await cls._check_struct(uow=uow, struct_id=data.struct_id, company_id=company_id)
-                await cls._check_position(uow=uow, position_id=data.position_id, company_id=company_id)
-                await cls._check_member(uow=uow, member_id=data.member_id, company_id=company_id)
-            except ValueError as e:
-                return br.bad_param(*e.args)
+            await cls._check_struct(uow=uow, struct_id=data.struct_id, company_id=company_id)
+            await cls._check_position(uow=uow, position_id=data.position_id, company_id=company_id)
+            await cls._check_member(uow=uow, member_id=data.member_id, company_id=company_id)
 
             struct_pos_obj: StructAdmPositionsModel = await uow.struct_adm_pos.add_one_and_get_obj(
                 struct_id=data.struct_id,
@@ -225,15 +223,12 @@ class PositionService(BaseService):
             new_values: dict = data.model_dump(exclude_none=True)
             struct_pos_id: UUID4 = new_values.pop('struct_position_id')
 
-            try:
-                await cls._check_struct_position(
-                    uow=uow, struct_pos_id=struct_pos_id, company_id=company_id
-                )
-                await cls._check_struct(uow=uow, struct_id=data.struct_id, company_id=company_id)
-                await cls._check_position(uow=uow, position_id=data.position_id, company_id=company_id)
-                await cls._check_member(uow=uow, member_id=data.member_id, company_id=company_id)
-            except ValueError as e:
-                return br.bad_param(*e.args)
+            await cls._check_struct_position(
+                uow=uow, struct_pos_id=struct_pos_id, company_id=company_id
+            )
+            await cls._check_struct(uow=uow, struct_id=data.struct_id, company_id=company_id)
+            await cls._check_position(uow=uow, position_id=data.position_id, company_id=company_id)
+            await cls._check_member(uow=uow, member_id=data.member_id, company_id=company_id)
 
             await uow.struct_adm_pos.update_one_by_id(_id=struct_pos_id, values=new_values)
 
@@ -249,12 +244,9 @@ class PositionService(BaseService):
         company_id: UUID4
     ) -> DeleteStructPositionResponseSchema:
         async with uow:
-            try:
-                await cls._check_struct_position(
-                    uow=uow, struct_pos_id=struct_position_id, company_id=company_id
-                )
-            except ValueError as e:
-                return br.bad_param(*e.args)
+            await cls._check_struct_position(
+                uow=uow, struct_pos_id=struct_position_id, company_id=company_id
+            )
 
             await uow.struct_adm_pos.delete_by_query(id=struct_position_id)
 
@@ -273,11 +265,10 @@ class PositionService(BaseService):
             struct_pos_id=struct_pos_id, company_id=company_id
         )
         if obj is None:
-            raise ValueError('struct_position_id', struct_pos_id)
+            raise bad_responses.bad_param('struct_position_id')
 
     @classmethod
     async def _check_struct(cls, uow: UnitOfWork, struct_id: UUID4, company_id: UUID4):
-        # Проверка, что существует структура в компании
         if struct_id is None:
             return
 
@@ -285,11 +276,10 @@ class PositionService(BaseService):
             id=struct_id, company_id=company_id
         )
         if struct_obj is None:
-            raise ValueError('struct_id', struct_id)
+            raise bad_responses.bad_param('struct_id')
 
     @classmethod
     async def _check_position(cls, uow: UnitOfWork, position_id: UUID4, company_id: UUID4):
-        # Проверка, что существует позиция в компании
         if position_id is None:
             return
 
@@ -297,7 +287,7 @@ class PositionService(BaseService):
             id=position_id, company_id=company_id
         )
         if position_obj is None:
-            raise ValueError('position_id', position_id)
+            raise bad_responses.bad_param('position_id')
 
     @classmethod
     async def _check_member(cls, uow: UnitOfWork, member_id: UUID4 | None, company_id: UUID4):
@@ -309,4 +299,4 @@ class PositionService(BaseService):
             id=member_id, company_id=company_id
         )
         if member_obj is None:
-            raise ValueError('company_id', company_id)
+            raise bad_responses.bad_param('company_id')

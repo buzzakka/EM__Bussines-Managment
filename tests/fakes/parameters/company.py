@@ -49,9 +49,9 @@ TEST_ENDPOINT_ADD_NEW_MEMBER: list[tuple[any]] = [
         AddMemberResponseSchema(
             status_code=status.HTTP_400_BAD_REQUEST,
             error=True,
-            message='Пользователь new_employee_1@gmail.com уже зарегистрирован.'
+            message='Пользователь с таким адресом электронной почты уже зарегестрирован.'
         ).model_dump(),
-        status.HTTP_200_OK,
+        status.HTTP_400_BAD_REQUEST,
         does_not_raise(),
     ),
 ]
@@ -97,9 +97,9 @@ TEST_ENDPOINT_UPDATE_USERS_EMAIL: list[tuple[any]] = [
         UpdateUsersEmailByAdminResponseSchema(
             status_code=status.HTTP_400_BAD_REQUEST,
             error=True,
-            message=f'Неверный account_id {FAKE_ACCOUNTS[2].id}.'
+            message=f'Неверный параметр: account_id.'
         ).model_dump_json(),
-        status.HTTP_200_OK,
+        status.HTTP_400_BAD_REQUEST,
         does_not_raise(),
     ),
 ]
@@ -130,9 +130,9 @@ TEST_ENDPOINT_UPDATE_USERS_NAME: list[tuple[any]] = [
         UpdateUsersNameByAdminResponseSchema(
             status_code=status.HTTP_400_BAD_REQUEST,
             error=True,
-            message=f'Неверный account_id {FAKE_ACCOUNTS[0].id}.'
+            message=f'Неверный параметр: account_id.'
         ).model_dump_json(),
-        status.HTTP_200_OK,
+        status.HTTP_400_BAD_REQUEST,
         does_not_raise(),
     )
 ]
@@ -201,9 +201,9 @@ TEST_ENDPOINT_UPDATE_POSITION: list[tuple[any]] = [
         UpdatePositionResponseSchema(
             status_code=status.HTTP_400_BAD_REQUEST,
             error=True,
-            message=f'Неверный position_id {FAKE_POSITIONS[0].id}.'
+            message=f'Неверный параметр: position_id.'
         ).model_dump_json(),
-        status.HTTP_200_OK,
+        status.HTTP_400_BAD_REQUEST,
         does_not_raise(),
     )
 ]
@@ -228,10 +228,10 @@ TEST_ENDPOINT_DELETE_POSITION: list[tuple[any]] = [
         DeletePositionResponseSchema(
             status_code=status.HTTP_400_BAD_REQUEST,
             error=True,
-            message=f'Неверный position_id {FAKE_POSITIONS[0].id}.'
+            message=f'Неверный параметр: position_id.'
         ).model_dump_json(),
 
-        status.HTTP_200_OK,
+        status.HTTP_400_BAD_REQUEST,
         does_not_raise(),
     ),
 ]

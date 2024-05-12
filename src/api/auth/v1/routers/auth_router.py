@@ -9,6 +9,8 @@ from src.api.auth.schemas import (
     TokenSchema
 )
 
+from src.api.auth.v1.utils.dependencies import is_authenticated_user
+
 router: APIRouter = APIRouter(
     prefix='/auth',
     tags=['auth']
@@ -30,13 +32,12 @@ async def login(
 
 @router.post(
     path='/logout',
-    tags=['protected'],
     response_model=BaseResponseModel
 )
 async def logout(
-    request: Request,
     uow: UnitOfWork = Depends(UnitOfWork),
+    payload: dict = Depends(is_authenticated_user)
 ):
-    account_id: int = request.state.payload['account_id']
+    account_id: int = payload['account_id']
     await AuthService.logout(uow=uow, account_id=account_id)
     return BaseResponseModel()

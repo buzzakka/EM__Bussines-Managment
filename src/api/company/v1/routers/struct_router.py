@@ -1,10 +1,11 @@
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Depends
 from pydantic import UUID4
 
 from src.core.utils import UnitOfWork
 
-from src.api.company.v1.services import PositionService
+from src.api.auth.v1.utils.dependencies import is_admin
 
+from src.api.company.v1.services import PositionService
 from src.api.company.v1.schemas import (
     AddStructRequestSchema,
     AddStructResponseSchema,
@@ -28,15 +29,13 @@ router: APIRouter = APIRouter(
 
 @router.post(
     '/',
-    tags=['protected', 'for_admins'],
     response_model=AddStructResponseSchema
 )
 async def add_struct(
-    request: Request,
     data: AddStructRequestSchema,
+    payload: dict = Depends(is_admin),
     uow: UnitOfWork = Depends(UnitOfWork),
 ):
-    payload: dict = request.state.payload
     company_id: str = payload['company_id']
     response: AddStructResponseSchema = await PositionService.add_struct(
         uow=uow,
@@ -48,16 +47,14 @@ async def add_struct(
 
 @router.patch(
     '/',
-    tags=['protected', 'for_admins'],
     response_model=UpdateStructResponseSchema
 )
 async def update_struct(
-    request: Request,
     data: UpdateStructRequestSchema,
+    payload: dict = Depends(is_admin),
     uow: UnitOfWork = Depends(UnitOfWork)
 ):
     """Изменение подразделения."""
-    payload: dict = request.state.payload
     company_id: str = payload['company_id']
     response: UpdateStructResponseSchema = await PositionService.update_struct(
         uow=uow,
@@ -69,16 +66,14 @@ async def update_struct(
 
 @router.delete(
     '/',
-    tags=['protected', 'for_admins'],
     response_model=DeleteStructResponseSchema
 )
 async def delete_struct(
-    request: Request,
     struct_id: UUID4,
+    payload: dict = Depends(is_admin),
     uow: UnitOfWork = Depends(UnitOfWork),
 ):
     """Удаление подразделения и всех его подразделений."""
-    payload: dict = request.state.payload
     company_id: str = payload['company_id']
     response: DeleteStructResponseSchema = await PositionService.delete_struct(
         uow=uow, struct_id=struct_id, company_id=company_id
@@ -88,15 +83,13 @@ async def delete_struct(
 
 @router.post(
     '/position/',
-    tags=['protected', 'for_admins'],
     response_model=UpdateStructPositionResponseSchema
 )
 async def add_position_to_struct(
-    request: Request,
     data: AddStructPositionRequestSchema,
+    payload: dict = Depends(is_admin),
     uow: UnitOfWork = Depends(UnitOfWork),
 ):
-    payload: dict = request.state.payload
     company_id: str = payload['company_id']
     response: UpdateStructPositionResponseSchema = await PositionService.add_position_to_struct(
         uow=uow, data=data, company_id=company_id
@@ -106,15 +99,13 @@ async def add_position_to_struct(
 
 @router.patch(
     '/position/',
-    tags=['protected', 'for_admins'],
     response_model=UpdateStructPositionResponseSchema
 )
 async def add_position_to_struct(
-    request: Request,
     data: UpdateStructPositionRequestSchema,
+    payload: dict = Depends(is_admin),
     uow: UnitOfWork = Depends(UnitOfWork),
 ):
-    payload: dict = request.state.payload
     company_id: str = payload['company_id']
     response: AddStructPositionResponseSchema = await PositionService.update_struct_position(
         uow=uow, data=data, company_id=company_id
@@ -124,15 +115,13 @@ async def add_position_to_struct(
 
 @router.delete(
     '/position/',
-    tags=['protected', 'for_admins'],
     response_model=DeleteStructPositionResponseSchema
 )
 async def delete_struct_position(
-    request: Request,
     struct_position_id: UUID4,
+    payload: dict = Depends(is_admin),
     uow: UnitOfWork = Depends(UnitOfWork),
 ):
-    payload: dict = request.state.payload
     company_id: str = payload['company_id']
     response: DeleteStructPositionResponseSchema = await PositionService.delete_struct_position(
         uow=uow, struct_position_id=struct_position_id, company_id=company_id

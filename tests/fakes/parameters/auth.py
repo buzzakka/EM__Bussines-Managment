@@ -20,7 +20,6 @@ from src.api.auth.v1.schemas import (
 from src.api.auth.schemas import (
     UserLoginRequestSchema,
     UserLoginResponseSchema,
-    TokenSchema
 )
 
 
@@ -58,9 +57,9 @@ TEST_ENDPOINT_CHECK_ACCOUNT: list[tuple[any]] = [
         CheckAccountResponseSchema(
             status_code=status.HTTP_400_BAD_REQUEST,
             error=True,
-            message='Пользователь user_1@example.com уже зарегистрирован.'
+            message='Пользователь с таким адресом электронной почты уже зарегестрирован.'
         ).model_dump(),
-        status.HTTP_200_OK,
+        status.HTTP_400_BAD_REQUEST,
         does_not_raise(),
     ),
 ]
@@ -89,7 +88,7 @@ TEST_ENDPOINT_SIGN_UP_COMPANY: list[tuple[any]] = [
             error=True,
             message='Неверный адрес электронной почты или токен.'
         ).model_dump(),
-        status.HTTP_200_OK,
+        status.HTTP_400_BAD_REQUEST,
         does_not_raise(),
     ),
 
@@ -103,7 +102,7 @@ TEST_ENDPOINT_SIGN_UP_COMPANY: list[tuple[any]] = [
             error=True,
             message='Неверный адрес электронной почты или токен.'
         ).model_dump(),
-        status.HTTP_200_OK,
+        status.HTTP_400_BAD_REQUEST,
         does_not_raise(),
     ),
 
@@ -115,9 +114,9 @@ TEST_ENDPOINT_SIGN_UP_COMPANY: list[tuple[any]] = [
         SignUpResponseSchema(
             status_code=status.HTTP_400_BAD_REQUEST,
             error=True,
-            message='Аккаунт user_3_2@example.com уже подтвержден.'
+            message='Аккаунт уже подтвержден.'
         ).model_dump(),
-        status.HTTP_200_OK,
+        status.HTTP_400_BAD_REQUEST,
         does_not_raise(),
     ),
 
@@ -129,9 +128,9 @@ TEST_ENDPOINT_SIGN_UP_COMPANY: list[tuple[any]] = [
         SignUpResponseSchema(
             status_code=status.HTTP_400_BAD_REQUEST,
             error=True,
-            message='Пользователь user_1@example.com уже зарегистрирован.'
+            message='Пользователь с таким адресом электронной почты уже зарегестрирован.'
         ).model_dump(),
-        status.HTTP_200_OK,
+        status.HTTP_400_BAD_REQUEST,
         does_not_raise(),
     ),
 ]
@@ -170,9 +169,9 @@ TEST_ENDPOINT_SIGN_UP_COMPLETE_COMPANY: list[tuple[any]] = [
         AccountRegisterResponseSchema(
             status_code=status.HTTP_400_BAD_REQUEST,
             error=True,
-            message='Аккаунт fake_user@example.com не подтвержден.'
+            message='Аккаунт не подтвержден.'
         ).model_dump(),
-        status.HTTP_200_OK,
+        status.HTTP_400_BAD_REQUEST,
         does_not_raise(),
     ),
 
@@ -188,9 +187,9 @@ TEST_ENDPOINT_SIGN_UP_COMPLETE_COMPANY: list[tuple[any]] = [
         AccountRegisterResponseSchema(
             status_code=status.HTTP_400_BAD_REQUEST,
             error=True,
-            message='Пользователь user_2@example.com уже зарегистрирован.'
+            message='Пользователь с таким адресом электронной почты уже зарегестрирован.'
         ).model_dump(),
-        status.HTTP_200_OK,
+        status.HTTP_400_BAD_REQUEST,
         does_not_raise(),
     ),
 
@@ -206,7 +205,7 @@ TEST_ENDPOINT_CONFIRM_EMPLOYEE_ACCOUNT: list[tuple[any]] = [
             error=True,
             message='Неверный адрес электронной почты или токен.'
         ).model_dump(),
-        status.HTTP_200_OK,
+        status.HTTP_400_BAD_REQUEST,
         does_not_raise(),
     ),
 
@@ -219,7 +218,7 @@ TEST_ENDPOINT_CONFIRM_EMPLOYEE_ACCOUNT: list[tuple[any]] = [
             error=True,
             message='Неверный адрес электронной почты или токен.'
         ).model_dump(),
-        status.HTTP_200_OK,
+        status.HTTP_400_BAD_REQUEST,
         does_not_raise(),
     ),
 
@@ -241,9 +240,9 @@ TEST_ENDPOINT_CONFIRM_EMPLOYEE_ACCOUNT: list[tuple[any]] = [
         EmployeConfirmResponseSchema(
             status_code=status.HTTP_400_BAD_REQUEST,
             error=True,
-            message='Аккаунт employee_1@example.com уже подтвержден.'
+            message='Аккаунт уже подтвержден.'
         ).model_dump(),
-        status.HTTP_200_OK,
+        status.HTTP_400_BAD_REQUEST,
         does_not_raise(),
     ),
 ]
@@ -269,9 +268,9 @@ TEST_ENDPOINT_SIGN_UP_COMPLETE_EMPLOYEE: list[tuple[any]] = [
         EmployeeSignUpCompleteResponseSchema(
             status_code=status.HTTP_400_BAD_REQUEST,
             error=True,
-            message='Пользователь employee_1@example.com уже зарегистрирован.'
+            message='Пользователь с таким адресом электронной почты уже зарегестрирован.'
         ).model_dump(),
-        status.HTTP_200_OK,
+        status.HTTP_400_BAD_REQUEST,
         does_not_raise(),
     ),
 
@@ -283,9 +282,9 @@ TEST_ENDPOINT_SIGN_UP_COMPLETE_EMPLOYEE: list[tuple[any]] = [
         EmployeeSignUpCompleteResponseSchema(
             status_code=status.HTTP_400_BAD_REQUEST,
             error=True,
-            message='Аккаунт error@example.com не подтвержден.'
+            message='Аккаунт не подтвержден.'
         ).model_dump(),
-        status.HTTP_200_OK,
+        status.HTTP_400_BAD_REQUEST,
         does_not_raise(),
     ),
 
@@ -297,9 +296,9 @@ TEST_ENDPOINT_SIGN_UP_COMPLETE_EMPLOYEE: list[tuple[any]] = [
         EmployeeSignUpCompleteResponseSchema(
             status_code=status.HTTP_400_BAD_REQUEST,
             error=True,
-            message='Аккаунт employee_2@example.com не подтвержден.'
+            message='Аккаунт не подтвержден.'
         ).model_dump(),
-        status.HTTP_200_OK,
+        status.HTTP_400_BAD_REQUEST,
         does_not_raise(),
     ),
 ]
@@ -313,7 +312,7 @@ TEST_ENDPOINT_INVALID_TOKEN: list[tuple[any]] = [
             error=True,
             message='Неверный адрес электронной почты или пароль.'
         ).model_dump(),
-        status.HTTP_200_OK,
+        status.HTTP_400_BAD_REQUEST,
         does_not_raise(),
     )
 ]

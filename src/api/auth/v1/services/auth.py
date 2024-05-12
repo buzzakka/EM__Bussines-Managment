@@ -1,4 +1,4 @@
-from src.api.auth.utils import exceptions, secret, bad_responses
+from src.api.auth.utils import secret, bad_responses
 from src.core.utils import UnitOfWork, BaseService
 
 from src.api.auth.models import CredentialModel, SecretModel
@@ -15,11 +15,8 @@ class AuthService(BaseService):
     @classmethod
     async def login(cls, uow: UnitOfWork, email: str, password: str) -> UserLoginResponseSchema:
         async with uow:
-            try:
-                await cls._check_account(uow=uow, email=email, password=password)
-                token: str = await cls._create_and_return_jwt(uow=uow, email=email)
-            except exceptions.InvalidEmailOrPassword:
-                return bad_responses.invalid_email_or_password()
+            await cls._check_account(uow=uow, email=email, password=password)
+            token: str = await cls._create_and_return_jwt(uow=uow, email=email)
 
             return UserLoginResponseSchema(payload=TokenSchema(access_token=token))
 
@@ -33,20 +30,20 @@ class AuthService(BaseService):
         account_info: SecretModel = await uow.secret.get_account_info_and_password(email=email)
 
         if account_info is None or not account_info.is_active:
-            raise exceptions.InvalidEmailOrPassword
+            raise bad_responses.invalid_email_or_password()
 
         is_correct_password: bool = secret.validate_password(
             password, account_info.password_hash)
 
         if not is_correct_password:
-            raise exceptions.InvalidEmailOrPassword
+            raise bad_responses.invalid_email_or_password()
 
     @classmethod
     async def _create_and_return_jwt(cls, uow: UnitOfWork, email: str):
         db_payload = await uow.credential.get_payload(email=email)
 
         if db_payload is None:
-            raise exceptions.InvalidEmailOrPassword
+            raise bad_responses.invalid_email_or_password()
 
         payload: dict = secret.make_payload(
             account_id=str(db_payload.account_id),

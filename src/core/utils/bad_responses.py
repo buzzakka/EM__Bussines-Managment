@@ -1,12 +1,8 @@
-from typing import Any
-from fastapi import status
+from fastapi import HTTPException, status
 
-from src.core.schemas import BaseResponseModel
 
-def bad_param(name: str, value: Any, message: str = None):
-    message: str = f'Неdерный параметр {name}: {value}.' if message is None else message
-    return BaseResponseModel(
+def bad_param(param_name: str):
+    return HTTPException(
         status_code=status.HTTP_400_BAD_REQUEST,
-        error=True,
-        message=message
+        detail=f'Неверный параметр: {param_name}.'
     )

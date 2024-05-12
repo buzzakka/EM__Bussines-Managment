@@ -1,9 +1,9 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr
 from src.core.schemas import BaseResponseModel
 
 
 class UserLoginRequestSchema(BaseModel):
-    email: str
+    email: EmailStr
     password: str
 
 

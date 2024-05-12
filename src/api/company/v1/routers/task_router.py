@@ -1,11 +1,12 @@
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Depends
 from pydantic import UUID4
 
 from src.core.schemas import BaseResponseModel
 from src.core.utils import UnitOfWork
 
-from src.api.company.v1.services import TaskService
+from src.api.auth.v1.utils.dependencies import is_admin
 
+from src.api.company.v1.services import TaskService
 from src.api.company.v1.schemas import (
     AddTaskRequestSchema,
     AddTaskResponseSchema,
@@ -22,15 +23,13 @@ router: APIRouter = APIRouter(
 
 @router.post(
     '/',
-    tags=['protected', 'for_admins'],
     response_model=AddTaskResponseSchema
 )
 async def add_task(
-    request: Request,
     data: AddTaskRequestSchema,
+    payload: dict = Depends(is_admin),
     uow: UnitOfWork = Depends(UnitOfWork),
 ):
-    payload: dict = request.state.payload
     account_id: str = payload['account_id']
     company_id: str = payload['company_id']
     response: AddTaskResponseSchema = await TaskService.add_new_task(
@@ -41,15 +40,13 @@ async def add_task(
 
 @router.patch(
     '/',
-    tags=['protected', 'for_admins'],
     response_model=UpdateTaskResponseSchema
 )
 async def update_task(
-    request: Request,
     data: UpdateTaskRequestSchema,
+    payload: dict = Depends(is_admin),
     uow: UnitOfWork = Depends(UnitOfWork),
 ):
-    payload: dict = request.state.payload
     company_id: str = payload['company_id']
     account_id: str = payload['account_id']
     response: UpdateTaskResponseSchema = await TaskService.update_task(
@@ -60,15 +57,13 @@ async def update_task(
 
 @router.delete(
     '/',
-    tags=['protected', 'for_admins'],
     response_model=BaseResponseModel
 )
 async def delete_task(
-    request: Request,
     task_id: UUID4,
+    payload: dict = Depends(is_admin),
     uow: UnitOfWork = Depends(UnitOfWork),
 ):
-    payload: dict = request.state.payload
     company_id: str = payload['company_id']
     response = await TaskService.delete_task(
         uow=uow, company_id=company_id, task_id=task_id
