@@ -3,7 +3,10 @@ from tests.fakes.schemas.model import (
     AccountSchema,
     SecretSchema,
     UserSchema,
+
     CompanySchema,
     MemberSchema,
-    PositionSchema
+    PositionSchema,
+    StructSchema,
+    StructPositionSchema,
 )

@@ -9,6 +9,8 @@ from tests.fakes.database import (
     FAKE_MEMBERS,
     FAKE_COMPANYS,
     FAKE_POSITIONS,
+    FAKE_STRUCT,
+    FAKE_STRUCT_POSITION,
 )
 
 from src.api.auth.models import (
@@ -21,6 +23,8 @@ from src.api.company.models import (
     MemberModel,
     CompanyModel,
     PositionModel,
+    StructAdmModel,
+    StructAdmPositionsModel
 )
 
 
@@ -34,13 +38,18 @@ async def fill_db(setup_db, async_session_maker) -> None:
         (FAKE_MEMBERS, MemberModel),
         (FAKE_COMPANYS, CompanyModel),
         (FAKE_POSITIONS, PositionModel),
+        (FAKE_STRUCT, StructAdmModel),
     ]
 
     async with async_session_maker() as s:
-        await s.execute(select(InviteModel))
         for elem in fake_base:
             fake, model = elem
             for row in fake:
                 obj = model(**row.model_dump())
                 s.add(obj)
+        await s.flush()
+
+        for row in FAKE_STRUCT_POSITION:
+            obj = StructAdmPositionsModel(**row.model_dump())
+            s.add(obj)
         await s.commit()

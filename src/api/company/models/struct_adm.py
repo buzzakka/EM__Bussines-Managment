@@ -2,6 +2,7 @@ from sqlalchemy import ForeignKey, Column, Index, func, UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship, remote, foreign
 from sqlalchemy_utils import LtreeType, Ltree
 
+from pydantic import UUID4
 from uuid import uuid4
 
 from src.api.company.schemas import StructSchema
@@ -35,8 +36,8 @@ class StructAdmModel(Base):
         Index('ix_struct_path', path, postgresql_using='gist'),
     )
 
-    def __init__(self, company_id: str, name: str, parent: 'StructAdmModel' = None):
-        self.id = uuid4()
+    def __init__(self, company_id: str, name: str, parent: 'StructAdmModel' = None, id: UUID4 | None = None, *args, **kwargs):
+        self.id = uuid4() if id is None else id
         self.company_id = company_id
         self.name = name
 
@@ -54,5 +55,5 @@ class StructAdmModel(Base):
             id=self.id,
             company_id=self.company_id,
             name=self.name,
-            path=self.path
+            path=str(self.path)
         )

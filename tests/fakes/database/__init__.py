@@ -9,4 +9,6 @@ from tests.fakes.database.fake_company import (
     FAKE_COMPANYS,
     FAKE_MEMBERS,
     FAKE_POSITIONS,
+    FAKE_STRUCT,
+    FAKE_STRUCT_POSITION,
 )

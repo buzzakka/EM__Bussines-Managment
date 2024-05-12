@@ -267,4 +267,4 @@ class PositionService(BaseService):
             id=member_id, company_id=company_id
         )
         if member_obj is None:
-            raise bad_responses.bad_param('company_id')
+            raise bad_responses.bad_param('member_id')

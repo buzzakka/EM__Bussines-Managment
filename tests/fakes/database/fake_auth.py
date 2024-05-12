@@ -28,7 +28,7 @@ FAKE_INVITES = [
         invite_type=InviteTypes.ACCOUNT,
         is_confirmed=True
     ),
-    
+
     # Пользователи, который подтвердил владение
     InviteSchema(
         id=uuid4(),
@@ -37,7 +37,7 @@ FAKE_INVITES = [
         invite_type=InviteTypes.ACCOUNT,
         is_confirmed=True
     ),
-    
+
     InviteSchema(
         id=uuid4(),
         email='user_3_2@example.com',
@@ -45,7 +45,7 @@ FAKE_INVITES = [
         invite_type=InviteTypes.ACCOUNT,
         is_confirmed=True
     ),
-    
+
     # Пользователь, который не подтвердил владение
     InviteSchema(
         id=uuid4(),
@@ -54,7 +54,7 @@ FAKE_INVITES = [
         invite_type=InviteTypes.ACCOUNT,
         is_confirmed=False
     ),
-    
+
     # Работник, подтвердивший владение
     InviteSchema(
         id=uuid4(),
@@ -119,7 +119,7 @@ FAKE_USERS = [
         first_name='Работник',
         last_name='Аккаунта_2'
     )
-    
+
 ]
 
 

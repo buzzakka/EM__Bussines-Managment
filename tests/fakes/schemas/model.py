@@ -30,11 +30,11 @@ class SecretSchema(BaseModel):
 
 
 class CompanySchema(BaseModel):
-   id: UUID4
-   name: str
+    id: UUID4
+    name: str
 
 
-class  MemberSchema(BaseModel):
+class MemberSchema(BaseModel):
     id: UUID4
     account_id: UUID4
     company_id: UUID4
@@ -46,3 +46,18 @@ class PositionSchema(BaseModel):
     title: str
     description: str | None = None
     company_id: UUID4
+
+
+class StructSchema(BaseModel):
+    id: UUID4
+    company_id: UUID4
+    name: str
+    path: str | None = None
+
+
+class StructPositionSchema(BaseModel):
+    id: UUID4
+    struct_id: UUID4
+    position_id: UUID4
+    member_id: UUID4
+    is_director: bool
