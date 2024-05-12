@@ -1,6 +1,8 @@
 from sqlalchemy import ForeignKey, UUID
 from sqlalchemy.orm import Mapped, mapped_column
 
+from src.api.company.schemas import StructPositionSchema
+
 from src.core.models import Base
 from src.core.models.mixins.custom_types import uuid_pk_T, created_at_T, updated_at_T
 
@@ -22,3 +24,12 @@ class StructAdmPositionsModel(Base):
 
     created_at: Mapped[created_at_T]
     updated_at: Mapped[updated_at_T]
+
+    def to_pydantic_schema(self):
+        return StructPositionSchema(
+            id=self.id,
+            struct_id=self.struct_id,
+            position_id=self.position_id,
+            member_id=self.member_id,
+            is_director=self.is_director
+        )

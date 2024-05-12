@@ -4,6 +4,8 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from src.core.models.base import Base
 from src.core.models.mixins.custom_types import uuid_pk_T
 
+from src.api.company.schemas import MemberSchema
+
 
 class MemberModel(Base):
     __tablename__ = 'member'
@@ -19,3 +21,11 @@ class MemberModel(Base):
 
     account: Mapped['AccountModel'] = relationship(uselist=False)
     company: Mapped['CompanyModel'] = relationship(uselist=False)
+
+    def to_pydantic_schema(self):
+        return MemberSchema(
+            id=self.id,
+            account_id=self.account_id,
+            company_id=self.company_id,
+            is_admin=self.is_admin
+        )

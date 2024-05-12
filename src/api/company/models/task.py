@@ -4,6 +4,8 @@ from typing import Optional
 from sqlalchemy import ForeignKey, UUID, Enum
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
+from src.api.company.schemas import TaskSchema
+
 from src.core.models.base import Base
 from src.core.models.mixins.custom_types import uuid_pk_T, created_at_T, updated_at_T
 
@@ -40,6 +42,17 @@ class TaskModel(Base):
 
     created_at: Mapped[created_at_T]
     updated_at: Mapped[updated_at_T]
+    
+    def to_pydantic_schema(self):
+        return TaskSchema(
+            id=self.id,
+            title=self.title,
+            description=self.description,
+            author_id=self.author_id,
+            responsible_id=self.responsible_id,
+            deadline=self.deadline,
+            status=self.status
+        )
 
 
 class TaskObserversModel(Base):

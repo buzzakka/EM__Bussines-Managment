@@ -3,3 +3,7 @@ from src.api.auth.schemas.auth import (
     UserLoginResponseSchema,
     TokenSchema
 )
+from src.api.auth.schemas.model_schemas import (
+    AccountSchema,
+    UserSchema
+)

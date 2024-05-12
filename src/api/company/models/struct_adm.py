@@ -4,6 +4,8 @@ from sqlalchemy_utils import LtreeType, Ltree
 
 from uuid import uuid4
 
+from src.api.company.schemas import StructSchema
+
 from src.core.models.base import Base
 from src.core.models.mixins.custom_types import uuid_pk_T, created_at_T, updated_at_T
 
@@ -46,3 +48,11 @@ class StructAdmModel(Base):
 
     def __repr__(self):
         return f'Struct({self.name=}, {self.company_id=})'
+
+    def to_pydantic_schema(self):
+        return StructSchema(
+            id=self.id,
+            company_id=self.company_id,
+            name=self.name,
+            path=self.path
+        )

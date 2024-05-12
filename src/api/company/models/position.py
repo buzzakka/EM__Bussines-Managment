@@ -1,6 +1,8 @@
 from sqlalchemy import ForeignKey, UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
+from src.api.company.schemas import PositionSchema
+
 from src.core.models.base import Base
 from src.core.models.mixins.custom_types import (
     uuid_pk_T,
@@ -23,3 +25,11 @@ class PositionModel(Base):
 
     created_at: Mapped[created_at_T]
     updated_at: Mapped[updated_at_T]
+
+    def to_pydantic_schema(self):
+        return PositionSchema(
+            id=self.id,
+            title=self.title,
+            description=self.description,
+            company_id=self.company_id
+        )
