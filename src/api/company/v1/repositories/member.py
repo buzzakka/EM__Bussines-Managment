@@ -1,7 +1,7 @@
 from sqlalchemy import select, and_
 
 from src.api.auth.models import AccountModel, UserModel, SecretModel
-from src.api.company.models import MemberModel, CompanyModel
+from src.api.company.models import MemberModel
 from src.core.utils import SqlAlchemyRepository
 
 

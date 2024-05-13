@@ -36,7 +36,7 @@ class BaseService:
         async with uow:
             _obj: Base = await uow.__dict__[cls.repository].get_by_query_one_or_none(**kwargs)
             return _obj
-    
+
     @classmethod
     async def get_by_query_all(
             cls,
@@ -57,7 +57,7 @@ class BaseService:
         async with uow:
             _obj = await uow.__dict__[cls.repository].update_one_by_id(_id=_id, values=values)
             return _obj
-        
+
     @classmethod
     async def update_one_by_filters(
         cls,

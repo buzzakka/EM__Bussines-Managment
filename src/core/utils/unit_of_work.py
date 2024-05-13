@@ -54,7 +54,7 @@ class UnitOfWork(AbstractUnitOfWork):
         self.secret = SecretRepository(self.session)
         self.account = AccountRepository(self.session)
         self.credential = CredentialRepository(self.session)
-        
+
         self.company = CompanyRepository(self.session)
         self.member = MemberRepository(self.session)
         self.position = PositionRepository(self.session)

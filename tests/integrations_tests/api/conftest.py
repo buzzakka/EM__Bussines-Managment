@@ -13,5 +13,5 @@ async def get_account_jwt(setup_db, client: TestClient) -> str:
     token_type: str = payload['token_type']
     access_token: str = payload['access_token']
     token: str = f'{token_type} {access_token}'
-    
+
     return token

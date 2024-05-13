@@ -70,4 +70,3 @@ class TaskSchema(BaseModel):
     author_id: UUID4
     deadline: datetime
     status: str
-

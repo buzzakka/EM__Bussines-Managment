@@ -1,6 +1,5 @@
-from datetime import datetime
 from pydantic import UUID4
-from sqlalchemy import UUID, Result, delete, insert, select, update
+from sqlalchemy import Result, delete, insert, select, update
 from sqlalchemy.orm import selectinload
 
 from src.core.utils import SqlAlchemyRepository

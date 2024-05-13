@@ -42,7 +42,7 @@ class TaskModel(Base):
 
     created_at: Mapped[created_at_T]
     updated_at: Mapped[updated_at_T]
-    
+
     def to_pydantic_schema(self):
         return TaskSchema(
             id=self.id,

@@ -2,7 +2,6 @@ from fastapi import HTTPException, status
 from pydantic import UUID4
 
 from src.core.utils import BaseService, UnitOfWork, bad_responses
-from src.core.schemas import BaseResponseModel
 
 from src.api.company.models import TaskModel
 from src.api.company.v1.schemas import (
@@ -80,7 +79,7 @@ class TaskService(BaseService):
             task: TaskModel = await cls._check_task_id(uow, task_id, company_id)
 
             task: TaskModel = await uow.task.delete_task(task_id=task_id)
-            
+
             payload: TaskPayloadSchema = TaskPayloadSchema(
                 observers=[str(elem.id) for elem in task.observers],
                 performers=[str(elem.id) for elem in task.performers],

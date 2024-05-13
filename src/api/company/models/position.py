@@ -27,7 +27,7 @@ class PositionModel(Base):
     updated_at: Mapped[updated_at_T]
 
     def to_pydantic_schema(self):
-            return PositionSchema(
+        return PositionSchema(
             id=self.id,
             title=self.title,
             description=self.description

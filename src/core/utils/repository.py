@@ -17,7 +17,7 @@ class AbstractRepository(ABC):
     @abstractmethod
     async def get_by_query_one_or_none(self, *args, **kwargs):
         raise NotImplementedError
-    
+
     @abstractmethod
     async def get_by_query_all(self, *args, **kwargs):
         raise NotImplementedError
@@ -25,7 +25,7 @@ class AbstractRepository(ABC):
     @abstractmethod
     async def update_one_by_id(self, *args, **kwargs):
         raise NotImplementedError
-    
+
     @abstractmethod
     async def update_one_by_filters(self, *args, **kwargs):
         raise NotImplementedError
@@ -55,7 +55,7 @@ class SqlAlchemyRepository(AbstractRepository):
         query = select(self.model).filter_by(**kwargs)
         res: Result = await self.session.execute(query)
         return res.unique().scalar_one_or_none()
-    
+
     async def get_by_query_all(self, **kwargs) -> Sequence[type(model)]:
         query = select(self.model).filter_by(**kwargs)
         res: Result = await self.session.execute(query)
@@ -66,9 +66,10 @@ class SqlAlchemyRepository(AbstractRepository):
                                           _id).values(**values).returning(self.model)
         _obj: Result | None = await self.session.execute(query)
         return _obj.scalar_one_or_none()
-    
+
     async def update_one_by_filters(self, filters: dict, values: dict) -> type(model) | None:
-        query = update(self.model).filter_by(**filters).values(**values).returning(self.model)
+        query = update(self.model).filter_by(
+            **filters).values(**values).returning(self.model)
         result = await self.session.execute(query)
         return result.scalar_one_or_none()
 

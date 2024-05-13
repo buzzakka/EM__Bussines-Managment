@@ -9,7 +9,8 @@ sql_utc_now = text("TIMEZONE('utc', now())")
 
 # Primary key
 int_pk_T = Annotated[int, mapped_column(Integer, primary_key=True)]
-uuid_pk_T = Annotated[uuid4, mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid4)]
+uuid_pk_T = Annotated[uuid4, mapped_column(
+    UUID(as_uuid=True), primary_key=True, default=uuid4)]
 
 # Datetime
 created_at_T = Annotated[

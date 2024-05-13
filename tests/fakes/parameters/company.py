@@ -736,7 +736,7 @@ TEST_ENDPOINT_UPDATE_TASK: list[tuple[any]] = [
         status.HTTP_200_OK,
         does_not_raise(),
     ),
-    
+
     # Изменение задачи с неправильным task_id
     (
         UpdateTaskRequestSchema(
@@ -750,7 +750,7 @@ TEST_ENDPOINT_UPDATE_TASK: list[tuple[any]] = [
         status.HTTP_400_BAD_REQUEST,
         does_not_raise(),
     ),
-    
+
     # Изменение задачи с неправильным responsible_id
     (
         UpdateTaskRequestSchema(
@@ -765,7 +765,7 @@ TEST_ENDPOINT_UPDATE_TASK: list[tuple[any]] = [
         status.HTTP_400_BAD_REQUEST,
         does_not_raise(),
     ),
-    
+
     # Изменение задачи с неправильным observers
     (
         UpdateTaskRequestSchema(
@@ -780,7 +780,7 @@ TEST_ENDPOINT_UPDATE_TASK: list[tuple[any]] = [
         status.HTTP_400_BAD_REQUEST,
         does_not_raise(),
     ),
-    
+
     # Изменение задачи с неправильным performers
     (
         UpdateTaskRequestSchema(
@@ -817,7 +817,7 @@ TEST_ENDPOINT_DELETE_TASK: list[tuple[any]] = [
         status.HTTP_200_OK,
         does_not_raise(),
     ),
-    
+
     # Удаление задачи повторно
     (
         {'task_id': str(FAKE_TASKS[3].id)},
@@ -829,7 +829,7 @@ TEST_ENDPOINT_DELETE_TASK: list[tuple[any]] = [
         status.HTTP_400_BAD_REQUEST,
         does_not_raise(),
     ),
-    
+
     # Удаление чужой задачи
     (
         {'task_id': str(FAKE_TASKS[0].id)},

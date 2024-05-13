@@ -1,4 +1,4 @@
-from sqlalchemy import Result, Select, select
+from sqlalchemy import select
 from src.api.company.models import StructAdmModel
 
 from src.core.utils import SqlAlchemyRepository

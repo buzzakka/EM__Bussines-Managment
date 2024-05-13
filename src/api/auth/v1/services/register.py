@@ -1,4 +1,3 @@
-from fastapi import HTTPException, status
 from random import randint
 
 
@@ -59,7 +58,6 @@ class RegisterService(BaseService):
             is_account_exists: bool = await cls._is_account_exists(uow=uow, email=email)
             if is_account_exists:
                 raise bad_responses.account_exists_response()
-
 
             await cls._confirm_invite_token(uow=uow, email=email, invite_token=token)
 
