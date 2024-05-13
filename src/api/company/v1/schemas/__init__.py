@@ -36,6 +36,8 @@ from src.api.company.v1.schemas.struct_pos import (
     DeleteStructPositionResponseSchema
 )
 from src.api.company.v1.schemas.task import (
+    TaskPayloadSchema,
+
     AddTaskRequestSchema,
     AddTaskResponseSchema,
 

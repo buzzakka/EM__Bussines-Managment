@@ -1,3 +1,4 @@
+from datetime import datetime
 from uuid import uuid4
 
 from tests.fakes.schemas import (
@@ -6,6 +7,7 @@ from tests.fakes.schemas import (
     PositionSchema,
     StructSchema,
     StructPositionSchema,
+    TaskSchema
 )
 from tests.fakes.database.fake_auth import FAKE_ACCOUNTS
 
@@ -124,5 +126,37 @@ FAKE_STRUCT_POSITION = [
         position_id=FAKE_POSITIONS[1].id,
         member_id=FAKE_MEMBERS[3].id,
         is_director=False
+    ),
+]
+
+
+FAKE_TASKS = [
+    TaskSchema(
+        id=uuid4(),
+        title='user_1@gmail.com task',
+        author_id=FAKE_ACCOUNTS[0].id,
+        deadline=datetime(2030, 1, 1),
+        status='OPEN'
+    ),
+    TaskSchema(
+        id=uuid4(),
+        title='user_2@gmail.com task',
+        author_id=FAKE_ACCOUNTS[1].id,
+        deadline=datetime(2030, 1, 1),
+        status='OPEN'
+    ),
+    TaskSchema(
+        id=uuid4(),
+        title='task for update',
+        author_id=FAKE_ACCOUNTS[1].id,
+        deadline=datetime(2030, 1, 1),
+        status='OPEN'
+    ),
+    TaskSchema(
+        id=uuid4(),
+        title='task for delete',
+        author_id=FAKE_ACCOUNTS[1].id,
+        deadline=datetime(2030, 1, 1),
+        status='OPEN'
     ),
 ]

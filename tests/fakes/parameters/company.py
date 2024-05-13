@@ -1,4 +1,5 @@
 from contextlib import nullcontext as does_not_raise
+from datetime import datetime
 from fastapi import status
 
 from src.core.schemas import BaseResponseModel
@@ -24,7 +25,15 @@ from src.api.company.v1.schemas import (
     AddStructPositionRequestSchema,
     UpdateStructPositionRequestSchema,
     UpdateStructPositionResponseSchema,
-    DeleteStructPositionResponseSchema
+    DeleteStructPositionResponseSchema,
+
+    TaskPayloadSchema,
+    AddTaskRequestSchema,
+    AddTaskResponseSchema,
+    UpdateTaskRequestSchema,
+    UpdateTaskResponseSchema,
+    DeleteTaskResponseSchema
+
 )
 from src.api.company.schemas import (
     CompanySchema,
@@ -32,7 +41,7 @@ from src.api.company.schemas import (
     PositionSchema,
     StructSchema,
     StructPositionSchema,
-    TaskSchema
+    TaskSchema,
 )
 from tests.fakes.database.fake_auth import FAKE_ACCOUNTS
 from tests.fakes.database.fake_company import (
@@ -41,6 +50,7 @@ from tests.fakes.database.fake_company import (
     FAKE_COMPANYS,
     FAKE_STRUCT,
     FAKE_STRUCT_POSITION,
+    FAKE_TASKS
 )
 
 
@@ -569,7 +579,7 @@ TEST_ENDPOINT_DELETE_STRUCT_POSITION: list[tuple[any]] = [
         status.HTTP_400_BAD_REQUEST,
         does_not_raise(),
     ),
-    
+
     # Удаление чужой позиции структуры
     (
         {'struct_position_id': FAKE_STRUCT_POSITION[1].id},
@@ -577,6 +587,256 @@ TEST_ENDPOINT_DELETE_STRUCT_POSITION: list[tuple[any]] = [
             status_code=status.HTTP_400_BAD_REQUEST,
             error=True,
             message='Неверный параметр: struct_position_id.'
+        ).model_dump_json(),
+        status.HTTP_400_BAD_REQUEST,
+        does_not_raise(),
+    ),
+]
+
+TEST_ENDPOINT_ADD_TASK: list[tuple[any]] = [
+    # Добавление новой задачи
+    (
+        AddTaskRequestSchema(
+            title='new added task 1',
+            description='descr',
+            responsible_id=FAKE_ACCOUNTS[3].id,
+            deadline=datetime(2030, 1, 1),
+            observers=[FAKE_ACCOUNTS[1].id, FAKE_ACCOUNTS[3].id],
+            performers=[FAKE_ACCOUNTS[1].id, FAKE_ACCOUNTS[3].id],
+        ).model_dump_json(),
+        {
+            'title': 'new added task 1',
+            'description': 'descr',
+            'responsible_id': str(FAKE_ACCOUNTS[3].id),
+            'deadline': '2030-01-01T00:00:00',
+            'author_id': str(FAKE_ACCOUNTS[1].id),
+            'observers': [str(FAKE_ACCOUNTS[1].id), str(FAKE_ACCOUNTS[3].id)],
+            'performers': [str(FAKE_ACCOUNTS[1].id), str(FAKE_ACCOUNTS[3].id)],
+        },
+        status.HTTP_200_OK,
+        does_not_raise(),
+    ),
+    (
+        AddTaskRequestSchema(
+            title='new added task 2',
+            deadline=datetime(2030, 1, 1),
+        ).model_dump_json(),
+        {
+            'title': 'new added task 2',
+            'description': None,
+            'responsible_id': None,
+            'deadline': '2030-01-01T00:00:00',
+            'author_id': str(FAKE_ACCOUNTS[1].id),
+            'observers': [],
+            'performers': [],
+        },
+        status.HTTP_200_OK,
+        does_not_raise(),
+    ),
+
+    # Добавление задачи с неправильным responsible_id
+    (
+        AddTaskRequestSchema(
+            title='error task 3',
+            responsible_id=FAKE_ACCOUNTS[0].id,
+            deadline=datetime(2030, 1, 1),
+        ).model_dump_json(),
+        BaseResponseModel(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            error=True,
+            message='Один из введенных id аккаунта некорректен.'
+        ).model_dump_json(),
+        status.HTTP_400_BAD_REQUEST,
+        does_not_raise(),
+    ),
+
+    # Добавление задачи с неправильным observer_id
+    (
+        AddTaskRequestSchema(
+            title='error task 2',
+            deadline=datetime(2030, 1, 1),
+            observers=[FAKE_ACCOUNTS[0].id]
+        ).model_dump_json(),
+        BaseResponseModel(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            error=True,
+            message='Один из введенных id аккаунта некорректен.'
+        ).model_dump_json(),
+        status.HTTP_400_BAD_REQUEST,
+        does_not_raise(),
+    ),
+
+    # Добавление задачи с неправильным performer_id
+    (
+        AddTaskRequestSchema(
+            title='error task 2',
+            deadline=datetime(2030, 1, 1),
+            performers=[FAKE_ACCOUNTS[0].id]
+        ).model_dump_json(),
+        BaseResponseModel(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            error=True,
+            message='Один из введенных id аккаунта некорректен.'
+        ).model_dump_json(),
+        status.HTTP_400_BAD_REQUEST,
+        does_not_raise(),
+    ),
+]
+
+TEST_ENDPOINT_UPDATE_TASK: list[tuple[any]] = [
+    # Изменение задачи
+    (
+        UpdateTaskRequestSchema(
+            task_id=FAKE_TASKS[2].id,
+            title='new title',
+            description='new descr',
+            responsible_id=FAKE_ACCOUNTS[3].id,
+            deadline=datetime(2040, 2, 2),
+            observers=[FAKE_ACCOUNTS[1].id, FAKE_ACCOUNTS[3].id],
+            performers=[FAKE_ACCOUNTS[1].id, FAKE_ACCOUNTS[3].id],
+            status='IN_PROGRESS'
+        ).model_dump_json(),
+        UpdateTaskResponseSchema(
+            payload=TaskPayloadSchema(
+                id=str(FAKE_TASKS[2].id),
+                title='new title',
+                description='new descr',
+                author_id=str(FAKE_ACCOUNTS[1].id),
+                responsible_id=str(FAKE_ACCOUNTS[3].id),
+                deadline='2040-02-02T00:00:00',
+                status='IN_PROGRESS',
+                observers=[str(FAKE_ACCOUNTS[1].id), str(FAKE_ACCOUNTS[3].id)],
+                performers=[str(FAKE_ACCOUNTS[1].id),
+                            str(FAKE_ACCOUNTS[3].id)],
+            )
+        ).model_dump_json(),
+        status.HTTP_200_OK,
+        does_not_raise(),
+    ),
+
+    # Изменение задачи пустыми значениями, задача не меняется
+    (
+        UpdateTaskRequestSchema(
+            task_id=FAKE_TASKS[2].id
+        ).model_dump_json(exclude_unset=True),
+        UpdateTaskResponseSchema(
+            payload=TaskPayloadSchema(
+                id=str(FAKE_TASKS[2].id),
+                title='new title',
+                description='new descr',
+                author_id=str(FAKE_ACCOUNTS[1].id),
+                responsible_id=str(FAKE_ACCOUNTS[3].id),
+                deadline='2040-02-02T00:00:00',
+                status='IN_PROGRESS',
+                observers=[str(FAKE_ACCOUNTS[1].id), str(FAKE_ACCOUNTS[3].id)],
+                performers=[str(FAKE_ACCOUNTS[1].id),
+                            str(FAKE_ACCOUNTS[3].id)],
+            )
+        ).model_dump_json(),
+        status.HTTP_200_OK,
+        does_not_raise(),
+    ),
+    
+    # Изменение задачи с неправильным task_id
+    (
+        UpdateTaskRequestSchema(
+            task_id=FAKE_TASKS[0].id
+        ).model_dump_json(exclude_unset=True),
+        BaseResponseModel(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            error=True,
+            message='Неверный параметр: task_id.'
+        ).model_dump_json(),
+        status.HTTP_400_BAD_REQUEST,
+        does_not_raise(),
+    ),
+    
+    # Изменение задачи с неправильным responsible_id
+    (
+        UpdateTaskRequestSchema(
+            task_id=FAKE_TASKS[2].id,
+            responsible_id=FAKE_TASKS[0].id,
+        ).model_dump_json(exclude_unset=True),
+        BaseResponseModel(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            error=True,
+            message='Один из введенных id аккаунта некорректен.'
+        ).model_dump_json(),
+        status.HTTP_400_BAD_REQUEST,
+        does_not_raise(),
+    ),
+    
+    # Изменение задачи с неправильным observers
+    (
+        UpdateTaskRequestSchema(
+            task_id=FAKE_TASKS[2].id,
+            observers=[FAKE_TASKS[0].id]
+        ).model_dump_json(exclude_unset=True),
+        BaseResponseModel(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            error=True,
+            message='Один из введенных id аккаунта некорректен.'
+        ).model_dump_json(),
+        status.HTTP_400_BAD_REQUEST,
+        does_not_raise(),
+    ),
+    
+    # Изменение задачи с неправильным performers
+    (
+        UpdateTaskRequestSchema(
+            task_id=FAKE_TASKS[2].id,
+            performers=[FAKE_TASKS[0].id]
+        ).model_dump_json(exclude_unset=True),
+        BaseResponseModel(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            error=True,
+            message='Один из введенных id аккаунта некорректен.'
+        ).model_dump_json(),
+        status.HTTP_400_BAD_REQUEST,
+        does_not_raise(),
+    ),
+]
+
+TEST_ENDPOINT_DELETE_TASK: list[tuple[any]] = [
+    # Удаление задачи
+    (
+        {'task_id': str(FAKE_TASKS[3].id)},
+        DeleteTaskResponseSchema(
+            payload=TaskPayloadSchema(
+                id=str(FAKE_TASKS[3].id),
+                title=FAKE_TASKS[3].title,
+                description=None,
+                author_id=str(FAKE_ACCOUNTS[1].id),
+                responsible_id=None,
+                deadline='2030-01-01T00:00:00',
+                status='OPEN',
+                observers=[],
+                performers=[],
+            )
+        ).model_dump_json(),
+        status.HTTP_200_OK,
+        does_not_raise(),
+    ),
+    
+    # Удаление задачи повторно
+    (
+        {'task_id': str(FAKE_TASKS[3].id)},
+        BaseResponseModel(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            error=True,
+            message='Неверный параметр: task_id.'
+        ).model_dump_json(),
+        status.HTTP_400_BAD_REQUEST,
+        does_not_raise(),
+    ),
+    
+    # Удаление чужой задачи
+    (
+        {'task_id': str(FAKE_TASKS[0].id)},
+        BaseResponseModel(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            error=True,
+            message='Неверный параметр: task_id.'
         ).model_dump_json(),
         status.HTTP_400_BAD_REQUEST,
         does_not_raise(),

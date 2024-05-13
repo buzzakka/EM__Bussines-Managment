@@ -20,6 +20,10 @@ from tests.fakes.parameters.company import (
     TEST_ENDPOINT_ADD_STRUCT_POSITION,
     TEST_ENDPOINT_UPDATE_STRUCT_POSITION,
     TEST_ENDPOINT_DELETE_STRUCT_POSITION,
+
+    TEST_ENDPOINT_ADD_TASK,
+    TEST_ENDPOINT_UPDATE_TASK,
+    TEST_ENDPOINT_DELETE_TASK
 )
 import json
 
@@ -243,7 +247,7 @@ class TestCompanyRouterV1:
         'data, expected_result, expected_status, expectation',
         TEST_ENDPOINT_ADD_STRUCT_POSITION
     )
-    def test_add_struct(
+    def test_add_struct_position(
         self,
         client: TestClient,
         get_account_jwt,
@@ -308,3 +312,72 @@ class TestCompanyRouterV1:
             assert response.status_code == expected_status
             assert response.json() == json.loads(expected_result)
 
+    @pytest.mark.parametrize(
+        'data, expected_result, expected_status, expectation',
+        TEST_ENDPOINT_ADD_TASK
+    )
+    def test_add_task(
+        self,
+        client: TestClient,
+        get_account_jwt,
+        data, expected_result, expected_status, expectation
+    ):
+        with expectation:
+            response: Response = client.post(
+                '/api/v1/company/tasks/',
+                data=data,
+                headers={'Authorization': get_account_jwt}
+            )
+            assert response.status_code == expected_status
+
+            response_data: dict = response.json()
+
+            if response.status_code == status.HTTP_200_OK:
+                payload: dict = response_data['payload']
+
+                assert 'id' in payload
+                assert is_valid_uuid(payload['id'])
+
+                for key, value in expected_result.items():
+                    assert key in payload
+                    assert payload[key] == value
+            else:
+                assert response_data == json.loads(expected_result)
+
+    @pytest.mark.parametrize(
+        'data, expected_result, expected_status, expectation',
+        TEST_ENDPOINT_UPDATE_TASK
+    )
+    def test_update_task(
+        self,
+        client: TestClient,
+        get_account_jwt,
+        data, expected_result, expected_status, expectation,
+    ):
+        with expectation:
+            response: Response = client.patch(
+                '/api/v1/company/tasks/',
+                data=data,
+                headers={'Authorization': get_account_jwt}
+            )
+            assert response.status_code == expected_status
+            assert response.json() == json.loads(expected_result)
+
+    @pytest.mark.parametrize(
+        'data, expected_result, expected_status, expectation',
+        TEST_ENDPOINT_DELETE_TASK
+    )
+    def test_delete_task(
+        self,
+        client: TestClient,
+        get_account_jwt,
+        data, expected_result, expected_status, expectation,
+    ):
+        with expectation:
+            response: Response = client.delete(
+                '/api/v1/company/tasks/',
+                params=data,
+                headers={'Authorization': get_account_jwt}
+            )
+            assert response.status_code == expected_status
+            assert response.json() == json.loads(expected_result)

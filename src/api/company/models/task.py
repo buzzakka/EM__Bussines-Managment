@@ -11,9 +11,9 @@ from src.core.models.mixins.custom_types import uuid_pk_T, created_at_T, updated
 
 
 class TaskStatus(enum.Enum):
-    OPEN: str = "OPEN"
-    IN_PROGRESS: str = "IN_PROGRESS"
-    COMPLETED: str = "COMPLETED"
+    OPEN: str = 'OPEN'
+    IN_PROGRESS: str = 'IN_PROGRESS'
+    COMPLETED: str = 'COMPLETED'
 
 
 class TaskModel(Base):

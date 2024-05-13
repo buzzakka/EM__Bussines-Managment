@@ -54,13 +54,15 @@ class TaskRepository(SqlAlchemyRepository):
         performers: list[UUID4] | None = None,
         **kwargs
     ):
-        update_query = (
+        query = (
             update(self.model)
             .where(self.model.id == task_id)
             .values(**kwargs)
+            .options(selectinload(TaskModel.performers))
+            .options(selectinload(TaskModel.observers))
             .returning(self.model)
         )
-        obj: Result = await self.session.execute(update_query)
+        obj: Result = await self.session.execute(query)
         task: TaskModel = obj.scalars().first()
 
         if observers is not None:
@@ -90,6 +92,18 @@ class TaskRepository(SqlAlchemyRepository):
             for account in account_objs.scalars().all():
                 task.performers.append(account)
 
+        return task
+
+    async def delete_task(self, task_id: UUID4):
+        query = (
+            delete(self.model)
+            .returning(self.model)
+            .filter_by(id=task_id)
+            .options(selectinload(TaskModel.performers))
+            .options(selectinload(TaskModel.observers))
+        )
+        obj: Result = await self.session.execute(query)
+        task: TaskModel = obj.scalars().first()
         return task
 
     async def get_companys_members_by_ids(

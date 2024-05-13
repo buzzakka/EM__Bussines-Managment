@@ -6,6 +6,7 @@ from src.core.schemas import BaseResponseModel
 
 from src.api.company.models import TaskModel
 from src.api.company.v1.schemas import (
+    TaskPayloadSchema,
     AddTaskRequestSchema,
     AddTaskResponseSchema,
     UpdateTaskRequestSchema,
@@ -25,26 +26,21 @@ class TaskService(BaseService):
         data: AddTaskRequestSchema
     ) -> AddTaskResponseSchema:
         async with uow:
-            try:
-                await cls._check_ids(
-                    uow,
-                    company_id,
-                    author_id,
-                    data.responsible_id,
-                    data.observers,
-                    data.performers
-                )
-            except ValueError:
-                return BaseResponseModel(
-                    status_code=status.HTTP_400_BAD_REQUEST,
-                    error=False,
-                    message='Один из введенных id неверный.'
-                )
+            await cls._check_ids(
+                uow,
+                company_id, author_id,
+                data.responsible_id, data.observers, data.performers
+            )
 
             task: TaskModel = await uow.task.add_task(author_id=author_id, **data.model_dump())
+            payload: TaskPayloadSchema = TaskPayloadSchema(
+                observers=[str(elem.id) for elem in task.observers],
+                performers=[str(elem.id) for elem in task.performers],
+                **(task.to_pydantic_schema().model_dump())
+            )
 
             return AddTaskResponseSchema(
-                payload=task.to_pydantic_schema()
+                payload=payload
             )
 
     @classmethod
@@ -64,9 +60,14 @@ class TaskService(BaseService):
             await cls._check_task_id(uow, data.task_id, company_id)
 
             task: TaskModel = await uow.task.update_task(**data.model_dump(exclude_unset=True))
+            payload: TaskPayloadSchema = TaskPayloadSchema(
+                observers=[str(elem.id) for elem in task.observers],
+                performers=[str(elem.id) for elem in task.performers],
+                **(task.to_pydantic_schema().model_dump())
+            )
 
             return UpdateTaskResponseSchema(
-                payload=task.to_pydantic_schema()
+                payload=payload
             )
 
     @classmethod
@@ -78,10 +79,16 @@ class TaskService(BaseService):
         async with uow:
             task: TaskModel = await cls._check_task_id(uow, task_id, company_id)
 
-            await uow.task.delete_by_query(id=task_id)
+            task: TaskModel = await uow.task.delete_task(task_id=task_id)
+            
+            payload: TaskPayloadSchema = TaskPayloadSchema(
+                observers=[str(elem.id) for elem in task.observers],
+                performers=[str(elem.id) for elem in task.performers],
+                **(task.to_pydantic_schema().model_dump())
+            )
 
             return UpdateTaskResponseSchema(
-                payload=task.to_pydantic_schema()
+                payload=payload
             )
 
     @classmethod

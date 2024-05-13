@@ -9,4 +9,5 @@ from tests.fakes.schemas.model import (
     PositionSchema,
     StructSchema,
     StructPositionSchema,
+    TaskSchema,
 )

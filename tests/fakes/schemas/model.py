@@ -1,3 +1,4 @@
+from datetime import datetime
 from pydantic import BaseModel, UUID4, EmailStr
 from src.api.auth.models import InviteTypes
 
@@ -61,3 +62,12 @@ class StructPositionSchema(BaseModel):
     position_id: UUID4
     member_id: UUID4
     is_director: bool
+
+
+class TaskSchema(BaseModel):
+    id: UUID4
+    title: str
+    author_id: UUID4
+    deadline: datetime
+    status: str
+
